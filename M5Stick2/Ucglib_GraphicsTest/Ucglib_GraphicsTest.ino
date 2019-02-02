@@ -1,6 +1,6 @@
 
 #include <SPI.h>
-#include "Ucglib.h"
+#include "src/Ucglib/src/Ucglib.h"
 
 #include <Wire.h>
 
@@ -22,7 +22,7 @@ Ucglib_ST7735_18x128x160_HWSPI ucg(/*cd=*/ 23, /*cs=*/ 5, /*reset=*/ 18);
   c = 17
   a-1 = 64 --> a = 65
 */
-uint8_t z = 127;	// start value
+uint8_t z = 127;        // start value
 uint32_t lcg_rnd(void) {
   z = (uint8_t)((uint16_t)65 * (uint16_t)z + (uint16_t)17);
   return (uint32_t)z;
@@ -156,16 +156,21 @@ void color_test(void)
   mx = ucg.getWidth() / 2;
   //my = ucg.getHeight() / 2;
 
+  Serial.printf("w=%d, h=%d\n", ucg.getWidth(), ucg.getHeight());
   ucg.setColor(0, 0, 0, 0);
   ucg.drawBox(0, 0, ucg.getWidth(), ucg.getHeight());
 
   ucg.setColor(255, 255, 255);
-  ucg.setPrintPos(2, 18);
+  ucg.setPrintPos(40, 40);
+  // ucg.setPrintPos(2, 18);
   ucg.setPrintDir(0);
   ucg.print("Color Test");
 
-  ucg.setColor(0, 127, 127, 127);
+  ucg.setColor(0, 80, 80, 80);
   ucg.drawBox(0, 20, 16 * 4 + 4, 5 * 8 + 4);
+
+  ucg.setColor(0, 200, 200, 0);
+  ucg.drawBox(0, 0, 79, 79);
 
   for ( c = 0, x = 2; c <= 255; c += 17, x += 4 )
   {
@@ -179,9 +184,10 @@ void color_test(void)
     ucg.drawBox(x, 22 + 3 * 8, 4, 8);
     ucg.setColor(0, c, 255 - c, 0);
     ucg.drawBox(x, 22 + 4 * 8, 4, 8);
-
   }
 
+  ucg.setColor(0, 0, 255, 255);
+  ucg.drawFrame(1, 1, 78, 78);
   DLY();
 }
 
@@ -335,7 +341,7 @@ void fonts(void)
   ucg.setFontMode(UCG_FONT_MODE_SOLID);
 
   ucg.setColor(255, 200, 170);
-  ucg.setColor(1, 0, 100, 120);		// background color in solid mode
+  ucg.setColor(1, 0, 100, 120);                // background color in solid mode
   ucg.setFont(ucg_font_helvB08_hr);
   ucg.setPrintPos(2, 75 + 30 + d);
   ucg.print("ABC abc 123");
@@ -364,10 +370,10 @@ void fonts(void)
 
 void clip(void)
 {
-  ucg.setColor(0, 0x00, 0xd1, 0x5e);		// dark green
-  ucg.setColor(1, 0xff, 0xf7, 0x61);		// yellow
-  ucg.setColor(2, 0xd1, 0xc7, 0x00);			// dark yellow
-  ucg.setColor(3, 0x61, 0xff, 0xa8);		// green
+  ucg.setColor(0, 0x00, 0xd1, 0x5e);                // dark green
+  ucg.setColor(1, 0xff, 0xf7, 0x61);                // yellow
+  ucg.setColor(2, 0xd1, 0xc7, 0x00);                        // dark yellow
+  ucg.setColor(3, 0x61, 0xff, 0xa8);                // green
 
   ucg.drawGradientBox(0, 0, ucg.getWidth(), ucg.getHeight());
 
@@ -488,8 +494,8 @@ void beginPower() {
   Wire.endTransmission();
 }
 
-void setup(void)
-{
+void setup(void) {
+  Serial.begin(115200);
   delay(1000);
   beginPower();
   ucg.begin(UCG_FONT_MODE_TRANSPARENT);
@@ -512,9 +518,8 @@ void set_clip_range(void)
 
 
 uint8_t r = 0;
-void loop(void)
-{
-  ucg.setRotate90();
+void loop(void) {
+  // ucg.setRotate90();
   //  switch (r & 3)
   //  {
   //    case 0: ucg.undoRotate(); break;
@@ -529,18 +534,18 @@ void loop(void)
   //    set_clip_range();
   //  }
 
-//  r++;
-  ucglib_graphics_test();
-  cross();
-  pixel_and_lines();
+  //  r++;
+  // ucglib_graphics_test();
+  //  cross();
+  //  pixel_and_lines();
   color_test();
-  triangle();
-  fonts();
-  text();
-//  if ( r <= 3 )
-//    clip();
-  box();
-  gradient();
+  //  triangle();
+  //  fonts();
+  //  text();
+  //  if ( r <= 3 )
+  //    clip();
+  //  box();
+  //  gradient();
   //ucg.clearScreen();
   DLY();
   ucg.setMaxClipRange();
