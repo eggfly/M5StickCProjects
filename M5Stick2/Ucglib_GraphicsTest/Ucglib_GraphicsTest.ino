@@ -519,7 +519,7 @@ void set_clip_range(void)
 
 uint8_t r = 0;
 void loop(void) {
-  // ucg.setRotate90();
+  ucg.setRotate90();
   //  switch (r & 3)
   //  {
   //    case 0: ucg.undoRotate(); break;
