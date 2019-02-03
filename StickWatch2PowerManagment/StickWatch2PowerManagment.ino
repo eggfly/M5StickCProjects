@@ -198,6 +198,9 @@ void homePressed() {
 }
 
 void setup(void) {
+  pinMode(BUTTON_HOME, INPUT | PULLUP);
+  pinMode(BUTTON_PIN, INPUT | PULLUP);
+
   Serial.begin(115200);
   attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), homePressed, FALLING);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, 0);
