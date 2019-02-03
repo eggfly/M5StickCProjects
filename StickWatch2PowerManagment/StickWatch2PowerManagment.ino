@@ -11,6 +11,10 @@ Ucglib_ST7735_18x128x160_HWSPI ucg(/*cd=*/ 23, /*cs=*/ 5, /*reset=*/ 18);
 #define T 4000
 #define DLY() delay(1000)
 
+int BUTTON_HOME = GPIO_NUM_37;
+int BUTTON_PIN = GPIO_NUM_39;
+
+
 void color_test(void)
 {
   ucg_int_t mx;
@@ -181,9 +185,22 @@ void beginPower() {
   Wire.endTransmission();
 }
 
+void shutdown_all_except_self() {
+  Wire.beginTransmission(0x34);
+  Wire.write(0x12);
+  Wire.write(0x01);
+  Wire.endTransmission();
+}
+
+//中断函数
+void homePressed() {
+  shutdown_all_except_self();
+}
+
 void setup(void) {
   Serial.begin(115200);
-  delay(1000);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), homePressed, FALLING);
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, 0);
   beginPower();
   ucg.begin(UCG_FONT_MODE_TRANSPARENT);
   ucg.setFont(ucg_font_ncenR14_hr);
