@@ -192,9 +192,11 @@ void shutdown_all_except_self() {
   Wire.endTransmission();
 }
 
+boolean need_shutdown = false;
+
 //中断函数
 void homePressed() {
-  shutdown_all_except_self();
+  need_shutdown = true;
 }
 
 void setup(void) {
@@ -210,11 +212,24 @@ void setup(void) {
   ucg.clearScreen();
 }
 
-uint8_t r = 0;
 void loop(void) {
   ucg.setRotate90();
   color_test();
   testAXP();
   DLY();
   ucg.setMaxClipRange();
+  if (need_shutdown) {
+    shutdown_all_except_self();
+    Serial.println("\r\nGoing to sleep now\r\n");
+    esp_deep_sleep_start();
+    Serial.println("This will never be printed");
+  }
+  //  if (digitalRead(BUTTON_HOME) == 0) {
+  //    while (digitalRead(BUTTON_HOME) == 0);
+  //    delay(100);
+  //    shutdown_all_except_self();
+  //    Serial.println("\r\nGoing to sleep now\r\n");
+  //    esp_deep_sleep_start();
+  //    Serial.println("This will never be printed");
+  //  }
 }
