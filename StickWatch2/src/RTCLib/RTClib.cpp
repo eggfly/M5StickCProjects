@@ -414,7 +414,6 @@ DateTime DS1307::now() {
 
 uint8_t DS3231::begin(void) {
   write(DS3231_CONTROL_ADDR, DS3231_INTC);
-  return 1;
 }
 
 uint8_t DS3231::read(const uint8_t addr) {
@@ -515,7 +514,7 @@ DateTime PCF8583::now()
   uint8_t year = (int)((incoming >> 6) & 0x03); // it will only hold 4 years...
   incoming = Wire.read();
   uint8_t month = bcd2bin(incoming & 0x1f);
-  // uint8_t dow = incoming >> 5;
+  uint8_t dow = incoming >> 5;
 
   // but that's not all - we need to find out what the base year is
   // so we can add the 2 bits we got above and find the real year
@@ -641,12 +640,9 @@ DateTime PCF8563::now()
   uint8_t minute = bcd2bin(Wire.read() & 0x7F);
   uint8_t hour = bcd2bin(Wire.read() & 0x3F);
   uint8_t day = bcd2bin(Wire.read() & 0x3F);
-  
-  // uint8_t wekday = Wire.read() & 0x07; // year/date counter
-  Wire.read(); // year/date counter
-  
+  uint8_t wekday = Wire.read() & 0x07; // year/date counter
   uint8_t month = Wire.read();
-  // uint8_t century = month >> 7;
+  uint8_t century = month >> 7;
   month = bcd2bin(month & 0x1F);
   uint8_t year = bcd2bin(Wire.read()); // it will only hold 4 years...
   return DateTime (year, month, day, hour, minute, second);
@@ -676,7 +672,6 @@ uint8_t PCF8563::isrunning(void){
   
   status1 = Wire.read();
   status2 = Wire.read();
-  Serial.printf("status1: %d\n", status1);
   return !(bitRead(status1,5));
 }
 

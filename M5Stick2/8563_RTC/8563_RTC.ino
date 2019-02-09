@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include "RTClib.h"
+#include "src/RTCLib/RTClib.h"
 
 PCF8563 rtc;
 
@@ -8,11 +8,11 @@ void setup () {
   Wire.begin();
   rtc.begin();
   rtc.isrunning();
-//  if (!rtc.isrunning()) {
-//    Serial.println("RTC is NOT running!");
-//    // following line sets the RTC to the date & time this sketch was compiled
-//    rtc.adjust(DateTime(__DATE__, __TIME__));
-//  }
+  //  if (!rtc.isrunning()) {
+  //    Serial.println("RTC is NOT running!");
+  //    // following line sets the RTC to the date & time this sketch was compiled
+  //    rtc.adjust(DateTime(__DATE__, __TIME__));
+  //  }
 }
 
 void loop () {
