@@ -144,6 +144,9 @@ void drawAXP() {
   unsigned long loop_start = millis();
 
   ucg.setColor(255, 255, 255);
+
+  ucg.drawString(80, 20, 2, "TEST");
+
   ucg.setPrintDir(0);
   ucg.setPrintPos(2, 40);
   ucg.print(data0_bin);
@@ -200,6 +203,63 @@ void drawAXP() {
   ucg.print(ccc, 2);
   ucg.print("mAh");
   Serial.printf("time0: %ld\n", millis() - loop_start);
+}
+
+
+
+void drawAXP2() {
+  unsigned long loop_start = millis();
+
+  ucg.setColor(255, 255, 255);
+
+  ucg.drawString(2, 40, 0, data0_bin);
+  ucg.drawString(42, 40, 0, data1_bin);
+
+  char buf[64] = "";
+
+  sprintf(buf, "vbat:%.4fV", vbat_v);
+  ucg.drawString(2, 50, 0, buf);
+
+  sprintf(buf, "charge:%dmA", charge);
+  ucg.drawString(2, 60, 0, buf);
+
+  sprintf(buf, "disCHG:%dmA", discharge);
+  ucg.drawString(2, 70, 0, buf);
+
+  sprintf(buf, "temp:%f C", temperature);
+  ucg.drawString(2, 80, 0, buf);
+
+  sprintf(buf, "temp:%f C", temperature);
+  ucg.setPrintPos(2, 90);
+  ucg.print("watt:");
+  ucg.print(bat_mw, 3);
+  ucg.print("mW");
+
+  ucg.setPrintPos(85, 40);
+  ucg.print("Vin:");
+  ucg.print(vbus_mv, 2);
+  ucg.print("mV");
+
+  ucg.setPrintPos(85, 50);
+  ucg.print("Iin:");
+  ucg.print(ibus_ma, 2);
+  ucg.print("mA");
+
+  ucg.setPrintPos(85, 60);
+  ucg.print("CoIn:");
+  ucg.print(coin);
+  // ucg.print("?");
+
+  ucg.setPrintPos(85, 70);
+  ucg.print("CoOut:");
+  ucg.print(coout);
+  // ucg.print("?");
+
+  ucg.setPrintPos(85, 80);
+  ucg.print("ccc:");
+  ucg.print(ccc, 2);
+  ucg.print("mAh");
+  Serial.printf("AXP2 time0: %ld\n", millis() - loop_start);
 }
 
 uint8_t read_register(uint8_t deviceAddr, uint8_t regAddr) {
@@ -347,12 +407,10 @@ void setup(void) {
 
 void show_time() {
   DateTime now = rtc.now();
-  char buf[100];
+  char buf[32];
   strncpy(buf, "YYYY.MM.DD hh:mm:ss\0", 100);
-  Serial.println(now.format(buf));
-
-  ucg.setPrintPos(40, 100);
-  ucg.print(buf);
+  // Serial.println(now.format(buf));
+  ucg.drawString(40, 100, 0, buf);
 }
 
 void loop(void) {
@@ -362,7 +420,7 @@ void loop(void) {
   Serial.printf("time0: %ld\n", millis() - loop_start);
   readAXP();
   Serial.printf("time1: %ld\n", millis() - loop_start);
-  drawAXP();
+  drawAXP2();
   Serial.printf("time2: %ld\n", millis() - loop_start);
   show_time();
   Serial.printf("time3: %ld\n", millis() - loop_start);
