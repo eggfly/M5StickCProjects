@@ -221,7 +221,8 @@ void beginPower() {
 
   Wire.beginTransmission(0x34);
   Wire.write(0x28);
-  Wire.write(0xff); //Enable LDO2&LDO3, LED&TFT 3.3V
+  Wire.write(0x9f); //Enable LDO2&LDO3, LED&TFT 3.3V
+  // 背光亮度通过LDO2调节
   Wire.endTransmission();
 
   Wire.beginTransmission(0x34);
