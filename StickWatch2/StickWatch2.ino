@@ -1,4 +1,3 @@
-
 #include <SPI.h>
 #include "src/Ucglib/src/Ucglib.h"
 #include "src/RTCLib/RTClib.h"
@@ -17,29 +16,8 @@ Ucglib_ST7735_18x128x160_HWSPI ucg(/*cd=*/ 23, /*cs=*/ 5, /*reset=*/ 18);
 int BUTTON_HOME = GPIO_NUM_37;
 int BUTTON_PIN = GPIO_NUM_39;
 
-
-void color_test(void) {
-  ucg_int_t mx;
+void color_test() {
   uint16_t c, x;
-  mx = ucg.getWidth() / 2;
-  //my = ucg.getHeight() / 2;
-
-  // Serial.printf("w=%d, h=%d\n", ucg.getWidth(), ucg.getHeight());
-  ucg.setColor(0, 255, 0, 0);
-  ucg.setColor(1, 0, 255, 0);
-  ucg.setColor(2, 255, 0, 255);
-  ucg.setColor(3, 0, 255, 255);
-  // ucg.drawBox(0, 0, ucg.getWidth(), ucg.getHeight());
-  ucg.drawGradientBox(0, 0 + 30, 161, 80 + 30);
-  // ucg.clearScreen();
-  //  ucg.setColor(255, 255, 255);
-
-  //  ucg.setColor(0, 80, 80, 80);
-  //  ucg.drawBox(0, 20, 16 * 4 + 4, 5 * 8 + 4);
-
-  //  ucg.setColor(0, 200, 200, 0);
-  //  ucg.drawBox(0, 0, 79, 79);
-
   for ( c = 0, x = 2; c <= 255; c += 17, x += 4 ) {
     ucg.setColor(0, c, c, c);
     ucg.drawBox(x, -12, 4, 8);
@@ -54,6 +32,29 @@ void color_test(void) {
   }
 }
 
+#define COLOR_COUNT 6
+
+int color_index = 0;
+uint8_t color_r[COLOR_COUNT] = {255,   0,   0, 255, 0,   255};
+uint8_t color_g[COLOR_COUNT] = {  0, 255,   0, 255, 255,   0};
+uint8_t color_b[COLOR_COUNT] = {  0,   0, 255,   0, 255, 255};
+
+void draw_background(void) {
+  ucg_int_t mx;
+  mx = ucg.getWidth() / 2;
+  //my = ucg.getHeight() / 2;
+
+  // Serial.printf("w=%d, h=%d\n", ucg.getWidth(), ucg.getHeight());
+  color_index++;
+  int i = color_index % COLOR_COUNT;
+  Serial.printf("color index: %d", i);
+  ucg.setColor(0, color_r[i], color_g[i], color_b[i]);
+  ucg.setColor(1, color_r[(i + 1) % COLOR_COUNT], color_g[(i + 1) % COLOR_COUNT], color_b[(i + 1) % COLOR_COUNT]);
+  ucg.setColor(2, color_r[(i + 2) % COLOR_COUNT], color_g[(i + 2) % COLOR_COUNT], color_b[(i + 2) % COLOR_COUNT]);
+  ucg.setColor(3, color_r[(i + 3) % COLOR_COUNT], color_g[(i + 3) % COLOR_COUNT], color_b[(i + 3) % COLOR_COUNT]);
+  // ucg.drawBox(0, 0, ucg.getWidth(), ucg.getHeight());
+  ucg.drawGradientBox(0, 0 + 20, 161, 80 + 20);
+}
 
 double acin_mv = 0;
 double acin_current = 0;
@@ -142,14 +143,12 @@ void readAXP() {
 
 void drawAXP() {
   unsigned long loop_start = millis();
-
   ucg.setColor(255, 255, 255);
-
-  ucg.drawString(80, 20, 2, "TEST");
 
   ucg.setPrintDir(0);
   ucg.setPrintPos(2, 40);
   ucg.print(data0_bin);
+
   ucg.setPrintPos(42, 40);
   ucg.print(data1_bin);
 
@@ -173,10 +172,10 @@ void drawAXP() {
   ucg.print(temperature);
   ucg.print(" C");
 
-  ucg.setPrintPos(2, 90);
-  ucg.print("watt:");
-  ucg.print(bat_mw, 3);
-  ucg.print("mW");
+  //  ucg.setPrintPos(2, 90);
+  //  ucg.print("watt:");
+  //  ucg.print(bat_mw, 3);
+  //  ucg.print("mW");
 
   ucg.setPrintPos(85, 40);
   ucg.print("Vin:");
@@ -188,20 +187,34 @@ void drawAXP() {
   ucg.print(ibus_ma, 2);
   ucg.print("mA");
 
-  ucg.setPrintPos(85, 60);
-  ucg.print("CoIn:");
-  ucg.print(coin);
-  // ucg.print("?");
+  //  ucg.setPrintPos(85, 60);
+  //  ucg.print("CoIn:");
+  //  ucg.print(coin);
+  //
+  //  ucg.setPrintPos(85, 70);
+  //  ucg.print("CoOut:");
+  //  ucg.print(coout);
+  //
+  //  ucg.setPrintPos(85, 80);
+  //  ucg.print("ccc:");
+  //  ucg.print(ccc, 2);
+  //  ucg.print("mAh");
 
-  ucg.setPrintPos(85, 70);
-  ucg.print("CoOut:");
-  ucg.print(coout);
-  // ucg.print("?");
+  char charge_status[128] = "";
+  boolean battery_charging = is_charging();
+  boolean has_usb = usb_plugged_in();
+  if (has_usb) {
+    if (battery_charging) {
+      sprintf(charge_status, "Charging..");
+    } else {
+      sprintf(charge_status, "Charge full");
+    }
+  } else {
+    sprintf(charge_status, "Using battery.");
+  }
+  ucg.setPrintPos(70, 30);
+  ucg.print(charge_status);
 
-  ucg.setPrintPos(85, 80);
-  ucg.print("ccc:");
-  ucg.print(ccc, 2);
-  ucg.print("mAh");
   Serial.printf("time0: %ld\n", millis() - loop_start);
 }
 
@@ -321,7 +334,7 @@ void shutdown_axp() {
   Wire.write(0x31); // enable sleep button short press
   Wire.write(0x0B);
   Wire.endTransmission();
-
+  delay(100);
   Wire.beginTransmission(0x34);
   Wire.write(0x32); // power down!
   Wire.write(0xC6);
@@ -337,9 +350,9 @@ boolean is_charging() {
   return data01 & 0b01000000;
 }
 
-boolean has_usb_plugin() {
+boolean usb_plugged_in() {
   uint8_t data00 = read_register(AXP192_ADDR, 0x00);
-  return data00 | 0b10100000; // 7 bit or 5 bit
+  return data00 & 0b10100000; // 7 bit or 5 bit
 }
 
 /**
@@ -389,14 +402,20 @@ void homePressed() {
 }
 
 void setup(void) {
+  Serial.begin(115200);
   rtc.begin();
   rtc.isrunning();
+  DateTime now = rtc.now();
+  if (now.year() < 2018) {
+    Serial.println("RTC need factory reset!");
+    // following line sets the RTC to the date & time this sketch was compiled
+    rtc.adjust(DateTime(__DATE__, __TIME__));
+  }
   pinMode(BUTTON_HOME, INPUT | PULLUP);
   pinMode(BUTTON_PIN, INPUT | PULLUP);
 
-  Serial.begin(115200);
   attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), homePressed, FALLING);
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, 0);
+  // esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, 0);
   beginPower();
   ucg.begin(UCG_FONT_MODE_TRANSPARENT);
   // ucg.setFont(ucg_font_ncenR14_hr);
@@ -413,10 +432,12 @@ void show_time() {
   ucg.drawString(40, 100, 0, buf);
 }
 
+unsigned long active_time = millis();
+
 void loop(void) {
   unsigned long loop_start = millis();
   ucg.setRotate90();
-  color_test();
+  draw_background();
   Serial.printf("time0: %ld\n", millis() - loop_start);
   readAXP();
   Serial.printf("time1: %ld\n", millis() - loop_start);
@@ -425,20 +446,16 @@ void loop(void) {
   show_time();
   Serial.printf("time3: %ld\n", millis() - loop_start);
   ucg.setMaxClipRange();
-  if (need_shutdown) {
+  if (usb_plugged_in()) {
+    // won't go so sleep when usb
+    active_time = loop_start;
+  }
+  if (need_shutdown || loop_start - active_time > 30 * 1000) {
     // shutdown_all_except_self();
     shutdown_axp();
     Serial.println("\r\nGoing to sleep now\r\n");
-    esp_deep_sleep_start();
+    // esp_deep_sleep_start();
     Serial.println("This will never be printed");
   }
   DLY();
-  //  if (digitalRead(BUTTON_HOME) == 0) {
-  //    while (digitalRead(BUTTON_HOME) == 0);
-  //    delay(100);
-  //    shutdown_all_except_self();
-  //    Serial.println("\r\nGoing to sleep now\r\n");
-  //    esp_deep_sleep_start();
-  //    Serial.println("This will never be printed");
-  //  }
 }
