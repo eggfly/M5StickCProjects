@@ -40,25 +40,21 @@ uint8_t color_g[COLOR_COUNT] = {  0, 255,   0, 255, 255,   0};
 uint8_t color_b[COLOR_COUNT] = {  0,   0, 255,   0, 255, 255};
 
 void draw_background(void) {
-  ucg_int_t mx;
-  mx = ucg.getWidth() / 2;
-  //my = ucg.getHeight() / 2;
-
   // Serial.printf("w=%d, h=%d\n", ucg.getWidth(), ucg.getHeight());
   color_index++;
   int i = color_index % COLOR_COUNT;
-  Serial.printf("color index: %d", i);
+  // Serial.printf("color index: %d", i);
   ucg.setColor(0, color_r[i], color_g[i], color_b[i]);
   ucg.setColor(1, color_r[(i + 1) % COLOR_COUNT], color_g[(i + 1) % COLOR_COUNT], color_b[(i + 1) % COLOR_COUNT]);
   ucg.setColor(2, color_r[(i + 2) % COLOR_COUNT], color_g[(i + 2) % COLOR_COUNT], color_b[(i + 2) % COLOR_COUNT]);
   ucg.setColor(3, color_r[(i + 3) % COLOR_COUNT], color_g[(i + 3) % COLOR_COUNT], color_b[(i + 3) % COLOR_COUNT]);
   // ucg.drawBox(0, 0, ucg.getWidth(), ucg.getHeight());
-  ucg.drawGradientBox(0, 0 + 20, 161, 80 + 20);
+  ucg.drawGradientBox(2, 23, 157, 78);
 }
 
 double acin_mv = 0;
 double acin_current = 0;
-double vbus_mv = 0;
+double vbus_v = 0;
 double ibus_ma = 0;
 
 double temperature = 0;
@@ -92,7 +88,7 @@ void readAXP() {
   uint8_t data5a = read_register(AXP192_ADDR, 0x5A);
   uint8_t data5b = read_register(AXP192_ADDR, 0x5B);
   int vbus = (data5a << 4) | data5b;
-  vbus_mv = vbus * 1.7;
+  vbus_v = vbus * 1.7 / 1000.0;
 
   uint8_t data5c = read_register(AXP192_ADDR, 0x5C);
   uint8_t data5d = read_register(AXP192_ADDR, 0x5D);
@@ -179,8 +175,8 @@ void drawAXP() {
 
   ucg.setPrintPos(85, 40);
   ucg.print("Vin:");
-  ucg.print(vbus_mv, 2);
-  ucg.print("mV");
+  ucg.print(vbus_v, 4);
+  ucg.print("V");
 
   ucg.setPrintPos(85, 50);
   ucg.print("Iin:");
@@ -242,7 +238,7 @@ void drawAXP2() {
   sprintf(buf, "temp:%f C", temperature);
   ucg.drawString(2, 80, 0, buf);
 
-  sprintf(buf, "temp:%f C", temperature);
+  sprintf(buf, "temp:%.1f C", temperature);
   ucg.setPrintPos(2, 90);
   ucg.print("watt:");
   ucg.print(bat_mw, 3);
@@ -250,7 +246,7 @@ void drawAXP2() {
 
   ucg.setPrintPos(85, 40);
   ucg.print("Vin:");
-  ucg.print(vbus_mv, 2);
+  ucg.print(vbus_v, 2);
   ucg.print("mV");
 
   ucg.setPrintPos(85, 50);
@@ -426,9 +422,11 @@ void setup(void) {
 
 void show_time() {
   DateTime now = rtc.now();
-  char buf[32];
+  char buf[100];
   strncpy(buf, "YYYY.MM.DD hh:mm:ss\0", 100);
-  // Serial.println(now.format(buf));
+  now.format(buf);
+  // Serial.printf("time now: %s\n", buf);
+  ucg.setColor(255, 255, 255);
   ucg.drawString(40, 100, 0, buf);
 }
 
@@ -437,6 +435,7 @@ unsigned long active_time = millis();
 void loop(void) {
   unsigned long loop_start = millis();
   ucg.setRotate90();
+  Serial.printf("time-1: %ld\n", millis() - loop_start);
   draw_background();
   Serial.printf("time0: %ld\n", millis() - loop_start);
   readAXP();
