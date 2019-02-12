@@ -1,0 +1,1155 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.8.0 #10562 (MINGW64)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module usb_ep0
+                                      6 	.optsdcc -mmcs51 --model-small
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _memcpy
+                                     12 	.globl _CDC_SetBaud
+                                     13 	.globl _USB_EP_HALT_CLEAR
+                                     14 	.globl _USB_EP_HALT_SET
+                                     15 	.globl _UIF_BUS_RST
+                                     16 	.globl _UIF_DETECT
+                                     17 	.globl _UIF_TRANSFER
+                                     18 	.globl _UIF_SUSPEND
+                                     19 	.globl _UIF_HST_SOF
+                                     20 	.globl _UIF_FIFO_OV
+                                     21 	.globl _U_SIE_FREE
+                                     22 	.globl _U_TOG_OK
+                                     23 	.globl _U_IS_NAK
+                                     24 	.globl _ADC_CHAN0
+                                     25 	.globl _ADC_CHAN1
+                                     26 	.globl _CMP_CHAN
+                                     27 	.globl _ADC_START
+                                     28 	.globl _ADC_IF
+                                     29 	.globl _CMP_IF
+                                     30 	.globl _CMPO
+                                     31 	.globl _U1RI
+                                     32 	.globl _U1TI
+                                     33 	.globl _U1RB8
+                                     34 	.globl _U1TB8
+                                     35 	.globl _U1REN
+                                     36 	.globl _U1SMOD
+                                     37 	.globl _U1SM0
+                                     38 	.globl _S0_R_FIFO
+                                     39 	.globl _S0_T_FIFO
+                                     40 	.globl _S0_FREE
+                                     41 	.globl _S0_IF_BYTE
+                                     42 	.globl _S0_IF_FIRST
+                                     43 	.globl _S0_IF_OV
+                                     44 	.globl _S0_FST_ACT
+                                     45 	.globl _CP_RL2
+                                     46 	.globl _C_T2
+                                     47 	.globl _TR2
+                                     48 	.globl _EXEN2
+                                     49 	.globl _TCLK
+                                     50 	.globl _RCLK
+                                     51 	.globl _EXF2
+                                     52 	.globl _CAP1F
+                                     53 	.globl _TF2
+                                     54 	.globl _RI
+                                     55 	.globl _TI
+                                     56 	.globl _RB8
+                                     57 	.globl _TB8
+                                     58 	.globl _REN
+                                     59 	.globl _SM2
+                                     60 	.globl _SM1
+                                     61 	.globl _SM0
+                                     62 	.globl _IT0
+                                     63 	.globl _IE0
+                                     64 	.globl _IT1
+                                     65 	.globl _IE1
+                                     66 	.globl _TR0
+                                     67 	.globl _TF0
+                                     68 	.globl _TR1
+                                     69 	.globl _TF1
+                                     70 	.globl _RXD
+                                     71 	.globl _PWM1_
+                                     72 	.globl _TXD
+                                     73 	.globl _PWM2_
+                                     74 	.globl _AIN3
+                                     75 	.globl _VBUS1
+                                     76 	.globl _INT0
+                                     77 	.globl _TXD1_
+                                     78 	.globl _INT1
+                                     79 	.globl _T0
+                                     80 	.globl _RXD1_
+                                     81 	.globl _PWM2
+                                     82 	.globl _T1
+                                     83 	.globl _UDP
+                                     84 	.globl _UDM
+                                     85 	.globl _TIN0
+                                     86 	.globl _CAP1
+                                     87 	.globl _T2
+                                     88 	.globl _AIN0
+                                     89 	.globl _VBUS2
+                                     90 	.globl _TIN1
+                                     91 	.globl _CAP2
+                                     92 	.globl _T2EX
+                                     93 	.globl _RXD_
+                                     94 	.globl _TXD_
+                                     95 	.globl _AIN1
+                                     96 	.globl _UCC1
+                                     97 	.globl _TIN2
+                                     98 	.globl _SCS
+                                     99 	.globl _CAP1_
+                                    100 	.globl _T2_
+                                    101 	.globl _AIN2
+                                    102 	.globl _UCC2
+                                    103 	.globl _TIN3
+                                    104 	.globl _PWM1
+                                    105 	.globl _MOSI
+                                    106 	.globl _TIN4
+                                    107 	.globl _RXD1
+                                    108 	.globl _MISO
+                                    109 	.globl _TIN5
+                                    110 	.globl _TXD1
+                                    111 	.globl _SCK
+                                    112 	.globl _IE_SPI0
+                                    113 	.globl _IE_TKEY
+                                    114 	.globl _IE_USB
+                                    115 	.globl _IE_ADC
+                                    116 	.globl _IE_UART1
+                                    117 	.globl _IE_PWMX
+                                    118 	.globl _IE_GPIO
+                                    119 	.globl _IE_WDOG
+                                    120 	.globl _PX0
+                                    121 	.globl _PT0
+                                    122 	.globl _PX1
+                                    123 	.globl _PT1
+                                    124 	.globl _PS
+                                    125 	.globl _PT2
+                                    126 	.globl _PL_FLAG
+                                    127 	.globl _PH_FLAG
+                                    128 	.globl _EX0
+                                    129 	.globl _ET0
+                                    130 	.globl _EX1
+                                    131 	.globl _ET1
+                                    132 	.globl _ES
+                                    133 	.globl _ET2
+                                    134 	.globl _E_DIS
+                                    135 	.globl _EA
+                                    136 	.globl _P
+                                    137 	.globl _F1
+                                    138 	.globl _OV
+                                    139 	.globl _RS0
+                                    140 	.globl _RS1
+                                    141 	.globl _F0
+                                    142 	.globl _AC
+                                    143 	.globl _CY
+                                    144 	.globl _UEP1_DMA_H
+                                    145 	.globl _UEP1_DMA_L
+                                    146 	.globl _UEP1_DMA
+                                    147 	.globl _UEP0_DMA_H
+                                    148 	.globl _UEP0_DMA_L
+                                    149 	.globl _UEP0_DMA
+                                    150 	.globl _UEP2_3_MOD
+                                    151 	.globl _UEP4_1_MOD
+                                    152 	.globl _UEP3_DMA_H
+                                    153 	.globl _UEP3_DMA_L
+                                    154 	.globl _UEP3_DMA
+                                    155 	.globl _UEP2_DMA_H
+                                    156 	.globl _UEP2_DMA_L
+                                    157 	.globl _UEP2_DMA
+                                    158 	.globl _USB_DEV_AD
+                                    159 	.globl _USB_CTRL
+                                    160 	.globl _USB_INT_EN
+                                    161 	.globl _UEP4_T_LEN
+                                    162 	.globl _UEP4_CTRL
+                                    163 	.globl _UEP0_T_LEN
+                                    164 	.globl _UEP0_CTRL
+                                    165 	.globl _USB_RX_LEN
+                                    166 	.globl _USB_MIS_ST
+                                    167 	.globl _USB_INT_ST
+                                    168 	.globl _USB_INT_FG
+                                    169 	.globl _UEP3_T_LEN
+                                    170 	.globl _UEP3_CTRL
+                                    171 	.globl _UEP2_T_LEN
+                                    172 	.globl _UEP2_CTRL
+                                    173 	.globl _UEP1_T_LEN
+                                    174 	.globl _UEP1_CTRL
+                                    175 	.globl _UDEV_CTRL
+                                    176 	.globl _USB_C_CTRL
+                                    177 	.globl _TKEY_DATH
+                                    178 	.globl _TKEY_DATL
+                                    179 	.globl _TKEY_DAT
+                                    180 	.globl _TKEY_CTRL
+                                    181 	.globl _ADC_DATA
+                                    182 	.globl _ADC_CFG
+                                    183 	.globl _ADC_CTRL
+                                    184 	.globl _SBAUD1
+                                    185 	.globl _SBUF1
+                                    186 	.globl _SCON1
+                                    187 	.globl _SPI0_SETUP
+                                    188 	.globl _SPI0_CK_SE
+                                    189 	.globl _SPI0_CTRL
+                                    190 	.globl _SPI0_DATA
+                                    191 	.globl _SPI0_STAT
+                                    192 	.globl _PWM_CK_SE
+                                    193 	.globl _PWM_CTRL
+                                    194 	.globl _PWM_DATA1
+                                    195 	.globl _PWM_DATA2
+                                    196 	.globl _T2CAP1H
+                                    197 	.globl _T2CAP1L
+                                    198 	.globl _T2CAP1
+                                    199 	.globl _TH2
+                                    200 	.globl _TL2
+                                    201 	.globl _T2COUNT
+                                    202 	.globl _RCAP2H
+                                    203 	.globl _RCAP2L
+                                    204 	.globl _RCAP2
+                                    205 	.globl _T2MOD
+                                    206 	.globl _T2CON
+                                    207 	.globl _SBUF
+                                    208 	.globl _SCON
+                                    209 	.globl _TH1
+                                    210 	.globl _TH0
+                                    211 	.globl _TL1
+                                    212 	.globl _TL0
+                                    213 	.globl _TMOD
+                                    214 	.globl _TCON
+                                    215 	.globl _XBUS_AUX
+                                    216 	.globl _PIN_FUNC
+                                    217 	.globl _P3_DIR_PU
+                                    218 	.globl _P3_MOD_OC
+                                    219 	.globl _P3
+                                    220 	.globl _P2
+                                    221 	.globl _P1_DIR_PU
+                                    222 	.globl _P1_MOD_OC
+                                    223 	.globl _P1
+                                    224 	.globl _ROM_CTRL
+                                    225 	.globl _ROM_DATA_H
+                                    226 	.globl _ROM_DATA_L
+                                    227 	.globl _ROM_DATA
+                                    228 	.globl _ROM_ADDR_H
+                                    229 	.globl _ROM_ADDR_L
+                                    230 	.globl _ROM_ADDR
+                                    231 	.globl _GPIO_IE
+                                    232 	.globl _IP_EX
+                                    233 	.globl _IE_EX
+                                    234 	.globl _IP
+                                    235 	.globl _IE
+                                    236 	.globl _WDOG_COUNT
+                                    237 	.globl _RESET_KEEP
+                                    238 	.globl _WAKE_CTRL
+                                    239 	.globl _CLOCK_CFG
+                                    240 	.globl _PCON
+                                    241 	.globl _GLOBAL_CFG
+                                    242 	.globl _SAFE_MOD
+                                    243 	.globl _DPH
+                                    244 	.globl _DPL
+                                    245 	.globl _SP
+                                    246 	.globl _B
+                                    247 	.globl _ACC
+                                    248 	.globl _PSW
+                                    249 	.globl _Ep0Buffer
+                                    250 	.globl _controlStates
+                                    251 	.globl _pDescr
+                                    252 	.globl _UsbConfig
+                                    253 	.globl _SetupLen
+                                    254 	.globl _SetupReq
+                                    255 	.globl _USB_EP0_SETUP
+                                    256 	.globl _USB_EP0_IN
+                                    257 	.globl _USB_EP0_OUT
+                                    258 ;--------------------------------------------------------
+                                    259 ; special function registers
+                                    260 ;--------------------------------------------------------
+                                    261 	.area RSEG    (ABS,DATA)
+      000000                        262 	.org 0x0000
+                           0000D0   263 _PSW	=	0x00d0
+                           0000E0   264 _ACC	=	0x00e0
+                           0000F0   265 _B	=	0x00f0
+                           000081   266 _SP	=	0x0081
+                           000082   267 _DPL	=	0x0082
+                           000083   268 _DPH	=	0x0083
+                           0000A1   269 _SAFE_MOD	=	0x00a1
+                           0000B1   270 _GLOBAL_CFG	=	0x00b1
+                           000087   271 _PCON	=	0x0087
+                           0000B9   272 _CLOCK_CFG	=	0x00b9
+                           0000A9   273 _WAKE_CTRL	=	0x00a9
+                           0000FE   274 _RESET_KEEP	=	0x00fe
+                           0000FF   275 _WDOG_COUNT	=	0x00ff
+                           0000A8   276 _IE	=	0x00a8
+                           0000B8   277 _IP	=	0x00b8
+                           0000E8   278 _IE_EX	=	0x00e8
+                           0000E9   279 _IP_EX	=	0x00e9
+                           0000C7   280 _GPIO_IE	=	0x00c7
+                           008584   281 _ROM_ADDR	=	0x8584
+                           000084   282 _ROM_ADDR_L	=	0x0084
+                           000085   283 _ROM_ADDR_H	=	0x0085
+                           008F8E   284 _ROM_DATA	=	0x8f8e
+                           00008E   285 _ROM_DATA_L	=	0x008e
+                           00008F   286 _ROM_DATA_H	=	0x008f
+                           000086   287 _ROM_CTRL	=	0x0086
+                           000090   288 _P1	=	0x0090
+                           000092   289 _P1_MOD_OC	=	0x0092
+                           000093   290 _P1_DIR_PU	=	0x0093
+                           0000A0   291 _P2	=	0x00a0
+                           0000B0   292 _P3	=	0x00b0
+                           000096   293 _P3_MOD_OC	=	0x0096
+                           000097   294 _P3_DIR_PU	=	0x0097
+                           0000C6   295 _PIN_FUNC	=	0x00c6
+                           0000A2   296 _XBUS_AUX	=	0x00a2
+                           000088   297 _TCON	=	0x0088
+                           000089   298 _TMOD	=	0x0089
+                           00008A   299 _TL0	=	0x008a
+                           00008B   300 _TL1	=	0x008b
+                           00008C   301 _TH0	=	0x008c
+                           00008D   302 _TH1	=	0x008d
+                           000098   303 _SCON	=	0x0098
+                           000099   304 _SBUF	=	0x0099
+                           0000C8   305 _T2CON	=	0x00c8
+                           0000C9   306 _T2MOD	=	0x00c9
+                           00CBCA   307 _RCAP2	=	0xcbca
+                           0000CA   308 _RCAP2L	=	0x00ca
+                           0000CB   309 _RCAP2H	=	0x00cb
+                           00CDCC   310 _T2COUNT	=	0xcdcc
+                           0000CC   311 _TL2	=	0x00cc
+                           0000CD   312 _TH2	=	0x00cd
+                           00CFCE   313 _T2CAP1	=	0xcfce
+                           0000CE   314 _T2CAP1L	=	0x00ce
+                           0000CF   315 _T2CAP1H	=	0x00cf
+                           00009B   316 _PWM_DATA2	=	0x009b
+                           00009C   317 _PWM_DATA1	=	0x009c
+                           00009D   318 _PWM_CTRL	=	0x009d
+                           00009E   319 _PWM_CK_SE	=	0x009e
+                           0000F8   320 _SPI0_STAT	=	0x00f8
+                           0000F9   321 _SPI0_DATA	=	0x00f9
+                           0000FA   322 _SPI0_CTRL	=	0x00fa
+                           0000FB   323 _SPI0_CK_SE	=	0x00fb
+                           0000FC   324 _SPI0_SETUP	=	0x00fc
+                           0000C0   325 _SCON1	=	0x00c0
+                           0000C1   326 _SBUF1	=	0x00c1
+                           0000C2   327 _SBAUD1	=	0x00c2
+                           000080   328 _ADC_CTRL	=	0x0080
+                           00009A   329 _ADC_CFG	=	0x009a
+                           00009F   330 _ADC_DATA	=	0x009f
+                           0000C3   331 _TKEY_CTRL	=	0x00c3
+                           00C5C4   332 _TKEY_DAT	=	0xc5c4
+                           0000C4   333 _TKEY_DATL	=	0x00c4
+                           0000C5   334 _TKEY_DATH	=	0x00c5
+                           000091   335 _USB_C_CTRL	=	0x0091
+                           0000D1   336 _UDEV_CTRL	=	0x00d1
+                           0000D2   337 _UEP1_CTRL	=	0x00d2
+                           0000D3   338 _UEP1_T_LEN	=	0x00d3
+                           0000D4   339 _UEP2_CTRL	=	0x00d4
+                           0000D5   340 _UEP2_T_LEN	=	0x00d5
+                           0000D6   341 _UEP3_CTRL	=	0x00d6
+                           0000D7   342 _UEP3_T_LEN	=	0x00d7
+                           0000D8   343 _USB_INT_FG	=	0x00d8
+                           0000D9   344 _USB_INT_ST	=	0x00d9
+                           0000DA   345 _USB_MIS_ST	=	0x00da
+                           0000DB   346 _USB_RX_LEN	=	0x00db
+                           0000DC   347 _UEP0_CTRL	=	0x00dc
+                           0000DD   348 _UEP0_T_LEN	=	0x00dd
+                           0000DE   349 _UEP4_CTRL	=	0x00de
+                           0000DF   350 _UEP4_T_LEN	=	0x00df
+                           0000E1   351 _USB_INT_EN	=	0x00e1
+                           0000E2   352 _USB_CTRL	=	0x00e2
+                           0000E3   353 _USB_DEV_AD	=	0x00e3
+                           00E5E4   354 _UEP2_DMA	=	0xe5e4
+                           0000E4   355 _UEP2_DMA_L	=	0x00e4
+                           0000E5   356 _UEP2_DMA_H	=	0x00e5
+                           00E7E6   357 _UEP3_DMA	=	0xe7e6
+                           0000E6   358 _UEP3_DMA_L	=	0x00e6
+                           0000E7   359 _UEP3_DMA_H	=	0x00e7
+                           0000EA   360 _UEP4_1_MOD	=	0x00ea
+                           0000EB   361 _UEP2_3_MOD	=	0x00eb
+                           00EDEC   362 _UEP0_DMA	=	0xedec
+                           0000EC   363 _UEP0_DMA_L	=	0x00ec
+                           0000ED   364 _UEP0_DMA_H	=	0x00ed
+                           00EFEE   365 _UEP1_DMA	=	0xefee
+                           0000EE   366 _UEP1_DMA_L	=	0x00ee
+                           0000EF   367 _UEP1_DMA_H	=	0x00ef
+                                    368 ;--------------------------------------------------------
+                                    369 ; special function bits
+                                    370 ;--------------------------------------------------------
+                                    371 	.area RSEG    (ABS,DATA)
+      000000                        372 	.org 0x0000
+                           0000D7   373 _CY	=	0x00d7
+                           0000D6   374 _AC	=	0x00d6
+                           0000D5   375 _F0	=	0x00d5
+                           0000D4   376 _RS1	=	0x00d4
+                           0000D3   377 _RS0	=	0x00d3
+                           0000D2   378 _OV	=	0x00d2
+                           0000D1   379 _F1	=	0x00d1
+                           0000D0   380 _P	=	0x00d0
+                           0000AF   381 _EA	=	0x00af
+                           0000AE   382 _E_DIS	=	0x00ae
+                           0000AD   383 _ET2	=	0x00ad
+                           0000AC   384 _ES	=	0x00ac
+                           0000AB   385 _ET1	=	0x00ab
+                           0000AA   386 _EX1	=	0x00aa
+                           0000A9   387 _ET0	=	0x00a9
+                           0000A8   388 _EX0	=	0x00a8
+                           0000BF   389 _PH_FLAG	=	0x00bf
+                           0000BE   390 _PL_FLAG	=	0x00be
+                           0000BD   391 _PT2	=	0x00bd
+                           0000BC   392 _PS	=	0x00bc
+                           0000BB   393 _PT1	=	0x00bb
+                           0000BA   394 _PX1	=	0x00ba
+                           0000B9   395 _PT0	=	0x00b9
+                           0000B8   396 _PX0	=	0x00b8
+                           0000EF   397 _IE_WDOG	=	0x00ef
+                           0000EE   398 _IE_GPIO	=	0x00ee
+                           0000ED   399 _IE_PWMX	=	0x00ed
+                           0000EC   400 _IE_UART1	=	0x00ec
+                           0000EB   401 _IE_ADC	=	0x00eb
+                           0000EA   402 _IE_USB	=	0x00ea
+                           0000E9   403 _IE_TKEY	=	0x00e9
+                           0000E8   404 _IE_SPI0	=	0x00e8
+                           000097   405 _SCK	=	0x0097
+                           000097   406 _TXD1	=	0x0097
+                           000097   407 _TIN5	=	0x0097
+                           000096   408 _MISO	=	0x0096
+                           000096   409 _RXD1	=	0x0096
+                           000096   410 _TIN4	=	0x0096
+                           000095   411 _MOSI	=	0x0095
+                           000095   412 _PWM1	=	0x0095
+                           000095   413 _TIN3	=	0x0095
+                           000095   414 _UCC2	=	0x0095
+                           000095   415 _AIN2	=	0x0095
+                           000094   416 _T2_	=	0x0094
+                           000094   417 _CAP1_	=	0x0094
+                           000094   418 _SCS	=	0x0094
+                           000094   419 _TIN2	=	0x0094
+                           000094   420 _UCC1	=	0x0094
+                           000094   421 _AIN1	=	0x0094
+                           000093   422 _TXD_	=	0x0093
+                           000092   423 _RXD_	=	0x0092
+                           000091   424 _T2EX	=	0x0091
+                           000091   425 _CAP2	=	0x0091
+                           000091   426 _TIN1	=	0x0091
+                           000091   427 _VBUS2	=	0x0091
+                           000091   428 _AIN0	=	0x0091
+                           000090   429 _T2	=	0x0090
+                           000090   430 _CAP1	=	0x0090
+                           000090   431 _TIN0	=	0x0090
+                           0000B7   432 _UDM	=	0x00b7
+                           0000B6   433 _UDP	=	0x00b6
+                           0000B5   434 _T1	=	0x00b5
+                           0000B4   435 _PWM2	=	0x00b4
+                           0000B4   436 _RXD1_	=	0x00b4
+                           0000B4   437 _T0	=	0x00b4
+                           0000B3   438 _INT1	=	0x00b3
+                           0000B2   439 _TXD1_	=	0x00b2
+                           0000B2   440 _INT0	=	0x00b2
+                           0000B2   441 _VBUS1	=	0x00b2
+                           0000B2   442 _AIN3	=	0x00b2
+                           0000B1   443 _PWM2_	=	0x00b1
+                           0000B1   444 _TXD	=	0x00b1
+                           0000B0   445 _PWM1_	=	0x00b0
+                           0000B0   446 _RXD	=	0x00b0
+                           00008F   447 _TF1	=	0x008f
+                           00008E   448 _TR1	=	0x008e
+                           00008D   449 _TF0	=	0x008d
+                           00008C   450 _TR0	=	0x008c
+                           00008B   451 _IE1	=	0x008b
+                           00008A   452 _IT1	=	0x008a
+                           000089   453 _IE0	=	0x0089
+                           000088   454 _IT0	=	0x0088
+                           00009F   455 _SM0	=	0x009f
+                           00009E   456 _SM1	=	0x009e
+                           00009D   457 _SM2	=	0x009d
+                           00009C   458 _REN	=	0x009c
+                           00009B   459 _TB8	=	0x009b
+                           00009A   460 _RB8	=	0x009a
+                           000099   461 _TI	=	0x0099
+                           000098   462 _RI	=	0x0098
+                           0000CF   463 _TF2	=	0x00cf
+                           0000CF   464 _CAP1F	=	0x00cf
+                           0000CE   465 _EXF2	=	0x00ce
+                           0000CD   466 _RCLK	=	0x00cd
+                           0000CC   467 _TCLK	=	0x00cc
+                           0000CB   468 _EXEN2	=	0x00cb
+                           0000CA   469 _TR2	=	0x00ca
+                           0000C9   470 _C_T2	=	0x00c9
+                           0000C8   471 _CP_RL2	=	0x00c8
+                           0000FF   472 _S0_FST_ACT	=	0x00ff
+                           0000FE   473 _S0_IF_OV	=	0x00fe
+                           0000FD   474 _S0_IF_FIRST	=	0x00fd
+                           0000FC   475 _S0_IF_BYTE	=	0x00fc
+                           0000FB   476 _S0_FREE	=	0x00fb
+                           0000FA   477 _S0_T_FIFO	=	0x00fa
+                           0000F8   478 _S0_R_FIFO	=	0x00f8
+                           0000C7   479 _U1SM0	=	0x00c7
+                           0000C5   480 _U1SMOD	=	0x00c5
+                           0000C4   481 _U1REN	=	0x00c4
+                           0000C3   482 _U1TB8	=	0x00c3
+                           0000C2   483 _U1RB8	=	0x00c2
+                           0000C1   484 _U1TI	=	0x00c1
+                           0000C0   485 _U1RI	=	0x00c0
+                           000087   486 _CMPO	=	0x0087
+                           000086   487 _CMP_IF	=	0x0086
+                           000085   488 _ADC_IF	=	0x0085
+                           000084   489 _ADC_START	=	0x0084
+                           000083   490 _CMP_CHAN	=	0x0083
+                           000081   491 _ADC_CHAN1	=	0x0081
+                           000080   492 _ADC_CHAN0	=	0x0080
+                           0000DF   493 _U_IS_NAK	=	0x00df
+                           0000DE   494 _U_TOG_OK	=	0x00de
+                           0000DD   495 _U_SIE_FREE	=	0x00dd
+                           0000DC   496 _UIF_FIFO_OV	=	0x00dc
+                           0000DB   497 _UIF_HST_SOF	=	0x00db
+                           0000DA   498 _UIF_SUSPEND	=	0x00da
+                           0000D9   499 _UIF_TRANSFER	=	0x00d9
+                           0000D8   500 _UIF_DETECT	=	0x00d8
+                           0000D8   501 _UIF_BUS_RST	=	0x00d8
+                                    502 ;--------------------------------------------------------
+                                    503 ; overlayable register banks
+                                    504 ;--------------------------------------------------------
+                                    505 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                        506 	.ds 8
+                                    507 ;--------------------------------------------------------
+                                    508 ; internal ram data
+                                    509 ;--------------------------------------------------------
+                                    510 	.area DSEG    (DATA)
+      000000                        511 _SetupReq::
+      000000                        512 	.ds 1
+      000001                        513 _SetupLen::
+      000001                        514 	.ds 1
+      000002                        515 _UsbConfig::
+      000002                        516 	.ds 1
+      000003                        517 _pDescr::
+      000003                        518 	.ds 3
+      000006                        519 _controlStates::
+      000006                        520 	.ds 2
+                                    521 ;--------------------------------------------------------
+                                    522 ; overlayable items in internal ram 
+                                    523 ;--------------------------------------------------------
+                                    524 ;--------------------------------------------------------
+                                    525 ; indirectly addressable internal ram data
+                                    526 ;--------------------------------------------------------
+                                    527 	.area ISEG    (DATA)
+                                    528 ;--------------------------------------------------------
+                                    529 ; absolute internal ram data
+                                    530 ;--------------------------------------------------------
+                                    531 	.area IABS    (ABS,DATA)
+                                    532 	.area IABS    (ABS,DATA)
+                                    533 ;--------------------------------------------------------
+                                    534 ; bit data
+                                    535 ;--------------------------------------------------------
+                                    536 	.area BSEG    (BIT)
+                                    537 ;--------------------------------------------------------
+                                    538 ; paged external ram data
+                                    539 ;--------------------------------------------------------
+                                    540 	.area PSEG    (PAG,XDATA)
+                                    541 ;--------------------------------------------------------
+                                    542 ; external ram data
+                                    543 ;--------------------------------------------------------
+                                    544 	.area XSEG    (XDATA)
+                           000000   545 _Ep0Buffer	=	0x0000
+                                    546 ;--------------------------------------------------------
+                                    547 ; absolute external ram data
+                                    548 ;--------------------------------------------------------
+                                    549 	.area XABS    (ABS,XDATA)
+                                    550 ;--------------------------------------------------------
+                                    551 ; external initialized ram data
+                                    552 ;--------------------------------------------------------
+                                    553 	.area XISEG   (XDATA)
+                                    554 	.area HOME    (CODE)
+                                    555 	.area GSINIT0 (CODE)
+                                    556 	.area GSINIT1 (CODE)
+                                    557 	.area GSINIT2 (CODE)
+                                    558 	.area GSINIT3 (CODE)
+                                    559 	.area GSINIT4 (CODE)
+                                    560 	.area GSINIT5 (CODE)
+                                    561 	.area GSINIT  (CODE)
+                                    562 	.area GSFINAL (CODE)
+                                    563 	.area CSEG    (CODE)
+                                    564 ;--------------------------------------------------------
+                                    565 ; global & static initialisations
+                                    566 ;--------------------------------------------------------
+                                    567 	.area HOME    (CODE)
+                                    568 	.area GSINIT  (CODE)
+                                    569 	.area GSFINAL (CODE)
+                                    570 	.area GSINIT  (CODE)
+                                    571 ;	usb_ep0.c:24: uint8_t controlStates[2] = {0x00, 0x00};
+      000000 75*06 00         [24]  572 	mov	_controlStates,#0x00
+      000003 75*07 00         [24]  573 	mov	(_controlStates + 0x0001),#0x00
+                                    574 ;--------------------------------------------------------
+                                    575 ; Home
+                                    576 ;--------------------------------------------------------
+                                    577 	.area HOME    (CODE)
+                                    578 	.area HOME    (CODE)
+                                    579 ;--------------------------------------------------------
+                                    580 ; code
+                                    581 ;--------------------------------------------------------
+                                    582 	.area CSEG    (CODE)
+                                    583 ;------------------------------------------------------------
+                                    584 ;Allocation info for local variables in function 'USB_EP0_SETUP'
+                                    585 ;------------------------------------------------------------
+                                    586 ;len                       Allocated to registers r5 
+                                    587 ;------------------------------------------------------------
+                                    588 ;	usb_ep0.c:28: void USB_EP0_SETUP(void) {
+                                    589 ;	-----------------------------------------
+                                    590 ;	 function USB_EP0_SETUP
+                                    591 ;	-----------------------------------------
+      000000                        592 _USB_EP0_SETUP:
+                           000007   593 	ar7 = 0x07
+                           000006   594 	ar6 = 0x06
+                           000005   595 	ar5 = 0x05
+                           000004   596 	ar4 = 0x04
+                           000003   597 	ar3 = 0x03
+                           000002   598 	ar2 = 0x02
+                           000001   599 	ar1 = 0x01
+                           000000   600 	ar0 = 0x00
+                                    601 ;	usb_ep0.c:29: uint8_t len = USB_RX_LEN;
+      000000 AF DB            [24]  602 	mov	r7,_USB_RX_LEN
+                                    603 ;	usb_ep0.c:30: if (len == (sizeof(USB_SETUP_REQ))) {
+      000002 BF 08 02         [24]  604 	cjne	r7,#0x08,00289$
+      000005 80 03            [24]  605 	sjmp	00290$
+      000007                        606 00289$:
+      000007 02r02r3F         [24]  607 	ljmp	00158$
+      00000A                        608 00290$:
+                                    609 ;	usb_ep0.c:31: SetupLen = UsbSetupBuf->wLengthL;
+      00000A 90 00 06         [24]  610 	mov	dptr,#(_Ep0Buffer + 0x0006)
+      00000D E0               [24]  611 	movx	a,@dptr
+      00000E F5*01            [12]  612 	mov	_SetupLen,a
+                                    613 ;	usb_ep0.c:32: if (UsbSetupBuf->wLengthH || SetupLen > 0x7F)
+      000010 90 00 07         [24]  614 	mov	dptr,#(_Ep0Buffer + 0x0007)
+      000013 E0               [24]  615 	movx	a,@dptr
+      000014 70 06            [24]  616 	jnz	00101$
+      000016 E5*01            [12]  617 	mov	a,_SetupLen
+      000018 24 80            [12]  618 	add	a,#0xff - 0x7f
+      00001A 50 03            [24]  619 	jnc	00102$
+      00001C                        620 00101$:
+                                    621 ;	usb_ep0.c:33: SetupLen = 0x7F;	// Limit the total length
+      00001C 75*01 7F         [24]  622 	mov	_SetupLen,#0x7f
+      00001F                        623 00102$:
+                                    624 ;	usb_ep0.c:35: len = 0;	// Assume success -> Tx 0-length packet
+      00001F 7F 00            [12]  625 	mov	r7,#0x00
+                                    626 ;	usb_ep0.c:36: SetupReq = UsbSetupBuf->bRequest;
+      000021 90 00 01         [24]  627 	mov	dptr,#(_Ep0Buffer + 0x0001)
+      000024 E0               [24]  628 	movx	a,@dptr
+      000025 F5*00            [12]  629 	mov	_SetupReq,a
+                                    630 ;	usb_ep0.c:38: if ((UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK) == USB_REQ_TYP_STANDARD) {
+      000027 90 00 00         [24]  631 	mov	dptr,#_Ep0Buffer
+      00002A E0               [24]  632 	movx	a,@dptr
+      00002B FE               [12]  633 	mov	r6,a
+      00002C 54 60            [12]  634 	anl	a,#0x60
+      00002E 60 03            [24]  635 	jz	00294$
+      000030 02r01rC4         [24]  636 	ljmp	00155$
+      000033                        637 00294$:
+                                    638 ;	usb_ep0.c:40: switch (SetupReq) {
+      000033 E5*00            [12]  639 	mov	a,_SetupReq
+      000035 24 F5            [12]  640 	add	a,#0xff - 0x0a
+      000037 50 03            [24]  641 	jnc	00295$
+      000039 02r01rBF         [24]  642 	ljmp	00140$
+      00003C                        643 00295$:
+      00003C E5*00            [12]  644 	mov	a,_SetupReq
+      00003E 24 0B            [12]  645 	add	a,#(00296$-3-.)
+      000040 83               [24]  646 	movc	a,@a+pc
+      000041 F5 82            [12]  647 	mov	dpl,a
+      000043 E5*00            [12]  648 	mov	a,_SetupReq
+      000045 24 0F            [12]  649 	add	a,#(00297$-3-.)
+      000047 83               [24]  650 	movc	a,@a+pc
+      000048 F5 83            [12]  651 	mov	dph,a
+      00004A E4               [12]  652 	clr	a
+      00004B 73               [24]  653 	jmp	@a+dptr
+      00004C                        654 00296$:
+      00004CrA6                     655 	.db	00136$
+      00004Dr44                     656 	.db	00125$
+      00004ErBF                     657 	.db	00140$
+      00004Fr67                     658 	.db	00129$
+      000050rBF                     659 	.db	00140$
+      000051r1E                     660 	.db	00119$
+      000052r62                     661 	.db	00104$
+      000053rBF                     662 	.db	00140$
+      000054r27                     663 	.db	00120$
+      000055r3B                     664 	.db	00123$
+      000056r41                     665 	.db	00159$
+      000057                        666 00297$:
+      000057s01                     667 	.db	00136$>>8
+      000058s01                     668 	.db	00125$>>8
+      000059s01                     669 	.db	00140$>>8
+      00005As01                     670 	.db	00129$>>8
+      00005Bs01                     671 	.db	00140$>>8
+      00005Cs01                     672 	.db	00119$>>8
+      00005Ds00                     673 	.db	00104$>>8
+      00005Es01                     674 	.db	00140$>>8
+      00005Fs01                     675 	.db	00120$>>8
+      000060s01                     676 	.db	00123$>>8
+      000061s02                     677 	.db	00159$>>8
+                                    678 ;	usb_ep0.c:41: case USB_GET_DESCRIPTOR: 
+      000062                        679 00104$:
+                                    680 ;	usb_ep0.c:42: switch (UsbSetupBuf->wValueH) {
+      000062 90 00 03         [24]  681 	mov	dptr,#(_Ep0Buffer + 0x0003)
+      000065 E0               [24]  682 	movx	a,@dptr
+      000066 FE               [12]  683 	mov	r6,a
+      000067 BE 01 02         [24]  684 	cjne	r6,#0x01,00298$
+      00006A 80 0F            [24]  685 	sjmp	00105$
+      00006C                        686 00298$:
+      00006C BE 02 02         [24]  687 	cjne	r6,#0x02,00299$
+      00006F 80 17            [24]  688 	sjmp	00106$
+      000071                        689 00299$:
+      000071 BE 03 02         [24]  690 	cjne	r6,#0x03,00300$
+      000074 80 1F            [24]  691 	sjmp	00107$
+      000076                        692 00300$:
+                                    693 ;	usb_ep0.c:43: case 1:												// Device Descriptor
+      000076 BE 22 5B         [24]  694 	cjne	r6,#0x22,00115$
+      000079 80 4B            [24]  695 	sjmp	00111$
+      00007B                        696 00105$:
+                                    697 ;	usb_ep0.c:44: pDescr = (uint8_t*)&DevDesc;
+      00007B 75*03r00         [24]  698 	mov	_pDescr,#_DevDesc
+      00007E 75*04s00         [24]  699 	mov	(_pDescr + 1),#(_DevDesc >> 8)
+      000081 75*05 80         [24]  700 	mov	(_pDescr + 2),#0x80
+                                    701 ;	usb_ep0.c:45: len = USB_DESCSIZE_DEVICE;
+      000084 7E 12            [12]  702 	mov	r6,#0x12
+                                    703 ;	usb_ep0.c:46: break;
+                                    704 ;	usb_ep0.c:47: case 2:												// Configure Descriptor
+      000086 80 4E            [24]  705 	sjmp	00116$
+      000088                        706 00106$:
+                                    707 ;	usb_ep0.c:48: pDescr = (uint8_t*)CfgDesc;
+      000088 75*03r00         [24]  708 	mov	_pDescr,#_CfgDesc
+      00008B 75*04s00         [24]  709 	mov	(_pDescr + 1),#(_CfgDesc >> 8)
+      00008E 75*05 80         [24]  710 	mov	(_pDescr + 2),#0x80
+                                    711 ;	usb_ep0.c:49: len = (USB_DESCSIZE_CONFIG_H << 8) | USB_DESCSIZE_CONFIG_L;
+      000091 7E 4B            [12]  712 	mov	r6,#0x4b
+                                    713 ;	usb_ep0.c:50: break;
+                                    714 ;	usb_ep0.c:51: case 3:												// String Descriptor
+      000093 80 41            [24]  715 	sjmp	00116$
+      000095                        716 00107$:
+                                    717 ;	usb_ep0.c:52: len = UsbSetupBuf->wValueL;	// Index
+      000095 90 00 02         [24]  718 	mov	dptr,#(_Ep0Buffer + 0x0002)
+      000098 E0               [24]  719 	movx	a,@dptr
+      000099 FD               [12]  720 	mov	r5,a
+                                    721 ;	usb_ep0.c:53: if (len < USB_STRINGDESC_COUNT) {
+      00009A BD 04 00         [24]  722 	cjne	r5,#0x04,00302$
+      00009D                        723 00302$:
+      00009D 50 23            [24]  724 	jnc	00109$
+                                    725 ;	usb_ep0.c:54: pDescr = (uint8_t*)(StringDescs[len]);
+      00009F ED               [12]  726 	mov	a,r5
+      0000A0 2D               [12]  727 	add	a,r5
+      0000A1 24r00            [12]  728 	add	a,#_StringDescs
+      0000A3 F9               [12]  729 	mov	r1,a
+      0000A4 87 04            [24]  730 	mov	ar4,@r1
+      0000A6 09               [12]  731 	inc	r1
+      0000A7 87 05            [24]  732 	mov	ar5,@r1
+      0000A9 8C*03            [24]  733 	mov	_pDescr,r4
+      0000AB 8D*04            [24]  734 	mov	(_pDescr + 1),r5
+      0000AD 75*05 80         [24]  735 	mov	(_pDescr + 2),#0x80
+                                    736 ;	usb_ep0.c:55: len = pDescr[0];
+      0000B0 AB*03            [24]  737 	mov	r3,_pDescr
+      0000B2 AC*04            [24]  738 	mov	r4,(_pDescr + 1)
+      0000B4 AD*05            [24]  739 	mov	r5,(_pDescr + 2)
+      0000B6 8B 82            [24]  740 	mov	dpl,r3
+      0000B8 8C 83            [24]  741 	mov	dph,r4
+      0000BA 8D F0            [24]  742 	mov	b,r5
+      0000BC 12r00r00         [24]  743 	lcall	__gptrget
+      0000BF FE               [12]  744 	mov	r6,a
+      0000C0 80 14            [24]  745 	sjmp	00116$
+      0000C2                        746 00109$:
+                                    747 ;	usb_ep0.c:57: len = 0xFF;								// Not supported
+      0000C2 7E FF            [12]  748 	mov	r6,#0xff
+                                    749 ;	usb_ep0.c:59: break;
+                                    750 ;	usb_ep0.c:60: case 0x22:										// Report Descriptor
+      0000C4 80 10            [24]  751 	sjmp	00116$
+      0000C6                        752 00111$:
+                                    753 ;	usb_ep0.c:61: len = UsbSetupBuf->wIndexL;
+      0000C6 90 00 04         [24]  754 	mov	dptr,#(_Ep0Buffer + 0x0004)
+      0000C9 E0               [24]  755 	movx	a,@dptr
+      0000CA FE               [12]  756 	mov	r6,a
+                                    757 ;	usb_ep0.c:62: if (len < USB_INTERFACES) {
+      0000CB BE 02 00         [24]  758 	cjne	r6,#0x02,00304$
+      0000CE                        759 00304$:
+      0000CE 40 06            [24]  760 	jc	00116$
+                                    761 ;	usb_ep0.c:67: len = 0xff;		// The host is trying to config invalid interfaces
+      0000D0 7E FF            [12]  762 	mov	r6,#0xff
+                                    763 ;	usb_ep0.c:69: break;
+                                    764 ;	usb_ep0.c:70: default:
+      0000D2 80 02            [24]  765 	sjmp	00116$
+      0000D4                        766 00115$:
+                                    767 ;	usb_ep0.c:71: len = 0xff;		// Unsupported descriptors
+      0000D4 7E FF            [12]  768 	mov	r6,#0xff
+                                    769 ;	usb_ep0.c:73: }	// switch (UsbSetupBuf->wValueH)
+      0000D6                        770 00116$:
+                                    771 ;	usb_ep0.c:74: if (SetupLen > len) {
+      0000D6 C3               [12]  772 	clr	c
+      0000D7 EE               [12]  773 	mov	a,r6
+      0000D8 95*01            [12]  774 	subb	a,_SetupLen
+      0000DA 50 02            [24]  775 	jnc	00118$
+                                    776 ;	usb_ep0.c:75: SetupLen = len;		// Limit length
+      0000DC 8E*01            [24]  777 	mov	_SetupLen,r6
+      0000DE                        778 00118$:
+                                    779 ;	usb_ep0.c:77: len = SetupLen >= 8 ? 8 : SetupLen;
+      0000DE 74 F8            [12]  780 	mov	a,#0x100 - 0x08
+      0000E0 25*01            [12]  781 	add	a,_SetupLen
+      0000E2 50 06            [24]  782 	jnc	00165$
+      0000E4 7D 08            [12]  783 	mov	r5,#0x08
+      0000E6 7E 00            [12]  784 	mov	r6,#0x00
+      0000E8 80 04            [24]  785 	sjmp	00166$
+      0000EA                        786 00165$:
+      0000EA AD*01            [24]  787 	mov	r5,_SetupLen
+      0000EC 7E 00            [12]  788 	mov	r6,#0x00
+      0000EE                        789 00166$:
+      0000EE 8D 07            [24]  790 	mov	ar7,r5
+                                    791 ;	usb_ep0.c:78: memcpy(Ep0Buffer, pDescr, len);
+      0000F0 85*03*00         [24]  792 	mov	_memcpy_PARM_2,_pDescr
+      0000F3 85*04*01         [24]  793 	mov	(_memcpy_PARM_2 + 1),(_pDescr + 1)
+      0000F6 85*05*02         [24]  794 	mov	(_memcpy_PARM_2 + 2),(_pDescr + 2)
+      0000F9 8F*00            [24]  795 	mov	_memcpy_PARM_3,r7
+      0000FB 75*01 00         [24]  796 	mov	(_memcpy_PARM_3 + 1),#0x00
+      0000FE 90 00 00         [24]  797 	mov	dptr,#_Ep0Buffer
+      000101 75 F0 00         [24]  798 	mov	b,#0x00
+      000104 C0 07            [24]  799 	push	ar7
+      000106 12r00r00         [24]  800 	lcall	_memcpy
+      000109 D0 07            [24]  801 	pop	ar7
+                                    802 ;	usb_ep0.c:79: SetupLen -= len;
+      00010B E5*01            [12]  803 	mov	a,_SetupLen
+      00010D C3               [12]  804 	clr	c
+      00010E 9F               [12]  805 	subb	a,r7
+      00010F F5*01            [12]  806 	mov	_SetupLen,a
+                                    807 ;	usb_ep0.c:80: pDescr += len;
+      000111 EF               [12]  808 	mov	a,r7
+      000112 25*03            [12]  809 	add	a,_pDescr
+      000114 F5*03            [12]  810 	mov	_pDescr,a
+      000116 E4               [12]  811 	clr	a
+      000117 35*04            [12]  812 	addc	a,(_pDescr + 1)
+      000119 F5*04            [12]  813 	mov	(_pDescr + 1),a
+                                    814 ;	usb_ep0.c:81: break;
+      00011B 02r02r41         [24]  815 	ljmp	00159$
+                                    816 ;	usb_ep0.c:82: case USB_SET_ADDRESS:
+      00011E                        817 00119$:
+                                    818 ;	usb_ep0.c:83: SetupLen = UsbSetupBuf->wValueL;	// Save the assigned address
+      00011E 90 00 02         [24]  819 	mov	dptr,#(_Ep0Buffer + 0x0002)
+      000121 E0               [24]  820 	movx	a,@dptr
+      000122 F5*01            [12]  821 	mov	_SetupLen,a
+                                    822 ;	usb_ep0.c:84: break;
+      000124 02r02r41         [24]  823 	ljmp	00159$
+                                    824 ;	usb_ep0.c:85: case USB_GET_CONFIGURATION:
+      000127                        825 00120$:
+                                    826 ;	usb_ep0.c:86: Ep0Buffer[0] = UsbConfig;
+      000127 90 00 00         [24]  827 	mov	dptr,#_Ep0Buffer
+      00012A E5*02            [12]  828 	mov	a,_UsbConfig
+      00012C F0               [24]  829 	movx	@dptr,a
+                                    830 ;	usb_ep0.c:87: if (SetupLen >= 1)
+      00012D 74 FF            [12]  831 	mov	a,#0x100 - 0x01
+      00012F 25*01            [12]  832 	add	a,_SetupLen
+      000131 40 03            [24]  833 	jc	00308$
+      000133 02r02r41         [24]  834 	ljmp	00159$
+      000136                        835 00308$:
+                                    836 ;	usb_ep0.c:88: len = 1;
+      000136 7F 01            [12]  837 	mov	r7,#0x01
+                                    838 ;	usb_ep0.c:89: break;
+      000138 02r02r41         [24]  839 	ljmp	00159$
+                                    840 ;	usb_ep0.c:90: case USB_SET_CONFIGURATION:
+      00013B                        841 00123$:
+                                    842 ;	usb_ep0.c:91: UsbConfig = UsbSetupBuf->wValueL;
+      00013B 90 00 02         [24]  843 	mov	dptr,#(_Ep0Buffer + 0x0002)
+      00013E E0               [24]  844 	movx	a,@dptr
+      00013F F5*02            [12]  845 	mov	_UsbConfig,a
+                                    846 ;	usb_ep0.c:92: break;
+      000141 02r02r41         [24]  847 	ljmp	00159$
+                                    848 ;	usb_ep0.c:95: case USB_CLEAR_FEATURE:                                            //Clear Feature
+      000144                        849 00125$:
+                                    850 ;	usb_ep0.c:96: if ((UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_ENDP) {	// Endpoint
+      000144 90 00 00         [24]  851 	mov	dptr,#_Ep0Buffer
+      000147 E0               [24]  852 	movx	a,@dptr
+      000148 FE               [12]  853 	mov	r6,a
+      000149 53 06 1F         [24]  854 	anl	ar6,#0x1f
+      00014C 7D 00            [12]  855 	mov	r5,#0x00
+      00014E BE 02 11         [24]  856 	cjne	r6,#0x02,00127$
+      000151 BD 00 0E         [24]  857 	cjne	r5,#0x00,00127$
+                                    858 ;	usb_ep0.c:97: len = USB_EP_HALT_CLEAR(UsbSetupBuf->wIndexL);
+      000154 90 00 04         [24]  859 	mov	dptr,#(_Ep0Buffer + 0x0004)
+      000157 E0               [24]  860 	movx	a,@dptr
+      000158 F5 82            [12]  861 	mov	dpl,a
+      00015A 12r00r00         [24]  862 	lcall	_USB_EP_HALT_CLEAR
+      00015D AF 82            [24]  863 	mov	r7,dpl
+      00015F 02r02r41         [24]  864 	ljmp	00159$
+      000162                        865 00127$:
+                                    866 ;	usb_ep0.c:99: len = 0xFF;			// Unsupported
+      000162 7F FF            [12]  867 	mov	r7,#0xff
+                                    868 ;	usb_ep0.c:101: break;
+      000164 02r02r41         [24]  869 	ljmp	00159$
+                                    870 ;	usb_ep0.c:102: case USB_SET_FEATURE:                                              /* Set Feature */
+      000167                        871 00129$:
+                                    872 ;	usb_ep0.c:103: if ((UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_ENDP) { // Endpoint
+      000167 90 00 00         [24]  873 	mov	dptr,#_Ep0Buffer
+      00016A E0               [24]  874 	movx	a,@dptr
+      00016B FE               [12]  875 	mov	r6,a
+      00016C 53 06 1F         [24]  876 	anl	ar6,#0x1f
+      00016F 7D 00            [12]  877 	mov	r5,#0x00
+      000171 BE 02 2D         [24]  878 	cjne	r6,#0x02,00134$
+      000174 BD 00 2A         [24]  879 	cjne	r5,#0x00,00134$
+                                    880 ;	usb_ep0.c:104: if ((((uint16_t)UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == USB_FEATURE_ENDPOINT_HALT) {
+      000177 90 00 03         [24]  881 	mov	dptr,#(_Ep0Buffer + 0x0003)
+      00017A E0               [24]  882 	movx	a,@dptr
+      00017B FD               [12]  883 	mov	r5,a
+      00017C 7E 00            [12]  884 	mov	r6,#0x00
+      00017E 90 00 02         [24]  885 	mov	dptr,#(_Ep0Buffer + 0x0002)
+      000181 E0               [24]  886 	movx	a,@dptr
+      000182 FC               [12]  887 	mov	r4,a
+      000183 7B 00            [12]  888 	mov	r3,#0x00
+      000185 42 06            [12]  889 	orl	ar6,a
+      000187 EB               [12]  890 	mov	a,r3
+      000188 42 05            [12]  891 	orl	ar5,a
+      00018A EE               [12]  892 	mov	a,r6
+      00018B 4D               [12]  893 	orl	a,r5
+      00018C 70 0E            [24]  894 	jnz	00131$
+                                    895 ;	usb_ep0.c:105: len = USB_EP_HALT_SET(UsbSetupBuf->wIndexL);
+      00018E 90 00 04         [24]  896 	mov	dptr,#(_Ep0Buffer + 0x0004)
+      000191 E0               [24]  897 	movx	a,@dptr
+      000192 F5 82            [12]  898 	mov	dpl,a
+      000194 12r00r00         [24]  899 	lcall	_USB_EP_HALT_SET
+      000197 AF 82            [24]  900 	mov	r7,dpl
+      000199 02r02r41         [24]  901 	ljmp	00159$
+      00019C                        902 00131$:
+                                    903 ;	usb_ep0.c:107: len = 0xFF;		// Unsupported
+      00019C 7F FF            [12]  904 	mov	r7,#0xff
+      00019E 02r02r41         [24]  905 	ljmp	00159$
+      0001A1                        906 00134$:
+                                    907 ;	usb_ep0.c:110: len = 0xFF;			// Unsupported
+      0001A1 7F FF            [12]  908 	mov	r7,#0xff
+                                    909 ;	usb_ep0.c:112: break;
+      0001A3 02r02r41         [24]  910 	ljmp	00159$
+                                    911 ;	usb_ep0.c:113: case USB_GET_STATUS:
+      0001A6                        912 00136$:
+                                    913 ;	usb_ep0.c:125: Ep0Buffer[0] = 0x00;
+      0001A6 90 00 00         [24]  914 	mov	dptr,#_Ep0Buffer
+      0001A9 E4               [12]  915 	clr	a
+      0001AA F0               [24]  916 	movx	@dptr,a
+                                    917 ;	usb_ep0.c:126: Ep0Buffer[1] = 0x00;
+      0001AB 90 00 01         [24]  918 	mov	dptr,#(_Ep0Buffer + 0x0001)
+      0001AE F0               [24]  919 	movx	@dptr,a
+                                    920 ;	usb_ep0.c:127: if (SetupLen >= 2) {
+      0001AF 74 FE            [12]  921 	mov	a,#0x100 - 0x02
+      0001B1 25*01            [12]  922 	add	a,_SetupLen
+      0001B3 50 05            [24]  923 	jnc	00138$
+                                    924 ;	usb_ep0.c:128: len = 2;
+      0001B5 7F 02            [12]  925 	mov	r7,#0x02
+      0001B7 02r02r41         [24]  926 	ljmp	00159$
+      0001BA                        927 00138$:
+                                    928 ;	usb_ep0.c:130: len = SetupLen;
+      0001BA AF*01            [24]  929 	mov	r7,_SetupLen
+                                    930 ;	usb_ep0.c:132: break;
+      0001BC 02r02r41         [24]  931 	ljmp	00159$
+                                    932 ;	usb_ep0.c:133: default:
+      0001BF                        933 00140$:
+                                    934 ;	usb_ep0.c:134: len = 0xff;				// Unsupported
+      0001BF 7F FF            [12]  935 	mov	r7,#0xff
+                                    936 ;	usb_ep0.c:136: }	// switch (SetupReq)
+      0001C1 02r02r41         [24]  937 	ljmp	00159$
+      0001C4                        938 00155$:
+                                    939 ;	usb_ep0.c:139: else if ((UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK) == USB_REQ_TYP_CLASS) {
+      0001C4 90 00 00         [24]  940 	mov	dptr,#_Ep0Buffer
+      0001C7 E0               [24]  941 	movx	a,@dptr
+      0001C8 FE               [12]  942 	mov	r6,a
+      0001C9 53 06 60         [24]  943 	anl	ar6,#0x60
+      0001CC 7D 00            [12]  944 	mov	r5,#0x00
+      0001CE BE 20 70         [24]  945 	cjne	r6,#0x20,00159$
+      0001D1 BD 00 6D         [24]  946 	cjne	r5,#0x00,00159$
+                                    947 ;	usb_ep0.c:141: if (UsbSetupBuf->bRequestType & USB_REQ_TYP_IN) {
+      0001D4 90 00 00         [24]  948 	mov	dptr,#_Ep0Buffer
+      0001D7 E0               [24]  949 	movx	a,@dptr
+      0001D8 FE               [12]  950 	mov	r6,a
+      0001D9 30 E7 51         [24]  951 	jnb	acc.7,00150$
+                                    952 ;	usb_ep0.c:143: switch( SetupReq ) {
+      0001DC 74 21            [12]  953 	mov	a,#0x21
+      0001DE B5*00 48         [24]  954 	cjne	a,_SetupReq,00143$
+                                    955 ;	usb_ep0.c:149: pDescr = LineCoding;
+      0001E1 75*03r00         [24]  956 	mov	_pDescr,#_LineCoding
+      0001E4 75*04s00         [24]  957 	mov	(_pDescr + 1),#(_LineCoding >> 8)
+      0001E7 75*05 00         [24]  958 	mov	(_pDescr + 2),#0x00
+                                    959 ;	usb_ep0.c:151: len = SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : SetupLen;  // ���δ��䳤��
+      0001EA 74 F8            [12]  960 	mov	a,#0x100 - 0x08
+      0001EC 25*01            [12]  961 	add	a,_SetupLen
+      0001EE 50 06            [24]  962 	jnc	00167$
+      0001F0 7D 08            [12]  963 	mov	r5,#0x08
+      0001F2 7E 00            [12]  964 	mov	r6,#0x00
+      0001F4 80 04            [24]  965 	sjmp	00168$
+      0001F6                        966 00167$:
+      0001F6 AD*01            [24]  967 	mov	r5,_SetupLen
+      0001F8 7E 00            [12]  968 	mov	r6,#0x00
+      0001FA                        969 00168$:
+      0001FA 8D 07            [24]  970 	mov	ar7,r5
+                                    971 ;	usb_ep0.c:152: memcpy(Ep0Buffer, pDescr, len);
+      0001FC 85*03*00         [24]  972 	mov	_memcpy_PARM_2,_pDescr
+      0001FF 85*04*01         [24]  973 	mov	(_memcpy_PARM_2 + 1),(_pDescr + 1)
+      000202 85*05*02         [24]  974 	mov	(_memcpy_PARM_2 + 2),(_pDescr + 2)
+      000205 8F*00            [24]  975 	mov	_memcpy_PARM_3,r7
+      000207 75*01 00         [24]  976 	mov	(_memcpy_PARM_3 + 1),#0x00
+      00020A 90 00 00         [24]  977 	mov	dptr,#_Ep0Buffer
+      00020D 75 F0 00         [24]  978 	mov	b,#0x00
+      000210 C0 07            [24]  979 	push	ar7
+      000212 12r00r00         [24]  980 	lcall	_memcpy
+      000215 D0 07            [24]  981 	pop	ar7
+                                    982 ;	usb_ep0.c:153: SetupLen -= len;
+      000217 E5*01            [12]  983 	mov	a,_SetupLen
+      000219 C3               [12]  984 	clr	c
+      00021A 9F               [12]  985 	subb	a,r7
+      00021B F5*01            [12]  986 	mov	_SetupLen,a
+                                    987 ;	usb_ep0.c:154: pDescr += len;
+      00021D EF               [12]  988 	mov	a,r7
+      00021E 25*03            [12]  989 	add	a,_pDescr
+      000220 F5*03            [12]  990 	mov	_pDescr,a
+      000222 E4               [12]  991 	clr	a
+      000223 35*04            [12]  992 	addc	a,(_pDescr + 1)
+      000225 F5*04            [12]  993 	mov	(_pDescr + 1),a
+                                    994 ;	usb_ep0.c:155: break;
+                                    995 ;	usb_ep0.c:156: default:
+      000227 80 18            [24]  996 	sjmp	00159$
+      000229                        997 00143$:
+                                    998 ;	usb_ep0.c:157: len = 0xFF;
+      000229 7F FF            [12]  999 	mov	r7,#0xff
+                                   1000 ;	usb_ep0.c:159: }
+      00022B 80 14            [24] 1001 	sjmp	00159$
+      00022D                       1002 00150$:
+                                   1003 ;	usb_ep0.c:162: switch( SetupReq ) {
+      00022D 74 20            [12] 1004 	mov	a,#0x20
+      00022F B5*00 02         [24] 1005 	cjne	a,_SetupReq,00321$
+      000232 80 0D            [24] 1006 	sjmp	00159$
+      000234                       1007 00321$:
+      000234 74 22            [12] 1008 	mov	a,#0x22
+      000236 B5*00 02         [24] 1009 	cjne	a,_SetupReq,00322$
+      000239 80 06            [24] 1010 	sjmp	00159$
+      00023B                       1011 00322$:
+                                   1012 ;	usb_ep0.c:174: len = 0xFF;
+      00023B 7F FF            [12] 1013 	mov	r7,#0xff
+                                   1014 ;	usb_ep0.c:176: }
+      00023D 80 02            [24] 1015 	sjmp	00159$
+      00023F                       1016 00158$:
+                                   1017 ;	usb_ep0.c:182: len = 0xff;						// Wrong packet length
+      00023F 7F FF            [12] 1018 	mov	r7,#0xff
+      000241                       1019 00159$:
+                                   1020 ;	usb_ep0.c:187: if (len == 0xff) {	// Return STALL to host if operation is not supported
+      000241 BF FF 07         [24] 1021 	cjne	r7,#0xff,00161$
+                                   1022 ;	usb_ep0.c:188: SetupReq = 0xFF;
+      000244 75*00 FF         [24] 1023 	mov	_SetupReq,#0xff
+                                   1024 ;	usb_ep0.c:189: UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_STALL | UEP_T_RES_STALL;//STALL
+      000247 75 DC CF         [24] 1025 	mov	_UEP0_CTRL,#0xcf
+      00024A 22               [24] 1026 	ret
+      00024B                       1027 00161$:
+                                   1028 ;	usb_ep0.c:191: UEP0_T_LEN = len;
+      00024B 8F DD            [24] 1029 	mov	_UEP0_T_LEN,r7
+                                   1030 ;	usb_ep0.c:192: UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;	// Expect DATA1, Answer ACK
+      00024D 75 DC C0         [24] 1031 	mov	_UEP0_CTRL,#0xc0
+                                   1032 ;	usb_ep0.c:194: }
+      000250 22               [24] 1033 	ret
+                                   1034 ;------------------------------------------------------------
+                                   1035 ;Allocation info for local variables in function 'USB_EP0_IN'
+                                   1036 ;------------------------------------------------------------
+                                   1037 ;len                       Allocated to registers r6 
+                                   1038 ;------------------------------------------------------------
+                                   1039 ;	usb_ep0.c:197: void USB_EP0_IN(void) {
+                                   1040 ;	-----------------------------------------
+                                   1041 ;	 function USB_EP0_IN
+                                   1042 ;	-----------------------------------------
+      000251                       1043 _USB_EP0_IN:
+                                   1044 ;	usb_ep0.c:199: switch (SetupReq)
+      000251 74 05            [12] 1045 	mov	a,#0x05
+      000253 B5*00 02         [24] 1046 	cjne	a,_SetupReq,00121$
+      000256 80 4A            [24] 1047 	sjmp	00102$
+      000258                       1048 00121$:
+      000258 74 06            [12] 1049 	mov	a,#0x06
+      00025A B5*00 50         [24] 1050 	cjne	a,_SetupReq,00103$
+                                   1051 ;	usb_ep0.c:202: len = SetupLen >= 8 ? 8 : SetupLen;		// Fix length
+      00025D 74 F8            [12] 1052 	mov	a,#0x100 - 0x08
+      00025F 25*01            [12] 1053 	add	a,_SetupLen
+      000261 50 06            [24] 1054 	jnc	00107$
+      000263 7E 08            [12] 1055 	mov	r6,#0x08
+      000265 7F 00            [12] 1056 	mov	r7,#0x00
+      000267 80 04            [24] 1057 	sjmp	00108$
+      000269                       1058 00107$:
+      000269 AE*01            [24] 1059 	mov	r6,_SetupLen
+      00026B 7F 00            [12] 1060 	mov	r7,#0x00
+      00026D                       1061 00108$:
+                                   1062 ;	usb_ep0.c:203: memcpy(Ep0Buffer, pDescr, len);			// Copy data to Ep0Buffer, ready to Tx
+      00026D 85*03*00         [24] 1063 	mov	_memcpy_PARM_2,_pDescr
+      000270 85*04*01         [24] 1064 	mov	(_memcpy_PARM_2 + 1),(_pDescr + 1)
+      000273 85*05*02         [24] 1065 	mov	(_memcpy_PARM_2 + 2),(_pDescr + 2)
+      000276 8E*00            [24] 1066 	mov	_memcpy_PARM_3,r6
+      000278 75*01 00         [24] 1067 	mov	(_memcpy_PARM_3 + 1),#0x00
+      00027B 90 00 00         [24] 1068 	mov	dptr,#_Ep0Buffer
+      00027E 75 F0 00         [24] 1069 	mov	b,#0x00
+      000281 C0 06            [24] 1070 	push	ar6
+      000283 12r00r00         [24] 1071 	lcall	_memcpy
+      000286 D0 06            [24] 1072 	pop	ar6
+                                   1073 ;	usb_ep0.c:204: SetupLen -= len;
+      000288 E5*01            [12] 1074 	mov	a,_SetupLen
+      00028A C3               [12] 1075 	clr	c
+      00028B 9E               [12] 1076 	subb	a,r6
+      00028C F5*01            [12] 1077 	mov	_SetupLen,a
+                                   1078 ;	usb_ep0.c:205: pDescr += len;
+      00028E EE               [12] 1079 	mov	a,r6
+      00028F 25*03            [12] 1080 	add	a,_pDescr
+      000291 F5*03            [12] 1081 	mov	_pDescr,a
+      000293 E4               [12] 1082 	clr	a
+      000294 35*04            [12] 1083 	addc	a,(_pDescr + 1)
+      000296 F5*04            [12] 1084 	mov	(_pDescr + 1),a
+                                   1085 ;	usb_ep0.c:206: UEP0_T_LEN = len;
+      000298 8E DD            [24] 1086 	mov	_UEP0_T_LEN,r6
+                                   1087 ;	usb_ep0.c:207: UEP0_CTRL ^= bUEP_T_TOG;				// Switch between DATA0 and DATA1
+      00029A AE DC            [24] 1088 	mov	r6,_UEP0_CTRL
+      00029C 63 06 40         [24] 1089 	xrl	ar6,#0x40
+      00029F 8E DC            [24] 1090 	mov	_UEP0_CTRL,r6
+                                   1091 ;	usb_ep0.c:208: break;
+                                   1092 ;	usb_ep0.c:209: case USB_SET_ADDRESS:
+      0002A1 22               [24] 1093 	ret
+      0002A2                       1094 00102$:
+                                   1095 ;	usb_ep0.c:210: USB_DEV_AD = bUDA_GP_BIT | SetupLen;
+      0002A2 AE*01            [24] 1096 	mov	r6,_SetupLen
+      0002A4 43 06 80         [24] 1097 	orl	ar6,#0x80
+      0002A7 8E E3            [24] 1098 	mov	_USB_DEV_AD,r6
+                                   1099 ;	usb_ep0.c:211: UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
+      0002A9 75 DC 02         [24] 1100 	mov	_UEP0_CTRL,#0x02
+                                   1101 ;	usb_ep0.c:212: break;
+                                   1102 ;	usb_ep0.c:213: default:
+      0002AC 22               [24] 1103 	ret
+      0002AD                       1104 00103$:
+                                   1105 ;	usb_ep0.c:214: UEP0_T_LEN = 0;							// End of transaction
+      0002AD 75 DD 00         [24] 1106 	mov	_UEP0_T_LEN,#0x00
+                                   1107 ;	usb_ep0.c:215: UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
+      0002B0 75 DC 02         [24] 1108 	mov	_UEP0_CTRL,#0x02
+                                   1109 ;	usb_ep0.c:217: }
+                                   1110 ;	usb_ep0.c:218: }
+      0002B3 22               [24] 1111 	ret
+                                   1112 ;------------------------------------------------------------
+                                   1113 ;Allocation info for local variables in function 'USB_EP0_OUT'
+                                   1114 ;------------------------------------------------------------
+                                   1115 ;len                       Allocated to registers 
+                                   1116 ;------------------------------------------------------------
+                                   1117 ;	usb_ep0.c:221: void USB_EP0_OUT(void) {
+                                   1118 ;	-----------------------------------------
+                                   1119 ;	 function USB_EP0_OUT
+                                   1120 ;	-----------------------------------------
+      0002B4                       1121 _USB_EP0_OUT:
+                                   1122 ;	usb_ep0.c:222: uint8_t len = USB_RX_LEN;
+      0002B4 E5 DB            [12] 1123 	mov	a,_USB_RX_LEN
+                                   1124 ;	usb_ep0.c:223: if (SetupReq == SET_LINE_CODING) {
+      0002B6 74 20            [12] 1125 	mov	a,#0x20
+      0002B8 B5*00 24         [24] 1126 	cjne	a,_SetupReq,00105$
+                                   1127 ;	usb_ep0.c:224: if( U_TOG_OK ) {
+      0002BB 30 DE 21         [24] 1128 	jnb	_U_TOG_OK,00105$
+                                   1129 ;	usb_ep0.c:225: memcpy(LineCoding,UsbSetupBuf,USB_RX_LEN);
+      0002BE 75*00 00         [24] 1130 	mov	_memcpy_PARM_2,#_Ep0Buffer
+      0002C1 75*01 00         [24] 1131 	mov	(_memcpy_PARM_2 + 1),#(_Ep0Buffer >> 8)
+      0002C4 75*02 00         [24] 1132 	mov	(_memcpy_PARM_2 + 2),#0x00
+      0002C7 85 DB*00         [24] 1133 	mov	_memcpy_PARM_3,_USB_RX_LEN
+      0002CA 75*01 00         [24] 1134 	mov	(_memcpy_PARM_3 + 1),#0x00
+      0002CD 90r00r00         [24] 1135 	mov	dptr,#_LineCoding
+      0002D0 75 F0 00         [24] 1136 	mov	b,#0x00
+      0002D3 12r00r00         [24] 1137 	lcall	_memcpy
+                                   1138 ;	usb_ep0.c:226: CDC_SetBaud();
+      0002D6 12r00r00         [24] 1139 	lcall	_CDC_SetBaud
+                                   1140 ;	usb_ep0.c:228: UEP0_T_LEN = 0;
+      0002D9 75 DD 00         [24] 1141 	mov	_UEP0_T_LEN,#0x00
+                                   1142 ;	usb_ep0.c:229: UEP0_CTRL |= UEP_R_RES_ACK | UEP_T_RES_ACK;  // ׼���ϴ�0��
+      0002DC 85 DC DC         [24] 1143 	mov	_UEP0_CTRL,_UEP0_CTRL
+                                   1144 ;	usb_ep0.c:232: else if(SetupReq == SET_CONTROL_LINE_STATE){
+      0002DF                       1145 00105$:
+                                   1146 ;	usb_ep0.c:254: UEP0_CTRL ^= bUEP_R_TOG;	// Switch between DATA0 and DATA1	
+      0002DF AE DC            [24] 1147 	mov	r6,_UEP0_CTRL
+      0002E1 63 06 80         [24] 1148 	xrl	ar6,#0x80
+      0002E4 8E DC            [24] 1149 	mov	_UEP0_CTRL,r6
+                                   1150 ;	usb_ep0.c:255: }
+      0002E6 22               [24] 1151 	ret
+                                   1152 	.area CSEG    (CODE)
+                                   1153 	.area CONST   (CODE)
+                                   1154 	.area XINIT   (CODE)
+                                   1155 	.area CABS    (ABS,CODE)

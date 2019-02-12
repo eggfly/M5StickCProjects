@@ -1,0 +1,256 @@
+#include "usb_desc.h"
+#include "usb_endp.h"
+#include "usb_cdc.h"
+#include <string.h>	// For memcpy()
+#include "bootloader.h"
+#include "ch554_platform.h"
+#include "stdio.h"
+extern void CDC_PutChar(uint8_t tdata);
+ void CDC_Puts(char *str);
+// Used in SET_FEATURE and CLEAR_FEATURE 
+#define USB_FEATURE_ENDPOINT_HALT 0						// Endpoint only
+#define USB_FEATURE_DEVICE_REMOTE_WAKEUP 1		// Device only
+
+#define USB_ENDP0_SIZE         DEFAULT_ENDP0_SIZE
+
+// The buffer (Tx and Rx) must have an even address, size: 10 (0x0A)
+xdatabuf(EP0_ADDR, Ep0Buffer, 8 > (USB_ENDP0_SIZE + 2) ? 8 : (USB_ENDP0_SIZE + 2));
+
+#define UsbSetupBuf ((PUSB_SETUP_REQ)Ep0Buffer)
+
+uint8_t   SetupReq, SetupLen, UsbConfig;
+uint8_t*  pDescr;
+
+uint8_t controlStates[2] = {0x00, 0x00};
+
+
+// Process SETUP packet
+void USB_EP0_SETUP(void) {
+	uint8_t len = USB_RX_LEN;
+	if (len == (sizeof(USB_SETUP_REQ))) {
+		SetupLen = UsbSetupBuf->wLengthL;
+		if (UsbSetupBuf->wLengthH || SetupLen > 0x7F)
+			SetupLen = 0x7F;	// Limit the total length
+
+		len = 0;	// Assume success -> Tx 0-length packet
+		SetupReq = UsbSetupBuf->bRequest;
+
+		if ((UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK) == USB_REQ_TYP_STANDARD) {
+			// Standard USB Request
+			switch (SetupReq) {
+			case USB_GET_DESCRIPTOR: 
+				switch (UsbSetupBuf->wValueH) {
+				case 1:												// Device Descriptor
+					pDescr = (uint8_t*)&DevDesc;
+					len = USB_DESCSIZE_DEVICE;
+					break;
+				case 2:												// Configure Descriptor
+					pDescr = (uint8_t*)CfgDesc;
+					len = (USB_DESCSIZE_CONFIG_H << 8) | USB_DESCSIZE_CONFIG_L;
+					break;
+				case 3:												// String Descriptor
+					len = UsbSetupBuf->wValueL;	// Index
+					if (len < USB_STRINGDESC_COUNT) {
+						pDescr = (uint8_t*)(StringDescs[len]);
+						len = pDescr[0];
+					} else {
+						len = 0xFF;								// Not supported
+					}
+					break;
+				case 0x22:										// Report Descriptor
+					len = UsbSetupBuf->wIndexL;
+					if (len < USB_INTERFACES) {
+						
+						//pDescr = USB_HID_GetReportDesc(len);
+						//len = USB_HID_GetReportDesc_Length(len);
+					} else {
+						len = 0xff;		// The host is trying to config invalid interfaces
+					}
+					break;
+				default:
+					len = 0xff;		// Unsupported descriptors
+					break;
+				}	// switch (UsbSetupBuf->wValueH)
+				if (SetupLen > len) {
+					SetupLen = len;		// Limit length
+				}
+				len = SetupLen >= 8 ? 8 : SetupLen;
+				memcpy(Ep0Buffer, pDescr, len);
+				SetupLen -= len;
+				pDescr += len;
+				break;
+			case USB_SET_ADDRESS:
+				SetupLen = UsbSetupBuf->wValueL;	// Save the assigned address
+				break;
+			case USB_GET_CONFIGURATION:
+				Ep0Buffer[0] = UsbConfig;
+				if (SetupLen >= 1)
+					len = 1;
+				break;
+			case USB_SET_CONFIGURATION:
+				UsbConfig = UsbSetupBuf->wValueL;
+				break;
+			case 0x0A:
+				break;
+			case USB_CLEAR_FEATURE:                                            //Clear Feature
+				if ((UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_ENDP) {	// Endpoint
+					len = USB_EP_HALT_CLEAR(UsbSetupBuf->wIndexL);
+				} else {
+					len = 0xFF;			// Unsupported
+				}
+				break;
+			case USB_SET_FEATURE:                                              /* Set Feature */
+				if ((UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK) == USB_REQ_RECIP_ENDP) { // Endpoint
+					if ((((uint16_t)UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == USB_FEATURE_ENDPOINT_HALT) {
+						len = USB_EP_HALT_SET(UsbSetupBuf->wIndexL);
+					} else {
+						len = 0xFF;		// Unsupported
+					}	// if ((((UINT16)UsbSetupBuf->wValueH << 8) | UsbSetupBuf->wValueL) == 0x00)
+				}	else {
+					len = 0xFF;			// Unsupported
+				}
+				break;
+			case USB_GET_STATUS:
+				// Device Status Bits:
+				// D0 1=Self-Powered 0=Bus-powered
+				// D1 1=Support remote wakeup
+				// D2-D15 Reserved, must be 0
+				//
+				// Interface Status Bits:
+				// All reserved, must be 0
+				// 
+				// Endpoint Status Bits:
+				// D0 1=Endpoint is halted
+				// D1-D15 Reserved, must be 0
+				Ep0Buffer[0] = 0x00;
+				Ep0Buffer[1] = 0x00;
+				if (SetupLen >= 2) {
+					len = 2;
+				} else {
+					len = SetupLen;
+				}
+				break;
+			default:
+				len = 0xff;				// Unsupported
+				break;
+			}	// switch (SetupReq)
+		}	// if ((UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK) == USB_REQ_TYP_STANDARD)
+		
+		else if ((UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK) == USB_REQ_TYP_CLASS) {
+			// USB CDC
+			if (UsbSetupBuf->bRequestType & USB_REQ_TYP_IN) {
+				// Device -> Host
+				switch( SetupReq ) {
+					//case SERIAL_STATE:   //0x20
+						// Return CTS DTR state
+						// Return format: bit4:0 [RING BREAK DSR DCD]
+						//break;
+					case GET_LINE_CODING:   //0x21  currently configured
+						pDescr = LineCoding;
+						len = LINECODING_SIZE;
+						len = SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : SetupLen;  // ���δ��䳤��
+						memcpy(Ep0Buffer, pDescr, len);
+						SetupLen -= len;
+						pDescr += len;
+						break;
+					default:
+						len = 0xFF;
+						break;
+				}
+			} else {	// USB_REQ_TYP_OUT
+				// Host -> Device
+				switch( SetupReq ) {
+					case SET_LINE_CODING: //0x20
+						break;
+					case SET_CONTROL_LINE_STATE:  //0x22  generates RS-232/V.24 style control signals
+						//CDC_Puts("SET_CONTROL_LINE_STATE");
+		
+						//CDC_Puts("\n");
+						// 0x00 0x0[0 0 RTS DTR]
+						break;
+					//case SEND_BREAK:
+						//break;
+					default:
+						len = 0xFF;
+						break;
+				}
+			}
+		} // else if ((UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK) == USB_REQ_TYP_CLASS)
+		
+		// Process class requests and vendor requests here (if necessary)
+	} else {
+		len = 0xff;						// Wrong packet length
+	}	// if (len == (sizeof(USB_SETUP_REQ)))
+	
+	
+	//Responce
+	if (len == 0xff) {	// Return STALL to host if operation is not supported
+		SetupReq = 0xFF;
+		UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_STALL | UEP_T_RES_STALL;//STALL
+	} else {	// Tx data to host or send 0-length packet
+		UEP0_T_LEN = len;
+		UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;	// Expect DATA1, Answer ACK
+	}
+}
+
+// Process IN packet
+void USB_EP0_IN(void) {
+	uint8_t len = 0;
+	switch (SetupReq)
+	{
+	case USB_GET_DESCRIPTOR:
+		len = SetupLen >= 8 ? 8 : SetupLen;		// Fix length
+		memcpy(Ep0Buffer, pDescr, len);			// Copy data to Ep0Buffer, ready to Tx
+		SetupLen -= len;
+		pDescr += len;
+		UEP0_T_LEN = len;
+		UEP0_CTRL ^= bUEP_T_TOG;				// Switch between DATA0 and DATA1
+		break;
+	case USB_SET_ADDRESS:
+		USB_DEV_AD = bUDA_GP_BIT | SetupLen;
+		UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
+		break;
+	default:
+		UEP0_T_LEN = 0;							// End of transaction
+		UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
+		break;
+	}
+}
+
+// Process OUT packet
+void USB_EP0_OUT(void) {
+	uint8_t len = USB_RX_LEN;
+	if (SetupReq == SET_LINE_CODING) {
+		if( U_TOG_OK ) {
+			memcpy(LineCoding,UsbSetupBuf,USB_RX_LEN);
+			CDC_SetBaud();
+ 
+			UEP0_T_LEN = 0;
+			UEP0_CTRL |= UEP_R_RES_ACK | UEP_T_RES_ACK;  // ׼���ϴ�0��
+		}
+	}
+	else if(SetupReq == SET_CONTROL_LINE_STATE){
+			/*memcpy(controlStates,UsbSetupBuf,USB_RX_LEN);
+			volatile uint8_t __DTR = (controlStates[1] & 0x1);
+			volatile uint8_t __RTS = ((controlStates[1] >> 1) & 0x1);
+			bootPin = (!__DTR) & __RTS;
+			resetPin = (!__RTS) & __DTR;
+			if(__DTR == 1){
+					CDC_Puts("DTR=1\n");
+				}else{
+					CDC_Puts("DTR=0\n");
+				}
+			if(__RTS == 1){
+					CDC_Puts("RTS=1\n");
+				}else{
+					CDC_Puts("RTS=0\n");
+				}
+			// 0x00 0x0[0 0 RTS DTR]
+			UEP0_T_LEN = 0;
+			UEP0_CTRL |= UEP_R_RES_ACK | UEP_T_RES_ACK;*/
+	
+	}
+
+	UEP0_CTRL ^= bUEP_R_TOG;	// Switch between DATA0 and DATA1	
+}
+

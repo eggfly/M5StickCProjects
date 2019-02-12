@@ -1,0 +1,19 @@
+-muwx
+-i blink.ihx
+-M
+-Y
+-X 0x0400
+-C 0x2800
+-b HOME = 0x0000
+-b ISEG = 0x0000
+-b BSEG = 0x0000
+-k c:\Program Files\SDCC\bin\..\lib\small
+-l mcs51
+-l libsdcc
+-l libint
+-l liblong
+-l libfloat
+main.rel
+debug.rel
+
+-e

@@ -1,0 +1,658 @@
+ASxxxx Linker V03.00 + NoICE + sdld,  page 1.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+CABS                                00000000    00000000 =           0. bytes (ABS,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+C:   00000000  l_BSEG                          
+C:   00000000  l_BSEG_BYTES                    
+C:   00000000  l_CABS                          
+C:   00000000  l_GSINIT1                       
+C:   00000000  l_GSINIT5                       
+C:   00000000  l_IABS                          
+C:   00000000  l_PSEG                          
+C:   00000000  l_REG_BANK_1                    
+C:   00000000  l_REG_BANK_2                    
+C:   00000000  l_REG_BANK_3                    
+C:   00000000  l_RSEG                          
+C:   00000000  l_RSEG0                         
+C:   00000000  l_RSEG1                         
+C:   00000000  l_XABS                          
+C:   00000000  l_XINIT                         
+C:   00000000  l_XISEG                         
+C:   00000000  l_XSEG                          
+C:   00000000  l__CODE                         
+C:   00000000  s_BSEG                          
+C:   00000000  s_CABS                          
+C:   00000000  s_DSEG                          
+C:   00000000  s_HOME                          
+C:   00000000  s_IABS                          
+C:   00000000  s_REG_BANK_0                    
+C:   00000000  s_RSEG                          
+C:   00000000  s_RSEG0                         
+C:   00000000  s_RSEG1                         
+C:   00000000  s_XABS                          
+C:   00000001  l_BIT_BANK                      
+C:   00000003  l_GSFINAL                       
+C:   00000003  l_GSINIT0                       
+C:   00000008  l_REG_BANK_0                    
+C:   00000008  s_REG_BANK_1                    
+C:   0000000A  l_GSINIT2                       
+C:   0000000B  l_OSEG                          
+C:   00000010  s_REG_BANK_2                    
+C:   00000018  s_REG_BANK_3                    
+C:   00000020  s_BIT_BANK                      
+C:   00000020  s_BSEG_BYTES                    
+C:   00000020  s__CODE                         
+C:   00000022  l_GSINIT3                       
+C:   0000002A  l_GSINIT4                       
+C:   00000043  l_SSEG                          
+C:   00000046  l_ISEG                          
+C:   0000004B  l_HOME                          
+C:   0000004B  s_GSINIT0                       
+C:   0000004E  s_GSINIT1                       
+C:   0000004E  s_GSINIT2                       
+C:   00000058  s_GSINIT3                       
+C:   0000006C  s_OSEG                          
+ASxxxx Linker V03.00 + NoICE + sdld,  page 2.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+CABS                                00000000    00000000 =           0. bytes (ABS,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+C:   00000077  s_ISEG                          
+C:   0000007A  s_GSINIT4                       
+C:   0000007E  l_DSEG                          
+C:   000000A4  s_GSINIT                        
+C:   000000A4  s_GSINIT5                       
+C:   000000AD  l_CONST                         
+C:   000000BD  s_SSEG                          
+C:   00000100  l_IRAM                          
+C:   00000100  s_PSEG                          
+C:   00000100  s_XISEG                         
+C:   00000100  s_XSEG                          
+C:   00000109  l_GSINIT                        
+C:   000001AD  s_GSFINAL                       
+C:   000001B0  s_CSEG                          
+C:   00000CBB  l_CSEG                          
+C:   00000E6B  s_CONST                         
+C:   00000F18  s_XINIT                         
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 3.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+.  .ABS.                            00000000    00000000 =           0. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00000000  .__.ABS.                           _startup
+     00000000  _Ep0Buffer                         usb_ep0
+     0000000A  _Ep1Buffer                         usb_endp
+     0000004A  _Ep2Buffer                         usb_endp
+     00000080  _ADC_CHAN0                         usb_string_desc
+     00000080  _ADC_CTRL                          usb_string_desc
+     00000081  _ADC_CHAN1                         usb_string_desc
+     00000081  _SP                                usb_string_desc
+     00000082  _DPL                               usb_string_desc
+     00000083  _CMP_CHAN                          usb_string_desc
+     00000083  _DPH                               usb_string_desc
+     00000084  _ADC_START                         usb_string_desc
+     00000084  _ROM_ADDR_L                        usb_string_desc
+     00000085  _ADC_IF                            usb_string_desc
+     00000085  _ROM_ADDR_H                        usb_string_desc
+     00000086  _CMP_IF                            usb_string_desc
+     00000086  _ROM_CTRL                          usb_string_desc
+     00000087  _CMPO                              usb_string_desc
+     00000087  _PCON                              usb_string_desc
+     00000088  _IT0                               usb_string_desc
+     00000088  _TCON                              usb_string_desc
+     00000089  _IE0                               usb_string_desc
+     00000089  _TMOD                              usb_string_desc
+     0000008A  _IT1                               usb_string_desc
+     0000008A  _TL0                               usb_string_desc
+     0000008B  _IE1                               usb_string_desc
+     0000008B  _TL1                               usb_string_desc
+     0000008C  _TH0                               usb_string_desc
+     0000008C  _TR0                               usb_string_desc
+     0000008D  _TF0                               usb_string_desc
+     0000008D  _TH1                               usb_string_desc
+     0000008E  _ROM_DATA_L                        usb_string_desc
+     0000008E  _TR1                               usb_string_desc
+     0000008F  _ROM_DATA_H                        usb_string_desc
+     0000008F  _TF1                               usb_string_desc
+     00000090  _CAP1                              usb_string_desc
+     00000090  _P1                                usb_string_desc
+     00000090  _T2                                usb_string_desc
+     00000090  _TIN0                              usb_string_desc
+     00000090  _resetPin                          main
+     00000090  _rstPin                            usb_cdc
+     00000091  _AIN0                              usb_string_desc
+     00000091  _CAP2                              usb_string_desc
+     00000091  _T2EX                              usb_string_desc
+     00000091  _TIN1                              usb_string_desc
+     00000091  _USB_C_CTRL                        usb_string_desc
+     00000091  _VBUS2                             usb_string_desc
+     00000092  _P1_MOD_OC                         usb_string_desc
+     00000092  _RXD_                              usb_string_desc
+     00000093  _P1_DIR_PU                         usb_string_desc
+ASxxxx Linker V03.00 + NoICE + sdld,  page 4.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+.  .ABS.                            00000000    00000000 =           0. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00000093  _TXD_                              usb_string_desc
+     00000094  _AIN1                              usb_string_desc
+     00000094  _CAP1_                             usb_string_desc
+     00000094  _SCS                               usb_string_desc
+     00000094  _T2_                               usb_string_desc
+     00000094  _TIN2                              usb_string_desc
+     00000094  _UCC1                              usb_string_desc
+     00000095  _AIN2                              usb_string_desc
+     00000095  _MOSI                              usb_string_desc
+     00000095  _PWM1                              usb_string_desc
+     00000095  _TIN3                              usb_string_desc
+     00000095  _UCC2                              usb_string_desc
+     00000096  _MISO                              usb_string_desc
+     00000096  _P3_MOD_OC                         usb_string_desc
+     00000096  _RXD1                              usb_string_desc
+     00000096  _TIN4                              usb_string_desc
+     00000097  _P3_DIR_PU                         usb_string_desc
+     00000097  _SCK                               usb_string_desc
+     00000097  _TIN5                              usb_string_desc
+     00000097  _TXD1                              usb_string_desc
+     00000097  _bootPin                           usb_cdc
+     00000098  _RI                                usb_string_desc
+     00000098  _SCON                              usb_string_desc
+     00000099  _SBUF                              usb_string_desc
+     00000099  _TI                                usb_string_desc
+     0000009A  _ADC_CFG                           usb_string_desc
+     0000009A  _RB8                               usb_string_desc
+     0000009B  _PWM_DATA2                         usb_string_desc
+     0000009B  _TB8                               usb_string_desc
+     0000009C  _PWM_DATA1                         usb_string_desc
+     0000009C  _REN                               usb_string_desc
+     0000009D  _PWM_CTRL                          usb_string_desc
+     0000009D  _SM2                               usb_string_desc
+     0000009E  _PWM_CK_SE                         usb_string_desc
+     0000009E  _SM1                               usb_string_desc
+     0000009F  _ADC_DATA                          usb_string_desc
+     0000009F  _SM0                               usb_string_desc
+     000000A0  _P2                                usb_string_desc
+     000000A0  __XPAGE                            
+     000000A1  _SAFE_MOD                          usb_string_desc
+     000000A2  _XBUS_AUX                          usb_string_desc
+     000000A8  _EX0                               usb_string_desc
+     000000A8  _IE                                usb_string_desc
+     000000A9  _ET0                               usb_string_desc
+     000000A9  _WAKE_CTRL                         usb_string_desc
+     000000AA  _EX1                               usb_string_desc
+     000000AB  _ET1                               usb_string_desc
+     000000AC  _ES                                usb_string_desc
+     000000AD  _ET2                               usb_string_desc
+     000000AE  _E_DIS                             usb_string_desc
+     000000AF  _EA                                usb_string_desc
+ASxxxx Linker V03.00 + NoICE + sdld,  page 5.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+.  .ABS.                            00000000    00000000 =           0. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     000000B0  _P3                                usb_string_desc
+     000000B0  _PWM1_                             usb_string_desc
+     000000B0  _RXD                               usb_string_desc
+     000000B1  _GLOBAL_CFG                        usb_string_desc
+     000000B1  _PWM2_                             usb_string_desc
+     000000B1  _TXD                               usb_string_desc
+     000000B2  _AIN3                              usb_string_desc
+     000000B2  _INT0                              usb_string_desc
+     000000B2  _TXD1_                             usb_string_desc
+     000000B2  _VBUS1                             usb_string_desc
+     000000B3  _INT1                              usb_string_desc
+     000000B3  _SDA                               main
+     000000B4  _PWM2                              usb_string_desc
+     000000B4  _RXD1_                             usb_string_desc
+     000000B4  _SCL                               main
+     000000B4  _T0                                usb_string_desc
+     000000B5  _T1                                usb_string_desc
+     000000B6  _UDP                               usb_string_desc
+     000000B7  _UDM                               usb_string_desc
+     000000B8  _IP                                usb_string_desc
+     000000B8  _PX0                               usb_string_desc
+     000000B9  _CLOCK_CFG                         usb_string_desc
+     000000B9  _PT0                               usb_string_desc
+     000000BA  _PX1                               usb_string_desc
+     000000BB  _PT1                               usb_string_desc
+     000000BC  _PS                                usb_string_desc
+     000000BD  _PT2                               usb_string_desc
+     000000BE  _PL_FLAG                           usb_string_desc
+     000000BF  _PH_FLAG                           usb_string_desc
+     000000C0  _SCON1                             usb_string_desc
+     000000C0  _U1RI                              usb_string_desc
+     000000C1  _SBUF1                             usb_string_desc
+     000000C1  _U1TI                              usb_string_desc
+     000000C2  _SBAUD1                            usb_string_desc
+     000000C2  _U1RB8                             usb_string_desc
+     000000C3  _TKEY_CTRL                         usb_string_desc
+     000000C3  _U1TB8                             usb_string_desc
+     000000C4  _TKEY_DATL                         usb_string_desc
+     000000C4  _U1REN                             usb_string_desc
+     000000C5  _TKEY_DATH                         usb_string_desc
+     000000C5  _U1SMOD                            usb_string_desc
+     000000C6  _PIN_FUNC                          usb_string_desc
+     000000C7  _GPIO_IE                           usb_string_desc
+     000000C7  _U1SM0                             usb_string_desc
+     000000C8  _CP_RL2                            usb_string_desc
+     000000C8  _T2CON                             usb_string_desc
+     000000C9  _C_T2                              usb_string_desc
+     000000C9  _T2MOD                             usb_string_desc
+     000000CA  _LineCoding                        usb_cdc
+     000000CA  _RCAP2L                            usb_string_desc
+     000000CA  _TR2                               usb_string_desc
+ASxxxx Linker V03.00 + NoICE + sdld,  page 6.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+.  .ABS.                            00000000    00000000 =           0. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     000000CB  _EXEN2                             usb_string_desc
+     000000CB  _RCAP2H                            usb_string_desc
+     000000CC  _TCLK                              usb_string_desc
+     000000CC  _TL2                               usb_string_desc
+     000000CD  _RCLK                              usb_string_desc
+     000000CD  _TH2                               usb_string_desc
+     000000CE  _EXF2                              usb_string_desc
+     000000CE  _T2CAP1L                           usb_string_desc
+     000000CF  _CAP1F                             usb_string_desc
+     000000CF  _T2CAP1H                           usb_string_desc
+     000000CF  _TF2                               usb_string_desc
+     000000D0  _P                                 usb_string_desc
+     000000D0  _PSW                               usb_string_desc
+     000000D1  _F1                                usb_string_desc
+     000000D1  _UDEV_CTRL                         usb_string_desc
+     000000D2  _OV                                usb_string_desc
+     000000D2  _UEP1_CTRL                         usb_string_desc
+     000000D3  _RS0                               usb_string_desc
+     000000D3  _UEP1_T_LEN                        usb_string_desc
+     000000D4  _RS1                               usb_string_desc
+     000000D4  _UEP2_CTRL                         usb_string_desc
+     000000D5  _F0                                usb_string_desc
+     000000D5  _UEP2_T_LEN                        usb_string_desc
+     000000D6  _AC                                usb_string_desc
+     000000D6  _UEP3_CTRL                         usb_string_desc
+     000000D7  _CY                                usb_string_desc
+     000000D7  _UEP3_T_LEN                        usb_string_desc
+     000000D8  _UIF_BUS_RST                       usb_string_desc
+     000000D8  _UIF_DETECT                        usb_string_desc
+     000000D8  _USB_INT_FG                        usb_string_desc
+     000000D9  _UIF_TRANSFER                      usb_string_desc
+     000000D9  _USB_INT_ST                        usb_string_desc
+     000000DA  _UIF_SUSPEND                       usb_string_desc
+     000000DA  _USB_MIS_ST                        usb_string_desc
+     000000DB  _UIF_HST_SOF                       usb_string_desc
+     000000DB  _USB_RX_LEN                        usb_string_desc
+     000000DC  _UEP0_CTRL                         usb_string_desc
+     000000DC  _UIF_FIFO_OV                       usb_string_desc
+     000000DD  _UEP0_T_LEN                        usb_string_desc
+     000000DD  _U_SIE_FREE                        usb_string_desc
+     000000DE  _UEP4_CTRL                         usb_string_desc
+     000000DE  _U_TOG_OK                          usb_string_desc
+     000000DF  _UEP4_T_LEN                        usb_string_desc
+     000000DF  _U_IS_NAK                          usb_string_desc
+     000000E0  _ACC                               usb_string_desc
+     000000E1  _USB_INT_EN                        usb_string_desc
+     000000E2  _USB_CTRL                          usb_string_desc
+     000000E3  _USB_DEV_AD                        usb_string_desc
+     000000E4  _UEP2_DMA_L                        usb_string_desc
+     000000E5  _UEP2_DMA_H                        usb_string_desc
+     000000E6  _UEP3_DMA_L                        usb_string_desc
+ASxxxx Linker V03.00 + NoICE + sdld,  page 7.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+.  .ABS.                            00000000    00000000 =           0. bytes (ABS,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     000000E7  _UEP3_DMA_H                        usb_string_desc
+     000000E8  _IE_EX                             usb_string_desc
+     000000E8  _IE_SPI0                           usb_string_desc
+     000000E9  _IE_TKEY                           usb_string_desc
+     000000E9  _IP_EX                             usb_string_desc
+     000000EA  _IE_USB                            usb_string_desc
+     000000EA  _UEP4_1_MOD                        usb_string_desc
+     000000EB  _IE_ADC                            usb_string_desc
+     000000EB  _UEP2_3_MOD                        usb_string_desc
+     000000EC  _IE_UART1                          usb_string_desc
+     000000EC  _UEP0_DMA_L                        usb_string_desc
+     000000ED  _IE_PWMX                           usb_string_desc
+     000000ED  _UEP0_DMA_H                        usb_string_desc
+     000000EE  _IE_GPIO                           usb_string_desc
+     000000EE  _UEP1_DMA_L                        usb_string_desc
+     000000EF  _IE_WDOG                           usb_string_desc
+     000000EF  _UEP1_DMA_H                        usb_string_desc
+     000000F0  _B                                 usb_string_desc
+     000000F5  _B_5                               _gptrget
+     000000F6  _B_6                               _gptrget
+     000000F7  _B_7                               _gptrget
+     000000F8  _S0_R_FIFO                         usb_string_desc
+     000000F8  _SPI0_STAT                         usb_string_desc
+     000000F9  _SPI0_DATA                         usb_string_desc
+     000000FA  _S0_T_FIFO                         usb_string_desc
+     000000FA  _SPI0_CTRL                         usb_string_desc
+     000000FB  _S0_FREE                           usb_string_desc
+     000000FB  _SPI0_CK_SE                        usb_string_desc
+     000000FC  _S0_IF_BYTE                        usb_string_desc
+     000000FC  _SPI0_SETUP                        usb_string_desc
+     000000FD  _S0_IF_FIRST                       usb_string_desc
+     000000FE  _RESET_KEEP                        usb_string_desc
+     000000FE  _S0_IF_OV                          usb_string_desc
+     000000FF  _S0_FST_ACT                        usb_string_desc
+     000000FF  _WDOG_COUNT                        usb_string_desc
+     00008584  _ROM_ADDR                          usb_string_desc
+     00008F8E  _ROM_DATA                          usb_string_desc
+     0000C5C4  _TKEY_DAT                          usb_string_desc
+     0000CBCA  _RCAP2                             usb_string_desc
+     0000CDCC  _T2COUNT                           usb_string_desc
+     0000CFCE  _T2CAP1                            usb_string_desc
+     0000E5E4  _UEP2_DMA                          usb_string_desc
+     0000E7E6  _UEP3_DMA                          usb_string_desc
+     0000EDEC  _UEP0_DMA                          usb_string_desc
+     0000EFEE  _UEP1_DMA                          usb_string_desc
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 8.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+REG_BANK_0                          00000000    00000008 =           8. bytes (REL,OVR)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 9.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+BIT_BANK                            00000020    00000001 =           1. bytes (REL,OVR)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 10.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+DSEG                                00000000    0000007E =         126. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00000008  _count                             main
+     0000000C  _state                             main
+     0000000D  _wasInDownloadMode                 main
+     0000000E  _SetupReq                          usb_ep0
+     0000000F  _SetupLen                          usb_ep0
+     00000010  _UsbConfig                         usb_ep0
+     00000011  _pDescr                            usb_ep0
+     00000014  _controlStates                     usb_ep0
+     00000016  _StringDescs                       usb_string_desc
+     00000021  _CDC_Baud                          usb_cdc
+     0000002E  _espBootCount                      usb_cdc
+     0000002F  _resetToBoot                       usb_cdc
+     00000030  _rebootESP32                       usb_cdc
+     00000031  _countESP32Endl                    usb_cdc
+     00000044  _pEndPoint_OUT_CallBack            usb_it
+     0000004E  _pEndPoint_SOF_CallBack            usb_it
+     00000058  _pEndPoint_IN_CallBack             usb_it
+     00000062  _pEndPoint_SETUP_CallBack          usb_it
+ASxxxx Linker V03.00 + NoICE + sdld,  page 11.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+OSEG                                0000006C    0000000B =          11. bytes (REL,OVR)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     0000006C  _Port1Cfg_PARM_2                   main
+     0000006C  __divslong_PARM_2                  _divulong
+     0000006C  __divulong_PARM_2                  _divulong
+     0000006C  __gptrput_PARM_2                   _gptrput
+     0000006C  __modslong_PARM_2                  _modulong
+     0000006C  __modulong_PARM_2                  _modulong
+     0000006C  _memcpy_PARM_2                     _memcpy
+     0000006F  _memcpy_PARM_3                     _memcpy
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 12.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+ISEG                                00000077    00000046 =          70. bytes (REL,CON)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     00000077  _CDC_PutCharBuf                    usb_cdc
+     000000B7  _CDC_PutCharBuf_Last               usb_cdc
+     000000B8  _CDC_PutCharBuf_First              usb_cdc
+     000000B9  _CDC_Tx_Busy                       usb_cdc
+     000000BA  _CDC_Tx_Full                       usb_cdc
+     000000BB  _CDC_Rx_Pending                    usb_cdc
+     000000BC  _CDC_Rx_CurPos                     usb_cdc
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 13.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+SSEG                                000000BD    00000043 =          67. bytes (REL,OVR)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+     000000BD  __start__stack                     main
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 14.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+HOME                                00000000    0000004B =          75. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+C:   00000046  __sdcc_program_startup             main
+C:   00000049  __sdcc_call_dptr                   
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 15.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+GSINIT0                             0000004B    00000003 =           3. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+C:   0000004B  __sdcc_gsinit_startup              
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 16.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+GSINIT2                             0000004E    0000000A =          10. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 17.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+GSINIT3                             00000058    00000022 =          34. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+C:   00000058  __mcs51_genXINIT                   
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 18.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+GSINIT4                             0000007A    0000002A =          42. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+C:   0000007A  __mcs51_genRAMCLEAR                
+C:   00000080  __mcs51_genXRAMCLEAR               
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 19.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+GSINIT                              000000A4    00000109 =         265. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 20.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+GSFINAL                             000001AD    00000003 =           3. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+ASxxxx Linker V03.00 + NoICE + sdld,  page 21.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+CSEG                                000001B0    00000CBB =        3259. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+C:   000001B0  _Port1Cfg                          main
+C:   00000239  _TypeC_UPF_PDInit                  main
+C:   00000243  _main                              main
+C:   00000360  _USBInterruptEntry                 main
+C:   0000039F  _UART0_RX                          main
+C:   000003DE  _JumpToBootloader                  bootloader
+C:   000003F1  _ConfigSysClock                    ch554_conf
+C:   00000405  _USBDevice_Init                    ch554_conf
+C:   00000456  _UART0_Init                        ch554_conf
+C:   0000047E  _CH554_Init                        ch554_conf
+C:   00000490  _CH554UART0RcvByte                 ch554_conf
+C:   00000499  _CH554UART0SendByte                ch554_conf
+C:   000004A2  _mDelayuS                          delay
+C:   000004B4  _mDelaymS                          delay
+C:   000004D2  _CDC_InitBaud                      usb_cdc
+C:   000004F5  _CDC_SetBaud                       usb_cdc
+C:   000005C7  _USB_EP1_IN                        usb_cdc
+C:   000005D5  _USB_EP2_IN                        usb_cdc
+C:   000005F8  _USB_EP2_OUT                       usb_cdc
+C:   0000060F  _CDC_PutChar                       usb_cdc
+C:   00000642  _CDC_Puts                          usb_cdc
+C:   0000066D  _CDC_USB_Poll                      usb_cdc
+C:   000007A4  _CDC_UART_Poll                     usb_cdc
+C:   00000858  _USB_EP_HALT_SET                   usb_endp
+C:   000008BD  _USB_EP_HALT_CLEAR                 usb_endp
+C:   0000091C  _USB_EP0_SETUP                     usb_ep0
+C:   00000B6D  _USB_EP0_IN                        usb_ep0
+C:   00000BD0  _USB_EP0_OUT                       usb_ep0
+C:   00000C03  _NOP_Process                       usb_it
+C:   00000C04  _USBInterrupt                      usb_it
+C:   00000CF3  __modulong                         _modulong
+C:   00000D76  __divulong                         _divulong
+C:   00000DDB  _memcpy                            _memcpy
+C:   00000E30  __gptrput                          _gptrput
+C:   00000E4B  __gptrget                          _gptrget
+C:   00000E67  __sdcc_external_startup            _startup
+ASxxxx Linker V03.00 + NoICE + sdld,  page 22.
+Hexadecimal  [32-Bits]
+
+Area                                    Addr        Size        Decimal Bytes (Attributes)
+--------------------------------        ----        ----        ------- ----- ------------
+CONST                               00000E6B    000000AD =         173. bytes (REL,CON,CODE)
+
+      Value  Global                              Global Defined In Module
+      -----  --------------------------------   ------------------------
+C:   00000E6B  _DevDesc                           usb_desc
+C:   00000E7D  _CfgDesc                           usb_desc
+C:   00000EC8  _LangDesc                          usb_string_desc
+C:   00000ECC  _DevName1                          usb_string_desc
+C:   00000EE0  _ProductName                       usb_string_desc
+C:   00000F06  _ManuName                          usb_string_desc
+ASxxxx Linker V03.00 + NoICE + sdld,  page 23.
+
+Files Linked                              [ module(s) ]
+
+main.rel                                  [  ]
+bootloader.rel                            [  ]
+ch554_conf.rel                            [  ]
+delay.rel                                 [  ]
+usb_cdc.rel                               [  ]
+usb_desc.rel                              [  ]
+usb_endp.rel                              [  ]
+usb_ep0.rel                               [  ]
+usb_it.rel                                [  ]
+usb_string_desc.rel                       [  ]
+
+
+Libraries Linked                          [ object file ]
+
+c:\Program Files\SDCC\bin\..\lib\small/liblong.lib
+                                          [ _modulong.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/liblong.lib
+                                          [ _divulong.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/mcs51.lib
+                                          [ crtclear.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/libsdcc.lib
+                                          [ _memcpy.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/mcs51.lib
+                                          [ crtxinit.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/libsdcc.lib
+                                          [ _gptrput.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/mcs51.lib
+                                          [ crtxclear.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/mcs51.lib
+                                          [ crtcall.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/mcs51.lib
+                                          [ crtpagesfr.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/mcs51.lib
+                                          [ crtstart.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/libsdcc.lib
+                                          [ _gptrget.rel ]
+c:\Program Files\SDCC\bin\..\lib\small/libsdcc.lib
+                                          [ _startup.rel ]
+
+ASxxxx Linker V03.00 + NoICE + sdld,  page 24.
+
+User Base Address Definitions
+
+HOME = 0x0000
+XSEG = 0x0100
+PSEG = 0x0100
+ISEG = 0x0000
+BSEG = 0x0000
+
+
