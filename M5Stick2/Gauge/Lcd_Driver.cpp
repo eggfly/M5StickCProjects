@@ -5,7 +5,6 @@
 #include "Lcd_Driver.h"
 #include "LCD_Config.h"
 //#include "delay.h"
- #include<inttypes.h >
 #include <SPI.h>
  
 //Һ��IO��ʼ������
@@ -290,7 +289,3 @@ void Lcd_pic(const unsigned char *array)
       z++;
     }   */
 }
-
-
-
-

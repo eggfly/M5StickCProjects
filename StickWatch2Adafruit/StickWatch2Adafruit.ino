@@ -1,10 +1,10 @@
 
 #include <Wire.h>
 
-#include "src/Adafruit_GFX/Adafruit_GFX.h"    // Core graphics library
-#include "src/Adafruit_ST7735/Adafruit_ST7735.h" // Hardware-specific library for ST7735
+#include "Adafruit_GFX.h"    // Core graphics library
+#include "Adafruit_ST7735.h" // Hardware-specific library for ST7735
 #include <SPI.h>
-#include "src/RTCLib/RTClib.h"
+#include "RTClib.h"
 
 #define TFT_CS          5
 #define TFT_RST        18 // Or set to -1 and connect to Arduino RESET pin
@@ -131,7 +131,7 @@ void loop() {
   tft.fillScreen(ST77XX_BLACK);
   // testdrawtext("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur adipiscing ante sed nibh tincidunt feugiat. Maecenas enim massa, fringilla sed malesuada et, malesuada sit amet turpis. Sed porttitor neque ut ante pretium vitae malesuada nunc bibendum. Nullam aliquet ultrices massa eu hendrerit. Ut sed nisi lorem. In vestibulum purus a tortor imperdiet posuere. ", ST77XX_WHITE);
   drawRTC(ST77XX_WHITE);
-  delay(1000);
+  // delay(1000);
 //  tft.invertDisplay(true);
 //  delay(500);
 //  tft.invertDisplay(false);
