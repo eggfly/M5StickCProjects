@@ -247,7 +247,7 @@ void drawAXP2() {
   ucg.setPrintPos(85, 40);
   ucg.print("Vin:");
   ucg.print(vbus_v, 2);
-  ucg.print("mV");
+  ucg.print("V");
 
   ucg.setPrintPos(85, 50);
   ucg.print("Iin:");
