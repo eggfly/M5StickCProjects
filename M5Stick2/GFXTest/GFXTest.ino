@@ -1,3 +1,4 @@
+#include <Adafruit_GFX.h>
 
 //#include <M5Stack.h>
 #include <Arduino.h>
@@ -5,8 +6,8 @@
 
 #include <stdio.h>
 #include "esp_sleep.h"
-#include "nvs.h"
-#include "nvs_flash.h"
+// #include "nvs.h"
+// #include "nvs_flash.h"
 #include "soc/rtc_cntl_reg.h"
 #include "soc/rtc_io_reg.h"
 #include "soc/sens_reg.h"
@@ -36,6 +37,7 @@
 
 // osmar
 
+GFXcanvas16 canvas = GFXcanvas16(80, 160);
 
 // End of constructor list
 
@@ -111,7 +113,7 @@ void setup(void) {
 
   Wire.beginTransmission(0x34);
   Wire.write(0x28);
-  Wire.write(0xff); //Enable LDO2&LDO3, LED&TFT 3.3V
+  Wire.write(0x9f); //Enable LDO2&LDO3, LED&TFT 3.3V
   Wire.endTransmission();
 
   Wire.beginTransmission(0x34);
@@ -146,11 +148,11 @@ void setup(void) {
 
   Lcd_Init();
   Lcd_Clear(WHITE);
-  Lcd_pic(gImage_001);
+  // Lcd_pic(gImage_001);
   //attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), blink, CHANGE);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), blink, FALLING);
 
-  //    u8g2.begin();
+  // u8g2.begin();
   sh200i_init();
 }
 
@@ -167,10 +169,21 @@ void loop(void) {
   loopTime = millis();
   startTime = loopTime;
 
-  if (state)
-    Lcd_pic(gImage_002);
-  else
-    Lcd_pic(gImage_001);
+  canvas.fillScreen(0xFFFF); // fill with white
+  canvas.setRotation(3);
+  canvas.drawPixel(40, 40, 0x8000);
+  canvas.fillCircle(40, 40, 20, 0x0000);
+  canvas.fillCircle(80, 80, 20, 0xFFFF);
+  canvas.setCursor(10, 10);
+  canvas.setTextColor(0x0000);
+  canvas.setTextSize(2);
+  canvas.print("1111");
+  if (state) {
+    Lcd_pic((unsigned char *)canvas.getBuffer());
+  } else {
+    Lcd_pic((unsigned char *)canvas.getBuffer());
+    // Lcd_pic(gImage_001);
+  }
   //  Lcd_Clear(WHITE);
   //  Lcd_Clear(RED);
   //  Lcd_Clear(GREEN);
