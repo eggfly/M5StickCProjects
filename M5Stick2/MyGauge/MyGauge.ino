@@ -184,7 +184,7 @@ void loop(void) {
   loopTime = millis();
   endTime = loopTime;
   fps = 1000 / (endTime - startTime);
-  printf("fps:%d\r\n", fps);
+  // printf("fps:%d\r\n", fps);
   ///*
   unsigned char tempdata[1];
   I2C_Read_NBytes(SH200I_ADDRESS, SH200I_OUTPUT_ACC_X, 1, tempdata);
@@ -219,7 +219,8 @@ void loop(void) {
   gyroZ |= tempdata[0] << 8;
 
 
-  Serial.printf("%ld,%ld,%ld,%ld,%ld,%ld\r\n", accX, accY, accZ, gyroX, gyroY, gyroZ);
+  // Serial.printf("%ld,%ld,%ld,%ld,%ld,%ld\r\n", accX, accY, accZ, gyroX, gyroY, gyroZ);
+  Serial.printf("%ld,%ld,%ld\r\n", accX, accY, accZ);
 
   delay(10);
   if (abs(accX) > abs(accY))

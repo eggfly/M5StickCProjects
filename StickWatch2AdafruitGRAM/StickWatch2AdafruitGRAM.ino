@@ -35,7 +35,7 @@
 
 // osmar
 
-GFXcanvas16 tft = GFXcanvas16(80, 160);
+GFXcanvas16 canvas = GFXcanvas16(80, 160);
 
 // End of constructor list
 
@@ -148,7 +148,7 @@ void setup(void) {
   // Lcd_pic(gImage_001);
   //attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), blink, CHANGE);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), blink, FALLING);
-  tft.setRotation(3);
+  canvas.setRotation(3);
 
   // u8g2.begin();
   // runGraphicTest();
@@ -167,24 +167,24 @@ long loopTime, startTime, endTime, fps;
 //  Lcd_Clear(BLUE);
 
 void sendGRAM() {
-  Lcd_pic((unsigned char *)tft.getBuffer());
+  Lcd_pic((unsigned char *)canvas.getBuffer());
 }
 
 void loop(void) {
   loopTime = millis();
   startTime = loopTime;
 
-  tft.fillScreen(0xFFFF); // fill with white
-  tft.setRotation(3);
-  tft.drawPixel(40, 40, 0x8000);
-  tft.fillCircle(40, 40, 20, RED);
-  tft.fillCircle(80, 80, 20, BLUE);
-  tft.setCursor(10, 10);
-  tft.setTextColor(GREEN);
-  tft.setTextSize(2);
-  tft.print("112233");
-  tft.setTextSize(1);
-  tft.print("test");
+  canvas.setRotation(3);
+  canvas.fillScreen(0xFFFF); // fill with white
+  canvas.drawPixel(40, 40, 0x8000);
+  canvas.fillCircle(40, 40, 20, RED);
+  canvas.fillCircle(80, 80, 20, BLUE);
+  canvas.setCursor(10, 10);
+  canvas.setTextColor(GREEN);
+  canvas.setTextSize(2);
+  canvas.print("112233");
+  canvas.setTextSize(1);
+  canvas.print("test");
 
   // Send GRAM using SPI.writePixels() is very very fast
   sendGRAM();
@@ -225,12 +225,12 @@ void blink()//中断函数
 
 
 void runGraphicTest() {
-  tft.fillScreen(ST77XX_BLACK);
+  canvas.fillScreen(ST77XX_BLACK);
 
   delay(500);
 
   // large block of text
-  tft.fillScreen(ST77XX_BLACK);
+  canvas.fillScreen(ST77XX_BLACK);
   testdrawtext("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur adipiscing ante sed nibh tincidunt feugiat. Maecenas enim massa, fringilla sed malesuada et, malesuada sit amet turpis. Sed porttitor neque ut ante pretium vitae malesuada nunc bibendum. Nullam aliquet ultrices massa eu hendrerit. Ut sed nisi lorem. In vestibulum purus a tortor imperdiet posuere. ", ST77XX_WHITE);
   sendGRAM();
   delay(1000);
@@ -241,7 +241,7 @@ void runGraphicTest() {
   delay(4000);
 
   // a single pixel
-  tft.drawPixel(tft.width() / 2, tft.height() / 2, ST77XX_GREEN);
+  canvas.drawPixel(canvas.width() / 2, canvas.height() / 2, ST77XX_GREEN);
   sendGRAM();
   delay(500);
 
@@ -263,7 +263,7 @@ void runGraphicTest() {
   sendGRAM();
   delay(500);
 
-  tft.fillScreen(ST77XX_BLACK);
+  canvas.fillScreen(ST77XX_BLACK);
   testfillcircles(10, ST77XX_BLUE);
   testdrawcircles(10, ST77XX_WHITE);
   sendGRAM();
@@ -291,121 +291,121 @@ void runGraphicTest() {
 // from Adafruit graphictest below
 
 void testlines(uint16_t color) {
-  tft.fillScreen(ST77XX_BLACK);
-  for (int16_t x = 0; x < tft.width(); x += 6) {
-    tft.drawLine(0, 0, x, tft.height() - 1, color);
+  canvas.fillScreen(ST77XX_BLACK);
+  for (int16_t x = 0; x < canvas.width(); x += 6) {
+    canvas.drawLine(0, 0, x, canvas.height() - 1, color);
     sendGRAM();
     delay(0);
   }
-  for (int16_t y = 0; y < tft.height(); y += 6) {
-    tft.drawLine(0, 0, tft.width() - 1, y, color);
-    sendGRAM();
-    delay(0);
-  }
-
-  tft.fillScreen(ST77XX_BLACK);
-  for (int16_t x = 0; x < tft.width(); x += 6) {
-    tft.drawLine(tft.width() - 1, 0, x, tft.height() - 1, color);
-    sendGRAM();
-    delay(0);
-  }
-  for (int16_t y = 0; y < tft.height(); y += 6) {
-    tft.drawLine(tft.width() - 1, 0, 0, y, color);
+  for (int16_t y = 0; y < canvas.height(); y += 6) {
+    canvas.drawLine(0, 0, canvas.width() - 1, y, color);
     sendGRAM();
     delay(0);
   }
 
-  tft.fillScreen(ST77XX_BLACK);
-  for (int16_t x = 0; x < tft.width(); x += 6) {
-    tft.drawLine(0, tft.height() - 1, x, 0, color);
+  canvas.fillScreen(ST77XX_BLACK);
+  for (int16_t x = 0; x < canvas.width(); x += 6) {
+    canvas.drawLine(canvas.width() - 1, 0, x, canvas.height() - 1, color);
     sendGRAM();
     delay(0);
   }
-  for (int16_t y = 0; y < tft.height(); y += 6) {
-    tft.drawLine(0, tft.height() - 1, tft.width() - 1, y, color);
+  for (int16_t y = 0; y < canvas.height(); y += 6) {
+    canvas.drawLine(canvas.width() - 1, 0, 0, y, color);
     sendGRAM();
     delay(0);
   }
 
-  tft.fillScreen(ST77XX_BLACK);
-  for (int16_t x = 0; x < tft.width(); x += 6) {
-    tft.drawLine(tft.width() - 1, tft.height() - 1, x, 0, color);
+  canvas.fillScreen(ST77XX_BLACK);
+  for (int16_t x = 0; x < canvas.width(); x += 6) {
+    canvas.drawLine(0, canvas.height() - 1, x, 0, color);
     sendGRAM();
     delay(0);
   }
-  for (int16_t y = 0; y < tft.height(); y += 6) {
-    tft.drawLine(tft.width() - 1, tft.height() - 1, 0, y, color);
+  for (int16_t y = 0; y < canvas.height(); y += 6) {
+    canvas.drawLine(0, canvas.height() - 1, canvas.width() - 1, y, color);
+    sendGRAM();
+    delay(0);
+  }
+
+  canvas.fillScreen(ST77XX_BLACK);
+  for (int16_t x = 0; x < canvas.width(); x += 6) {
+    canvas.drawLine(canvas.width() - 1, canvas.height() - 1, x, 0, color);
+    sendGRAM();
+    delay(0);
+  }
+  for (int16_t y = 0; y < canvas.height(); y += 6) {
+    canvas.drawLine(canvas.width() - 1, canvas.height() - 1, 0, y, color);
     sendGRAM();
     delay(0);
   }
 }
 
 void testdrawtext(char *text, uint16_t color) {
-  tft.setCursor(0, 0);
-  tft.setTextColor(color);
-  tft.setTextWrap(true);
-  tft.print(text);
+  canvas.setCursor(0, 0);
+  canvas.setTextColor(color);
+  canvas.setTextWrap(true);
+  canvas.print(text);
   sendGRAM();
 }
 
 void testfastlines(uint16_t color1, uint16_t color2) {
-  tft.fillScreen(ST77XX_BLACK);
-  for (int16_t y = 0; y < tft.height(); y += 5) {
-    tft.drawFastHLine(0, y, tft.width(), color1);
+  canvas.fillScreen(ST77XX_BLACK);
+  for (int16_t y = 0; y < canvas.height(); y += 5) {
+    canvas.drawFastHLine(0, y, canvas.width(), color1);
     sendGRAM();
   }
-  for (int16_t x = 0; x < tft.width(); x += 5) {
-    tft.drawFastVLine(x, 0, tft.height(), color2);
+  for (int16_t x = 0; x < canvas.width(); x += 5) {
+    canvas.drawFastVLine(x, 0, canvas.height(), color2);
     sendGRAM();
   }
 }
 
 void testdrawrects(uint16_t color) {
-  tft.fillScreen(ST77XX_BLACK);
-  for (int16_t x = 0; x < tft.width(); x += 6) {
-    tft.drawRect(tft.width() / 2 - x / 2, tft.height() / 2 - x / 2 , x, x, color);
+  canvas.fillScreen(ST77XX_BLACK);
+  for (int16_t x = 0; x < canvas.width(); x += 6) {
+    canvas.drawRect(canvas.width() / 2 - x / 2, canvas.height() / 2 - x / 2 , x, x, color);
     sendGRAM();
   }
 }
 
 void testfillrects(uint16_t color1, uint16_t color2) {
-  tft.fillScreen(ST77XX_BLACK);
-  for (int16_t x = tft.width() - 1; x > 6; x -= 6) {
-    tft.fillRect(tft.width() / 2 - x / 2, tft.height() / 2 - x / 2 , x, x, color1);
+  canvas.fillScreen(ST77XX_BLACK);
+  for (int16_t x = canvas.width() - 1; x > 6; x -= 6) {
+    canvas.fillRect(canvas.width() / 2 - x / 2, canvas.height() / 2 - x / 2 , x, x, color1);
     sendGRAM();
-    tft.drawRect(tft.width() / 2 - x / 2, tft.height() / 2 - x / 2 , x, x, color2);
+    canvas.drawRect(canvas.width() / 2 - x / 2, canvas.height() / 2 - x / 2 , x, x, color2);
     sendGRAM();
   }
 }
 
 void testfillcircles(uint8_t radius, uint16_t color) {
-  for (int16_t x = radius; x < tft.width(); x += radius * 2) {
-    for (int16_t y = radius; y < tft.height(); y += radius * 2) {
-      tft.fillCircle(x, y, radius, color);
+  for (int16_t x = radius; x < canvas.width(); x += radius * 2) {
+    for (int16_t y = radius; y < canvas.height(); y += radius * 2) {
+      canvas.fillCircle(x, y, radius, color);
       sendGRAM();
     }
   }
 }
 
 void testdrawcircles(uint8_t radius, uint16_t color) {
-  for (int16_t x = 0; x < tft.width() + radius; x += radius * 2) {
-    for (int16_t y = 0; y < tft.height() + radius; y += radius * 2) {
-      tft.drawCircle(x, y, radius, color);
+  for (int16_t x = 0; x < canvas.width() + radius; x += radius * 2) {
+    for (int16_t y = 0; y < canvas.height() + radius; y += radius * 2) {
+      canvas.drawCircle(x, y, radius, color);
       sendGRAM();
     }
   }
 }
 
 void testtriangles() {
-  tft.fillScreen(ST77XX_BLACK);
+  canvas.fillScreen(ST77XX_BLACK);
   int color = 0xF800;
   int t;
-  int w = tft.width() / 2;
-  int x = tft.height() - 1;
+  int w = canvas.width() / 2;
+  int x = canvas.height() - 1;
   int y = 0;
-  int z = tft.width();
+  int z = canvas.width();
   for (t = 0 ; t <= 15; t++) {
-    tft.drawTriangle(w, y, y, x, z, x, color);
+    canvas.drawTriangle(w, y, y, x, z, x, color);
     sendGRAM();
     x -= 4;
     y += 4;
@@ -415,17 +415,17 @@ void testtriangles() {
 }
 
 void testroundrects() {
-  tft.fillScreen(ST77XX_BLACK);
+  canvas.fillScreen(ST77XX_BLACK);
   int color = 100;
   int i;
   int t;
   for (t = 0 ; t <= 4; t += 1) {
     int x = 0;
     int y = 0;
-    int w = tft.width() - 2;
-    int h = tft.height() - 2;
+    int w = canvas.width() - 2;
+    int h = canvas.height() - 2;
     for (i = 0 ; i <= 16; i += 1) {
-      tft.drawRoundRect(x, y, w, h, 5, color);
+      canvas.drawRoundRect(x, y, w, h, 5, color);
       sendGRAM();
       x += 2;
       y += 3;
@@ -440,72 +440,72 @@ void testroundrects() {
 float p = 3.1415926;
 
 void tftPrintTest() {
-  tft.setTextWrap(false);
-  tft.fillScreen(ST77XX_BLACK);
-  tft.setCursor(0, 30);
-  tft.setTextColor(ST77XX_RED);
-  tft.setTextSize(1);
-  tft.println("Hello World!");
-  tft.setTextColor(ST77XX_YELLOW);
-  tft.setTextSize(2);
-  tft.println("Hello World!");
-  tft.setTextColor(ST77XX_GREEN);
-  tft.setTextSize(3);
-  tft.println("Hello World!");
-  tft.setTextColor(ST77XX_BLUE);
-  tft.setTextSize(4);
-  tft.print(1234.567);
+  canvas.setTextWrap(false);
+  canvas.fillScreen(ST77XX_BLACK);
+  canvas.setCursor(0, 30);
+  canvas.setTextColor(ST77XX_RED);
+  canvas.setTextSize(1);
+  canvas.println("Hello World!");
+  canvas.setTextColor(ST77XX_YELLOW);
+  canvas.setTextSize(2);
+  canvas.println("Hello World!");
+  canvas.setTextColor(ST77XX_GREEN);
+  canvas.setTextSize(3);
+  canvas.println("Hello World!");
+  canvas.setTextColor(ST77XX_BLUE);
+  canvas.setTextSize(4);
+  canvas.print(1234.567);
   delay(1500);
-  tft.setCursor(0, 0);
-  tft.fillScreen(ST77XX_BLACK);
-  tft.setTextColor(ST77XX_WHITE);
-  tft.setTextSize(0);
-  tft.println("Hello World!");
-  tft.setTextSize(1);
-  tft.setTextColor(ST77XX_GREEN);
-  tft.print(p, 6);
-  tft.println(" Want pi?");
+  canvas.setCursor(0, 0);
+  canvas.fillScreen(ST77XX_BLACK);
+  canvas.setTextColor(ST77XX_WHITE);
+  canvas.setTextSize(0);
+  canvas.println("Hello World!");
+  canvas.setTextSize(1);
+  canvas.setTextColor(ST77XX_GREEN);
+  canvas.print(p, 6);
+  canvas.println(" Want pi?");
   sendGRAM();
-  tft.println(" ");
-  tft.print(8675309, HEX); // print 8,675,309 out in HEX!
-  tft.println(" Print HEX!");
-  tft.println(" ");
-  tft.setTextColor(ST77XX_WHITE);
-  tft.println("Sketch has been");
-  tft.println("running for: ");
-  tft.setTextColor(ST77XX_MAGENTA);
-  tft.print(millis() / 1000);
-  tft.setTextColor(ST77XX_WHITE);
-  tft.print(" seconds.");
+  canvas.println(" ");
+  canvas.print(8675309, HEX); // print 8,675,309 out in HEX!
+  canvas.println(" Print HEX!");
+  canvas.println(" ");
+  canvas.setTextColor(ST77XX_WHITE);
+  canvas.println("Sketch has been");
+  canvas.println("running for: ");
+  canvas.setTextColor(ST77XX_MAGENTA);
+  canvas.print(millis() / 1000);
+  canvas.setTextColor(ST77XX_WHITE);
+  canvas.print(" seconds.");
 }
 
 void mediabuttons() {
   // play
-  tft.fillScreen(ST77XX_BLACK);
+  canvas.fillScreen(ST77XX_BLACK);
   sendGRAM();
-  tft.fillRoundRect(25, 10, 78, 60, 8, ST77XX_WHITE);
+  canvas.fillRoundRect(25, 10, 78, 60, 8, ST77XX_WHITE);
   sendGRAM();
-  tft.fillTriangle(42, 20, 42, 60, 90, 40, ST77XX_RED);
+  canvas.fillTriangle(42, 20, 42, 60, 90, 40, ST77XX_RED);
   sendGRAM();
   delay(500);
   // pause
-  tft.fillRoundRect(25, 90, 78, 60, 8, ST77XX_WHITE);
+  canvas.fillRoundRect(25, 90, 78, 60, 8, ST77XX_WHITE);
   sendGRAM();
-  tft.fillRoundRect(39, 98, 20, 45, 5, ST77XX_GREEN);
+  canvas.fillRoundRect(39, 98, 20, 45, 5, ST77XX_GREEN);
   sendGRAM();
-  tft.fillRoundRect(69, 98, 20, 45, 5, ST77XX_GREEN);
+  canvas.fillRoundRect(69, 98, 20, 45, 5, ST77XX_GREEN);
   sendGRAM();
   delay(500);
   // play color
-  tft.fillTriangle(42, 20, 42, 60, 90, 40, ST77XX_BLUE);
+  canvas.fillTriangle(42, 20, 42, 60, 90, 40, ST77XX_BLUE);
   sendGRAM();
   delay(50);
   // pause color
-  tft.fillRoundRect(39, 98, 20, 45, 5, ST77XX_RED);
+  canvas.fillRoundRect(39, 98, 20, 45, 5, ST77XX_RED);
   sendGRAM();
-  tft.fillRoundRect(69, 98, 20, 45, 5, ST77XX_RED);
+  canvas.fillRoundRect(69, 98, 20, 45, 5, ST77XX_RED);
   sendGRAM();
   // play color
-  tft.fillTriangle(42, 20, 42, 60, 90, 40, ST77XX_GREEN);
+  canvas.fillTriangle(42, 20, 42, 60, 90, 40, ST77XX_GREEN);
   sendGRAM();
 }
