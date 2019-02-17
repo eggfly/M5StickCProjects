@@ -3079,6 +3079,7 @@ void loop(void) {
   canvas.setTextSize(1);
   canvas.print("test");
 
+  
   canvas.drawRGBBitmap(0, 0, (uint16_t *)bg, 160, 80);
   // Send GRAM using SPI.writePixels() is very very fast
   sendGRAM();
