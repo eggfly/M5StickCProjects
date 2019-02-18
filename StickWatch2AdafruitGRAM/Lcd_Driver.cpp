@@ -88,95 +88,100 @@ void Lcd_Init(void)
   //LCD Init For 1.44Inch LCD Panel with ST7735R.
   Lcd_WriteIndex(0x11);//Sleep exit
   delay_ms (120);
-  Lcd_WriteIndex(0x21);
+  
+  Lcd_WriteIndex(0x13); // >??
+  //Lcd_WriteIndex(0x21);
+  //Lcd_WriteIndex(0x21);
+  // Lcd_WriteIndex(0x21);
   Lcd_WriteIndex(0x21);
 
-//  Lcd_WriteIndex(0xB1);
-//  Lcd_WriteData(0x05);
-//  Lcd_WriteData(0x3A);
-//  Lcd_WriteData(0x3A);
-//
-//  Lcd_WriteIndex(0xB2);
-//  Lcd_WriteData(0x05);
-//  Lcd_WriteData(0x3A);
-//  Lcd_WriteData(0x3A);
-//
-//  Lcd_WriteIndex(0xB3);
-//  Lcd_WriteData(0x05);
-//  Lcd_WriteData(0x3A);
-//  Lcd_WriteData(0x3A);
-//  Lcd_WriteData(0x05);
-//  Lcd_WriteData(0x3A);
-//  Lcd_WriteData(0x3A);
-//
-//  Lcd_WriteIndex(0xB4);
-//  Lcd_WriteData(0x03); 
-//
-//  Lcd_WriteIndex(0xC0);
-//  Lcd_WriteData(0x62);
-//  Lcd_WriteData(0x02);
-//  Lcd_WriteData(0x04);
-//
-//  Lcd_WriteIndex(0xC1);
-//  Lcd_WriteData(0xC0);
-//
-//  Lcd_WriteIndex(0xC2);
-//  Lcd_WriteData(0x0D);
-//  Lcd_WriteData(0x00);
-//
-//  Lcd_WriteIndex(0xC3);
-//  Lcd_WriteData(0x8D);
-//  Lcd_WriteData(0x6A);
-//
-//  Lcd_WriteIndex(0xC4);
-//  Lcd_WriteData(0x8D);
-//  Lcd_WriteData(0xEE);
-//
-//  Lcd_WriteIndex(0xC5);  /*VCOM*/
-//  Lcd_WriteData(0x0E);
-//
-//  Lcd_WriteIndex(0xE0);
-//  Lcd_WriteData(0x10);
-//  Lcd_WriteData(0x0E);
-//  Lcd_WriteData(0x02);
-//  Lcd_WriteData(0x03);
-//  Lcd_WriteData(0x0E);
-//  Lcd_WriteData(0x07);
-//  Lcd_WriteData(0x02);
-//  Lcd_WriteData(0x07);
-//  Lcd_WriteData(0x0A);
-//  Lcd_WriteData(0x12);
-//  Lcd_WriteData(0x27);
-//  Lcd_WriteData(0x37);
-//  Lcd_WriteData(0x00);
-//  Lcd_WriteData(0x0D);
-//  Lcd_WriteData(0x0E);
-//  Lcd_WriteData(0x10);
-//
-//  Lcd_WriteIndex(0xE1);
-//  Lcd_WriteData(0x10);
-//  Lcd_WriteData(0x0E);
-//  Lcd_WriteData(0x03);
-//  Lcd_WriteData(0x03);
-//  Lcd_WriteData(0x0F);
-//  Lcd_WriteData(0x06);
-//  Lcd_WriteData(0x02);
-//  Lcd_WriteData(0x08);
-//  Lcd_WriteData(0x0A);
-//  Lcd_WriteData(0x13);
-//  Lcd_WriteData(0x26);
-//  Lcd_WriteData(0x36);
-//  Lcd_WriteData(0x00);
-//  Lcd_WriteData(0x0D);
-//  Lcd_WriteData(0x0E);
-//  Lcd_WriteData(0x10);
+  Lcd_WriteIndex(0xB1);
+  Lcd_WriteData(0x05);
+  Lcd_WriteData(0x3A);
+  Lcd_WriteData(0x3A);
+
+  Lcd_WriteIndex(0xB2);
+  Lcd_WriteData(0x05);
+  Lcd_WriteData(0x3A);
+  Lcd_WriteData(0x3A);
+
+  Lcd_WriteIndex(0xB3);
+  Lcd_WriteData(0x05);
+  Lcd_WriteData(0x3A);
+  Lcd_WriteData(0x3A);
+  Lcd_WriteData(0x05);
+  Lcd_WriteData(0x3A);
+  Lcd_WriteData(0x3A);
+
+  Lcd_WriteIndex(0xB4);
+  Lcd_WriteData(0x03); 
+
+  Lcd_WriteIndex(0xC0);
+  Lcd_WriteData(0x62);
+  Lcd_WriteData(0x02);
+  Lcd_WriteData(0x04);
+
+  Lcd_WriteIndex(0xC1);
+  Lcd_WriteData(0xC0);
+
+  Lcd_WriteIndex(0xC2);
+  Lcd_WriteData(0x0D);
+  Lcd_WriteData(0x00);
+
+  Lcd_WriteIndex(0xC3);
+  Lcd_WriteData(0x8D);
+  Lcd_WriteData(0x6A);
+
+  Lcd_WriteIndex(0xC4);
+  Lcd_WriteData(0x8D);
+  Lcd_WriteData(0xEE);
+
+  Lcd_WriteIndex(0xC5);  /*VCOM*/
+  Lcd_WriteData(0x0E);
+
+  Lcd_WriteIndex(0xE0);
+  Lcd_WriteData(0x10);
+  Lcd_WriteData(0x0E);
+  Lcd_WriteData(0x02);
+  Lcd_WriteData(0x03);
+  Lcd_WriteData(0x0E);
+  Lcd_WriteData(0x07);
+  Lcd_WriteData(0x02);
+  Lcd_WriteData(0x07);
+  Lcd_WriteData(0x0A);
+  Lcd_WriteData(0x12);
+  Lcd_WriteData(0x27);
+  Lcd_WriteData(0x37);
+  Lcd_WriteData(0x00);
+  Lcd_WriteData(0x0D);
+  Lcd_WriteData(0x0E);
+  Lcd_WriteData(0x10);
+
+  Lcd_WriteIndex(0xE1);
+  Lcd_WriteData(0x10);
+  Lcd_WriteData(0x0E);
+  Lcd_WriteData(0x03);
+  Lcd_WriteData(0x03);
+  Lcd_WriteData(0x0F);
+  Lcd_WriteData(0x06);
+  Lcd_WriteData(0x02);
+  Lcd_WriteData(0x08);
+  Lcd_WriteData(0x0A);
+  Lcd_WriteData(0x13);
+  Lcd_WriteData(0x26);
+  Lcd_WriteData(0x36);
+  Lcd_WriteData(0x00);
+  Lcd_WriteData(0x0D);
+  Lcd_WriteData(0x0E);
+  Lcd_WriteData(0x10);
 
   Lcd_WriteIndex(0x3A);
-  Lcd_WriteData(0x05); // RGB 5-6-5
-  // Lcd_WriteData(0x06); // RGB 6-6-6
+  // Lcd_WriteData(0x05); // RGB 5-6-5
+  Lcd_WriteData(0x06); // RGB 6-6-6
 
   Lcd_WriteIndex(0x36);
-  Lcd_WriteData(0xC8);
+  Lcd_WriteData(0x00);
+  // Lcd_WriteData(0xC8);
 
   Lcd_WriteIndex(0x29);
 
@@ -275,8 +280,8 @@ void Lcd_pic(const unsigned char *array, int len)
   Lcd_WriteIndex(0x2C);
 
   LCD_RS_SET;
-  //SPI.writeBytes((uint8_t*)array, 25600);
-  SPI.writePixels(array, len);
+  SPI.writeBytes((uint8_t*)array, len);
+  // SPI.writePixels(array, len);
 
   /*
     for(i=0;i<X_MAX_PIXEL;i++)
