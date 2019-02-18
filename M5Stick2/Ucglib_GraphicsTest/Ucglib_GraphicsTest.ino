@@ -172,18 +172,19 @@ void color_test(void)
   ucg.setColor(0, 200, 200, 0);
   ucg.drawBox(0, 0, 79, 79);
 
-  for ( c = 0, x = 2; c <= 255; c += 17, x += 4 )
+  int H = 16;
+  for ( c = 0, x = 2; c <= 255; c += 17, x += 9 )
   {
     ucg.setColor(0, c, c, c);
-    ucg.drawBox(x, 22, 4, 8);
+    ucg.drawBox(x, 22, 9, H);
     ucg.setColor(0, c, 0, 0);
-    ucg.drawBox(x, 22 + 8, 4, 8);
+    ucg.drawBox(x, 22 + H, 9, H);
     ucg.setColor(0, 0, c, 0);
-    ucg.drawBox(x, 22 + 2 * 8, 4, 8);
+    ucg.drawBox(x, 22 + 2 * H, 9, H);
     ucg.setColor(0, 0, 0, c);
-    ucg.drawBox(x, 22 + 3 * 8, 4, 8);
+    ucg.drawBox(x, 22 + 3 * H, 9, H);
     ucg.setColor(0, c, 255 - c, 0);
-    ucg.drawBox(x, 22 + 4 * 8, 4, 8);
+    ucg.drawBox(x, 22 + 4 * H, 9, H);
   }
 
   ucg.setColor(0, 0, 255, 255);
