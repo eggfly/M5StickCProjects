@@ -1,11 +1,10 @@
 
-//#include "stm32f10x.h"
 #include "Lcd_Driver.h"
 #include "LCD_Config.h"
 //#include "delay.h"
 #include <SPI.h>
 
-//Һ��IO��ʼ������
+
 void LCD_GPIO_Init(void)
 {
 
@@ -16,7 +15,7 @@ void delay_ms(unsigned int x)
   delay(x);
 }
 
-//��SPI���ߴ���һ��8λ�
+
 /*���
   void  SPI_WriteData(u8 Data)
   {
@@ -88,7 +87,7 @@ void Lcd_Init(void)
   //LCD Init For 1.44Inch LCD Panel with ST7735R.
   Lcd_WriteIndex(0x11);//Sleep exit
   delay_ms (120);
-  
+
   Lcd_WriteIndex(0x13); // >??
   //Lcd_WriteIndex(0x21);
   //Lcd_WriteIndex(0x21);
@@ -114,7 +113,7 @@ void Lcd_Init(void)
   Lcd_WriteData(0x3A);
 
   Lcd_WriteIndex(0xB4);
-  Lcd_WriteData(0x03); 
+  Lcd_WriteData(0x03);
 
   Lcd_WriteIndex(0xC0);
   Lcd_WriteData(0x62);
@@ -181,7 +180,7 @@ void Lcd_Init(void)
 
   Lcd_WriteIndex(0x36);
   Lcd_WriteData(0x00);
-  // Lcd_WriteData(0xC8);
+  // Lcd_WriteData(0xC8); // ???
 
   Lcd_WriteIndex(0x29);
 
