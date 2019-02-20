@@ -1,3 +1,6 @@
+#ifndef _LCD_DRIVER_H
+#define _LCD_DRIVER_H
+
 //2014/3/16
 #include <Arduino.h>
 //
@@ -53,3 +56,5 @@ unsigned int Lcd_ReadPoint(u16 x,u16 y);
 void Lcd_SetRegion(u16 x_start,u16 y_start,u16 x_end,u16 y_end);
 void LCD_WriteData_16Bit(u16 Data);
 void Lcd_pic(const unsigned char *array, int len);
+
+#endif // _LCD_DRIVER_H

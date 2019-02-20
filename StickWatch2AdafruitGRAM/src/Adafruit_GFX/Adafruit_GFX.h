@@ -86,7 +86,7 @@ class Adafruit_GFX : public Print {
       uint8_t *bitmap, uint8_t *mask, int16_t w, int16_t h),
     drawRGBBitmap(int16_t x, int16_t y, const uint16_t bitmap[],
       int16_t w, int16_t h),
-    drawRGBBitmap(int16_t x, int16_t y, uint16_t *bitmap,
+    drawRGBBitmap(int16_t x, int16_t y, uint8_t *bitmap,
       int16_t w, int16_t h),
     drawRGBBitmap(int16_t x, int16_t y,
       const uint16_t bitmap[], const uint8_t mask[],
@@ -96,8 +96,8 @@ class Adafruit_GFX : public Print {
     drawChar(int16_t x, int16_t y, unsigned char c, uint32_t color,
       uint16_t bg, uint8_t size),
     setCursor(int16_t x, int16_t y),
-    setTextColor(uint16_t c),
-    setTextColor(uint16_t c, uint16_t bg),
+    setTextColor(uint32_t c),
+    setTextColor(uint32_t c, uint32_t bg),
     setTextSize(uint8_t s),
     setTextWrap(boolean w),
     cp437(boolean x=true),
@@ -137,7 +137,7 @@ class Adafruit_GFX : public Print {
     _height,        ///< Display height as modified by current rotation
     cursor_x,       ///< x location to start print()ing text
     cursor_y;       ///< y location to start print()ing text
-  uint16_t
+  uint32_t
     textcolor,      ///< 16-bit background color for print()
     textbgcolor;    ///< 16-bit text color for print()
   uint8_t

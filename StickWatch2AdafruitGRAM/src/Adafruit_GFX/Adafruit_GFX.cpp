@@ -942,11 +942,16 @@ void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
 */
 /**************************************************************************/
 void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
-  uint16_t *bitmap, int16_t w, int16_t h) {
+  uint8_t *bitmap, int16_t w, int16_t h) {
     startWrite();
     for(int16_t j=0; j<h; j++, y++) {
         for(int16_t i=0; i<w; i++ ) {
-            writePixel(x+i, y, bitmap[j * w + i]);
+            int16_t offset = j * w + i;
+            uint8_t r = bitmap[offset * 3];
+            uint8_t g = bitmap[offset * 3 + 1];
+            uint8_t b = bitmap[offset * 3 + 2];
+            uint32_t color = (r << 16) | (g << 8) | b;
+            writePixel(x+i, y, color);
         }
     }
     endWrite();
@@ -1221,7 +1226,7 @@ void Adafruit_GFX::setTextSize(uint8_t s) {
     @param   c   32-bit ARGB Color to draw text with
 */
 /**************************************************************************/
-void Adafruit_GFX::setTextColor(uint16_t c) {
+void Adafruit_GFX::setTextColor(uint32_t c) {
     // For 'transparent' background, we'll set the bg
     // to the same as fg instead of using a flag
     textcolor = textbgcolor = c;
@@ -1234,7 +1239,7 @@ void Adafruit_GFX::setTextColor(uint16_t c) {
     @param   b   32-bit ARGB Color to draw background/fill with
 */
 /**************************************************************************/
-void Adafruit_GFX::setTextColor(uint16_t c, uint16_t b) {
+void Adafruit_GFX::setTextColor(uint32_t c, uint32_t b) {
     textcolor   = c;
     textbgcolor = b;
 }
