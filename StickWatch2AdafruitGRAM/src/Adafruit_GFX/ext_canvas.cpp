@@ -41,7 +41,7 @@ uint8_t* GFXcanvas24::getBuffer(void) {
    @brief    Draw a pixel to the canvas 
     @param   x   x coordinate
     @param   y   y coordinate
-   @param    color 16-bit 5-6-5 Color to fill with
+   @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void GFXcanvas24::drawPixel(int16_t x, int16_t y, uint32_t color) {
@@ -64,26 +64,33 @@ void GFXcanvas24::drawPixel(int16_t x, int16_t y, uint32_t color) {
                 y = HEIGHT - 1 - t;
                 break;
         }
-        buffer[3*(x + y * WIDTH)] = (color>>16) & 0xFF;
-        buffer[3*(x + y * WIDTH)+1] = (color>>8) & 0xFF;
-        buffer[3*(x + y * WIDTH)+2] = color & 0xFF;
+        uint32_t offset = 3 * (x + y * WIDTH);
+        buffer[offset] = (color >> 16) & 0xFF;
+        buffer[offset + 1] = (color>>8) & 0xFF;
+        buffer[offset + 2] = color & 0xFF;
     }
 }
 
 /**************************************************************************/
 /*!
    @brief    Fill the gram completely with one color
-    @param    color 16-bit 5-6-5 Color to fill with
+    @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void GFXcanvas24::fillScreen(uint32_t color) {
-    if(buffer) {
-        uint8_t hi = color >> 8, lo = color & 0xFF;
-        if(hi == lo) {
-            memset(buffer, lo, WIDTH * HEIGHT * 2);
+    if (buffer) {
+        uint8_t r = (color >> 16) & 0xFF;
+        uint8_t g = (color >> 8) & 0xFF;
+        uint8_t b = color & 0xFF;
+        if (r == g && g == b) {
+            memset(buffer, r, WIDTH * HEIGHT * 3);
         } else {
             uint32_t i, pixels = WIDTH * HEIGHT;
-            for(i=0; i<pixels; i++) buffer[i] = color;
+            for (i = 0; i < pixels; i++) {
+                buffer[i*3] = r;
+                buffer[i*3+1] = g;
+                buffer[i*3+2] = b;
+            }
         }
     }
 }

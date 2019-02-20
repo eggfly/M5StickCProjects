@@ -98,7 +98,7 @@ WIDTH(w), HEIGHT(h)
     @param    y0  Start point y coordinate
     @param    x1  End point x coordinate
     @param    y1  End point y coordinate
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
@@ -154,7 +154,7 @@ void Adafruit_GFX::startWrite(){
    @brief    Write a pixel, overwrite in subclasses if startWrite is defined!
     @param   x   x coordinate
     @param   y   y coordinate
-   @param    color 16-bit 5-6-5 Color to fill with
+   @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::writePixel(int16_t x, int16_t y, uint32_t color){
@@ -167,7 +167,7 @@ void Adafruit_GFX::writePixel(int16_t x, int16_t y, uint32_t color){
     @param    x   Top-most x coordinate
     @param    y   Top-most y coordinate
     @param    h   Height in pixels
-   @param    color 16-bit 5-6-5 Color to fill with
+   @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::writeFastVLine(int16_t x, int16_t y,
@@ -184,7 +184,7 @@ void Adafruit_GFX::writeFastVLine(int16_t x, int16_t y,
     @param    x   Left-most x coordinate
     @param    y   Left-most y coordinate
     @param    w   Width in pixels
-   @param    color 16-bit 5-6-5 Color to fill with
+   @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::writeFastHLine(int16_t x, int16_t y,
@@ -202,7 +202,7 @@ void Adafruit_GFX::writeFastHLine(int16_t x, int16_t y,
     @param    y   Top left corner y coordinate
     @param    w   Width in pixels
     @param    h   Height in pixels
-   @param    color 16-bit 5-6-5 Color to fill with
+   @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::writeFillRect(int16_t x, int16_t y, int16_t w, int16_t h,
@@ -225,7 +225,7 @@ void Adafruit_GFX::endWrite(){
     @param    x   Top-most x coordinate
     @param    y   Top-most y coordinate
     @param    h   Height in pixels
-   @param    color 16-bit 5-6-5 Color to fill with
+   @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawFastVLine(int16_t x, int16_t y,
@@ -241,7 +241,7 @@ void Adafruit_GFX::drawFastVLine(int16_t x, int16_t y,
     @param    x   Left-most x coordinate
     @param    y   Left-most y coordinate
     @param    w   Width in pixels
-   @param    color 16-bit 5-6-5 Color to fill with
+   @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawFastHLine(int16_t x, int16_t y,
@@ -258,7 +258,7 @@ void Adafruit_GFX::drawFastHLine(int16_t x, int16_t y,
     @param    y   Top left corner y coordinate
     @param    w   Width in pixels
     @param    h   Height in pixels
-   @param    color 16-bit 5-6-5 Color to fill with
+   @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
@@ -273,7 +273,7 @@ void Adafruit_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
 /**************************************************************************/
 /*!
    @brief    Fill the screen completely with one color. Update in subclasses if desired!
-    @param    color 16-bit 5-6-5 Color to fill with
+    @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::fillScreen(uint32_t color) {
@@ -287,7 +287,7 @@ void Adafruit_GFX::fillScreen(uint32_t color) {
     @param    y0  Start point y coordinate
     @param    x1  End point x coordinate
     @param    y1  End point y coordinate
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
@@ -312,7 +312,7 @@ void Adafruit_GFX::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
     @param    x0   Center-point x coordinate
     @param    y0   Center-point y coordinate
     @param    r   Radius of circle
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawCircle(int16_t x0, int16_t y0, int16_t r,
@@ -358,7 +358,7 @@ void Adafruit_GFX::drawCircle(int16_t x0, int16_t y0, int16_t r,
     @param    y0   Center-point y coordinate
     @param    r   Radius of circle
     @param    cornername  Mask bit #1 or bit #2 to indicate which quarters of the circle we're doing
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawCircleHelper( int16_t x0, int16_t y0,
@@ -403,7 +403,7 @@ void Adafruit_GFX::drawCircleHelper( int16_t x0, int16_t y0,
     @param    x0   Center-point x coordinate
     @param    y0   Center-point y coordinate
     @param    r   Radius of circle
-    @param    color 16-bit 5-6-5 Color to fill with
+    @param    color 32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::fillCircle(int16_t x0, int16_t y0, int16_t r,
@@ -423,7 +423,7 @@ void Adafruit_GFX::fillCircle(int16_t x0, int16_t y0, int16_t r,
     @param  r        Radius of circle
     @param  corners  Mask bits indicating which quarters we're doing
     @param  delta    Offset from center-point, used for round-rects
-    @param  color    16-bit 5-6-5 Color to fill with
+    @param  color    32-bit ARGB Color to fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
@@ -470,7 +470,7 @@ void Adafruit_GFX::fillCircleHelper(int16_t x0, int16_t y0, int16_t r,
     @param    y   Top left corner y coordinate
     @param    w   Width in pixels
     @param    h   Height in pixels
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawRect(int16_t x, int16_t y, int16_t w, int16_t h,
@@ -491,7 +491,7 @@ void Adafruit_GFX::drawRect(int16_t x, int16_t y, int16_t w, int16_t h,
     @param    w   Width in pixels
     @param    h   Height in pixels
     @param    r   Radius of corner rounding
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawRoundRect(int16_t x, int16_t y, int16_t w,
@@ -520,7 +520,7 @@ void Adafruit_GFX::drawRoundRect(int16_t x, int16_t y, int16_t w,
     @param    w   Width in pixels
     @param    h   Height in pixels
     @param    r   Radius of corner rounding
-    @param    color 16-bit 5-6-5 Color to draw/fill with
+    @param    color 32-bit ARGB Color to draw/fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::fillRoundRect(int16_t x, int16_t y, int16_t w,
@@ -545,7 +545,7 @@ void Adafruit_GFX::fillRoundRect(int16_t x, int16_t y, int16_t w,
     @param    y1  Vertex #1 y coordinate
     @param    x2  Vertex #2 x coordinate
     @param    y2  Vertex #2 y coordinate
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawTriangle(int16_t x0, int16_t y0,
@@ -564,7 +564,7 @@ void Adafruit_GFX::drawTriangle(int16_t x0, int16_t y0,
     @param    y1  Vertex #1 y coordinate
     @param    x2  Vertex #2 x coordinate
     @param    y2  Vertex #2 y coordinate
-    @param    color 16-bit 5-6-5 Color to fill/draw with
+    @param    color 32-bit ARGB Color to fill/draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::fillTriangle(int16_t x0, int16_t y0,
@@ -657,7 +657,7 @@ void Adafruit_GFX::fillTriangle(int16_t x0, int16_t y0,
     @param    bitmap  byte array with monochrome bitmap
     @param    w   Width of bitmap in pixels
     @param    h   Hieght of bitmap in pixels
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
@@ -685,8 +685,8 @@ void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
     @param    bitmap  byte array with monochrome bitmap
     @param    w   Width of bitmap in pixels
     @param    h   Hieght of bitmap in pixels
-    @param    color 16-bit 5-6-5 Color to draw pixels with
-    @param    bg 16-bit 5-6-5 Color to draw background with
+    @param    color 32-bit ARGB Color to draw pixels with
+    @param    bg 32-bit ARGB Color to draw background with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
@@ -715,7 +715,7 @@ void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
     @param    bitmap  byte array with monochrome bitmap
     @param    w   Width of bitmap in pixels
     @param    h   Hieght of bitmap in pixels
-    @param    color 16-bit 5-6-5 Color to draw with
+    @param    color 32-bit ARGB Color to draw with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
@@ -743,8 +743,8 @@ void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
     @param    bitmap  byte array with monochrome bitmap
     @param    w   Width of bitmap in pixels
     @param    h   Hieght of bitmap in pixels
-    @param    color 16-bit 5-6-5 Color to draw pixels with
-    @param    bg 16-bit 5-6-5 Color to draw background with
+    @param    color 32-bit ARGB Color to draw pixels with
+    @param    bg 32-bit ARGB Color to draw background with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
@@ -776,7 +776,7 @@ void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
     @param    bitmap  byte array with monochrome bitmap
     @param    w   Width of bitmap in pixels
     @param    h   Hieght of bitmap in pixels
-    @param    color 16-bit 5-6-5 Color to draw pixels with
+    @param    color 32-bit ARGB Color to draw pixels with
 */
 /**************************************************************************/
 void Adafruit_GFX::drawXBitmap(int16_t x, int16_t y,
@@ -1019,8 +1019,8 @@ void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
     @param    x   Bottom left corner x coordinate
     @param    y   Bottom left corner y coordinate
     @param    c   The 8-bit font-indexed character (likely ascii)
-    @param    color 16-bit 5-6-5 Color to draw chraracter with
-    @param    bg 16-bit 5-6-5 Color to fill background with (if same as color, no background)
+    @param    color 32-bit ARGB Color to draw chraracter with
+    @param    bg 32-bit ARGB Color to fill background with (if same as color, no background)
     @param    size  Font magnification level, 1 is 'original' size
 */
 /**************************************************************************/
@@ -1218,7 +1218,7 @@ void Adafruit_GFX::setTextSize(uint8_t s) {
 /**************************************************************************/
 /*!
     @brief   Set text font color with transparant background
-    @param   c   16-bit 5-6-5 Color to draw text with
+    @param   c   32-bit ARGB Color to draw text with
 */
 /**************************************************************************/
 void Adafruit_GFX::setTextColor(uint16_t c) {
@@ -1230,8 +1230,8 @@ void Adafruit_GFX::setTextColor(uint16_t c) {
 /**************************************************************************/
 /*!
     @brief   Set text font color with custom background color
-    @param   c   16-bit 5-6-5 Color to draw text with
-    @param   b   16-bit 5-6-5 Color to draw background/fill with
+    @param   c   32-bit ARGB Color to draw text with
+    @param   b   32-bit ARGB Color to draw background/fill with
 */
 /**************************************************************************/
 void Adafruit_GFX::setTextColor(uint16_t c, uint16_t b) {
