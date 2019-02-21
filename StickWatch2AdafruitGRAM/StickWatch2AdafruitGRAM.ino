@@ -1,5 +1,6 @@
 #include "src/Adafruit_GFX/Adafruit_GFX.h"
 #include "src/Adafruit_GFX/ext_canvas.h"
+#include "src/Adafruit_GFX/config.h"
 #include "src/image_data.h"
 
 #include <stdio.h>
@@ -13,22 +14,20 @@
 #include "esp32/ulp.h"
 
 
-#define ST77XX_BLACK      0xAA000000
-#define ST77XX_WHITE      0xAAFFFFFF
-#define ST77XX_RED        0xAAFF0000
-#define ST77XX_GREEN      0xAA00FF00
-#define ST77XX_BLUE       0xAA0000FF
-#define ST77XX_CYAN       0x07FF
-#define ST77XX_MAGENTA    0xF81F
-#define ST77XX_YELLOW     0xFFE0
-#define ST77XX_ORANGE     0xFC00
+#define ST77XX_BLACK      0x000000
+#define ST77XX_WHITE      0xFFFFFF
+#define ST77XX_RED        0xFF0000
+#define ST77XX_GREEN      0x00FF00
+#define ST77XX_BLUE       0x0000FF
+#define ST77XX_CYAN       0x00FFFF
+#define ST77XX_MAGENTA    0xFF00FF
+#define ST77XX_YELLOW     0xFFFF00
+#define ST77XX_ORANGE     0xFFA500
 
 #include <Wire.h>
 
-// osmar
 #include <SPI.h>
-#include "Lcd_Driver.h"
-#include "LCD_Config.h"
+#include "src/Lcd_Driver.h"
 
 #define TFT_MOSI      15
 #define TFT_CLK       13
@@ -36,9 +35,8 @@
 #define TFT_DC        23  // Data/command line for TFT on Shield
 #define TFT_RST       18  // Reset line for TFT is handled by seesaw!
 
-// osmar
 
-GFXcanvas24 canvas = GFXcanvas24(80, 160);
+GFXcanvas24 canvas = GFXcanvas24(LCD_WIDTH, LCD_HEIGHT);
 
 // End of constructor list
 
@@ -96,12 +94,11 @@ void setup(void) {
   SPI.begin (TFT_CLK, -1, TFT_MOSI, -1);
   SPI.beginTransaction(SPISettings(70000000, MSBFIRST, SPI_MODE0));
 
-  Serial.begin(115200);
+  Serial.begin(1500*1000);
   while (!Serial);             // Leonardo: wait for serial monitor
 
   ++bootCount;
   Serial.println("Boot number: " + String(bootCount));
-  Serial.printf("winxp_888_bg3.size=%d\n", sizeof(winxp_888_bg3));
 
   //Print the wakeup reason for ESP32
   print_wakeup_reason();
@@ -156,20 +153,11 @@ void setup(void) {
   canvas.setRotation(1);
 
   // u8g2.begin();
-  // runGraphicTest();
+  runGraphicTest();
 }
 
 long loopTime, startTime, endTime, fps;
 
-//  Lcd_Clear(WHITE);
-//  Lcd_Clear(RED);
-//  Lcd_Clear(GREEN);
-//  Lcd_Clear(BLUE);
-//  Lcd_Clear(BLACK);
-//  Lcd_Clear(YELLOW);
-//  Lcd_Clear(GRAY0);
-//  Lcd_Clear(GRAY2);
-//  Lcd_Clear(BLUE);
 
 void loop(void) {
   loopTime = millis();
@@ -193,7 +181,7 @@ void loop(void) {
   endTime = loopTime;
   unsigned long delta = endTime - startTime;
   fps = 1000 / delta;
-  printf("fill+draw+send GRAM cost: %dms, calc fps:%d, real fps:%d\r\n", delta, fps, fps > 60 ? 60 : fps);
+  Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
   delay(10);
 
   if (digitalRead(BUTTON_HOME) == 0) {
@@ -237,7 +225,7 @@ void runGraphicTest() {
   // tft print function!
   tftPrintTest();
   sendGRAM();
-  delay(4000);
+  delay(1000);
 
   // a single pixel
   canvas.drawPixel(canvas.width() / 2, canvas.height() / 2, ST77XX_GREEN);
@@ -287,14 +275,13 @@ void runGraphicTest() {
 
 
 void sendGRAM() {
-  Lcd_pic((unsigned char *)canvas.getBuffer(), 38400);
-  // Lcd_pic(imagen_666, sizeof(imagen_666));
+  Lcd_pic(canvas.getBuffer(), GRAM_BUFFER_SIZE);
 }
 
 
 // from Adafruit graphictest below
 
-void testlines(uint16_t color) {
+void testlines(uint32_t color) {
   canvas.fillScreen(ST77XX_BLACK);
   for (int16_t x = 0; x < canvas.width(); x += 6) {
     canvas.drawLine(0, 0, x, canvas.height() - 1, color);
@@ -344,7 +331,7 @@ void testlines(uint16_t color) {
   }
 }
 
-void testdrawtext(char *text, uint16_t color) {
+void testdrawtext(char *text, uint32_t color) {
   canvas.setCursor(0, 0);
   canvas.setTextColor(color);
   canvas.setTextWrap(true);
@@ -352,7 +339,7 @@ void testdrawtext(char *text, uint16_t color) {
   sendGRAM();
 }
 
-void testfastlines(uint16_t color1, uint16_t color2) {
+void testfastlines(uint32_t color1, uint32_t color2) {
   canvas.fillScreen(ST77XX_BLACK);
   for (int16_t y = 0; y < canvas.height(); y += 5) {
     canvas.drawFastHLine(0, y, canvas.width(), color1);
@@ -364,7 +351,7 @@ void testfastlines(uint16_t color1, uint16_t color2) {
   }
 }
 
-void testdrawrects(uint16_t color) {
+void testdrawrects(uint32_t color) {
   canvas.fillScreen(ST77XX_BLACK);
   for (int16_t x = 0; x < canvas.width(); x += 6) {
     canvas.drawRect(canvas.width() / 2 - x / 2, canvas.height() / 2 - x / 2 , x, x, color);
@@ -372,7 +359,7 @@ void testdrawrects(uint16_t color) {
   }
 }
 
-void testfillrects(uint16_t color1, uint16_t color2) {
+void testfillrects(uint32_t color1, uint32_t color2) {
   canvas.fillScreen(ST77XX_BLACK);
   for (int16_t x = canvas.width() - 1; x > 6; x -= 6) {
     canvas.fillRect(canvas.width() / 2 - x / 2, canvas.height() / 2 - x / 2 , x, x, color1);
@@ -382,7 +369,7 @@ void testfillrects(uint16_t color1, uint16_t color2) {
   }
 }
 
-void testfillcircles(uint8_t radius, uint16_t color) {
+void testfillcircles(uint8_t radius, uint32_t color) {
   for (int16_t x = radius; x < canvas.width(); x += radius * 2) {
     for (int16_t y = radius; y < canvas.height(); y += radius * 2) {
       canvas.fillCircle(x, y, radius, color);
@@ -391,7 +378,7 @@ void testfillcircles(uint8_t radius, uint16_t color) {
   }
 }
 
-void testdrawcircles(uint8_t radius, uint16_t color) {
+void testdrawcircles(uint8_t radius, uint32_t color) {
   for (int16_t x = 0; x < canvas.width() + radius; x += radius * 2) {
     for (int16_t y = 0; y < canvas.height() + radius; y += radius * 2) {
       canvas.drawCircle(x, y, radius, color);

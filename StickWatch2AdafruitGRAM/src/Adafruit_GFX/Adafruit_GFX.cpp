@@ -31,6 +31,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
+
 #include "Adafruit_GFX.h"
 #include "glcdfont.c"
 #ifdef __AVR__
@@ -85,7 +87,7 @@ WIDTH(w), HEIGHT(h)
     rotation  = 0;
     cursor_y  = cursor_x    = 0;
     textsize  = 1;
-    textcolor = textbgcolor = 0xFFFF;
+    textcolor = textbgcolor = 0xFFFFFFFF;
     wrap      = true;
     _cp437    = false;
     gfxFont   = NULL;
@@ -947,9 +949,9 @@ void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
     for(int16_t j=0; j<h; j++, y++) {
         for(int16_t i=0; i<w; i++ ) {
             int16_t offset = j * w + i;
-            uint8_t r = bitmap[offset * 3];
-            uint8_t g = bitmap[offset * 3 + 1];
-            uint8_t b = bitmap[offset * 3 + 2];
+            uint8_t r = bitmap[offset * BYTES_PER_PIXEL];
+            uint8_t g = bitmap[offset * BYTES_PER_PIXEL + 1];
+            uint8_t b = bitmap[offset * BYTES_PER_PIXEL + 2];
             uint32_t color = (r << 16) | (g << 8) | b;
             writePixel(x+i, y, color);
         }
@@ -1030,7 +1032,7 @@ void Adafruit_GFX::drawRGBBitmap(int16_t x, int16_t y,
 */
 /**************************************************************************/
 void Adafruit_GFX::drawChar(int16_t x, int16_t y, unsigned char c,
-  uint32_t color, uint16_t bg, uint8_t size) {
+  uint32_t color, uint32_t bg, uint8_t size) {
 
     if(!gfxFont) { // 'Classic' built-in font
 

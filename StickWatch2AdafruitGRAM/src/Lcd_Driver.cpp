@@ -1,7 +1,6 @@
 
 #include "Lcd_Driver.h"
-#include "LCD_Config.h"
-//#include "delay.h"
+#include "Adafruit_GFX/config.h"
 #include <SPI.h>
 
 
@@ -16,52 +15,29 @@ void delay_ms(unsigned int x)
 }
 
 
-/*���
-  void  SPI_WriteData(u8 Data)
-  {
-	unsigned char i=0;
-	for(i=8;i>0;i--)
-	{
-		if(Data&0x80)
-	    LCD_SDA_SET; //�������
-      else
-      LCD_SDA_CLR;
-
-      LCD_SCL_CLR;
-      LCD_SCL_SET;
-      Data<<=1;
-	}
-  }
-*/
 
 void SPI_WriteData(u8 Data)
 {
-  //  digitalWrite(slaveSelectPin, LOW);
   SPI.transfer(Data);
-  //  digitalWrite(slaveSelectPin, HIGH);
 }
-//��Һ����дһ��8λָ��
+
 void Lcd_WriteIndex(u8 Index)
 {
-  //SPI д����ʱ��ʼ
   LCD_RS_CLR;
   SPI_WriteData(Index);
 }
 
-//��Һ����дһ��8λ����
 void Lcd_WriteData(u8 Data)
 {
   LCD_RS_SET;
   SPI_WriteData(Data);
 }
-//��Һ����дһ��16λ����
+
 void LCD_WriteData_16Bit(u16 Data)
 {
-
   LCD_RS_SET;
-  SPI_WriteData(Data >> 8); 	//д���8λ����
-  SPI_WriteData(Data); 			//д���8λ����
-
+  SPI_WriteData(Data >> 8);
+  SPI_WriteData(Data);
 }
 
 void Lcd_WriteReg(u8 Index, u8 Data)
@@ -188,12 +164,6 @@ void Lcd_Init(void)
 }
 
 
-/*************************************************
-  ��������LCD_Set_Region
-  ���ܣ�����lcd��ʾ�����ڴ�����д�������Զ�����
-  ��ڲ�����xy�����յ�
-  ����ֵ����
-*************************************************/
 void Lcd_SetRegion(u16 x_start, u16 y_start, u16 x_end, u16 y_end)
 {
   Lcd_WriteIndex(0x2a);
@@ -211,24 +181,13 @@ void Lcd_SetRegion(u16 x_start, u16 y_start, u16 x_end, u16 y_end)
 
 }
 
-/*************************************************
-  ��������LCD_Set_XY
-  ���ܣ�����lcd��ʾ��ʼ��
-  ��ڲ�����xy����
-  ����ֵ����
-*************************************************/
+
 void Lcd_SetXY(u16 x, u16 y)
 {
   Lcd_SetRegion(x, y, x, y);
 }
 
 
-/*************************************************
-  ��������LCD_DrawPoint
-  ���ܣ���һ����
-  ��ڲ�������
-  ����ֵ����
-*************************************************/
 void Gui_DrawPoint(u16 x, u16 y, u16 Data)
 {
   Lcd_SetRegion(x, y, x + 1, y + 1);
@@ -236,59 +195,15 @@ void Gui_DrawPoint(u16 x, u16 y, u16 Data)
 
 }
 
-/*****************************************
-  �������ܣ���TFTĳһ�����ɫ
-  ���ڲ�����color  ����ɫֵ
-******************************************/
-unsigned int Lcd_ReadPoint(u16 x, u16 y)
-{
-  unsigned int Data;
-  Lcd_SetXY(x, y);
 
-  //Lcd_ReadData();//���������ֽ�
-  //Data=Lcd_ReadData();
-  Lcd_WriteData(Data);
-  return Data;
-}
-/*************************************************
-  ��������Lcd_Clear
-  ���ܣ�ȫ����������
-  ��ڲ����������ɫCOLOR
-  ����ֵ����
-*************************************************/
-void Lcd_Clear(u16 Color)
-{
-  unsigned int i, m;
-  Lcd_SetRegion(0, 0, X_MAX_PIXEL - 1, Y_MAX_PIXEL - 1);
-  Lcd_WriteIndex(0x2C);
 
-  LCD_RS_SET;
-
-  for (i = 0; i < X_MAX_PIXEL; i++)
-    for (m = 0; m < Y_MAX_PIXEL; m++)
-    {
-      //	LCD_WriteData_16Bit(Color);
-      SPI.write16(Color);
-    }
-  delay(1000);
-}
 void Lcd_pic(const unsigned char *array, int len)
 {
-  unsigned int i, m, z = 0;
-  Lcd_SetRegion(0, 0, X_MAX_PIXEL - 1, Y_MAX_PIXEL - 1);
+  Lcd_SetRegion(0, 0, LCD_WIDTH - 1, LCD_HEIGHT - 1);
   Lcd_WriteIndex(0x2C);
 
   LCD_RS_SET;
   SPI.writeBytes((uint8_t*)array, len);
   // SPI.writePixels(array, len);
 
-  /*
-    for(i=0;i<X_MAX_PIXEL;i++)
-    for(m=0;m<Y_MAX_PIXEL;m++)
-    {
-    //  SPI_WriteData(array[(z * 2) + 1]);  //д���8λ����
-    //   SPI_WriteData(array[(z * 2)]);       //д���8λ��
-
-     z++;
-    }   */
 }

@@ -1,5 +1,6 @@
 
 #include "ext_canvas.h"
+#include "config.h"
 #include "Adafruit_GFX.h"
 
 
@@ -11,7 +12,7 @@
 */
 /**************************************************************************/
 GFXcanvas24::GFXcanvas24(uint16_t w, uint16_t h) : Adafruit_GFX(w, h) {
-    uint32_t bytes = w * h * 3;
+    uint32_t bytes = w * h * BYTES_PER_PIXEL;
     if((buffer = (uint8_t *)malloc(bytes))) {
         memset(buffer, 0, bytes);
     }
@@ -64,7 +65,7 @@ void GFXcanvas24::drawPixel(int16_t x, int16_t y, uint32_t color) {
                 y = HEIGHT - 1 - t;
                 break;
         }
-        uint32_t offset = 3 * (x + y * WIDTH);
+        uint32_t offset = BYTES_PER_PIXEL * (x + y * WIDTH);
         buffer[offset] = (color >> 16) & 0xFF;
         buffer[offset + 1] = (color>>8) & 0xFF;
         buffer[offset + 2] = color & 0xFF;
@@ -87,9 +88,9 @@ void GFXcanvas24::fillScreen(uint32_t color) {
         } else {
             uint32_t i, pixels = WIDTH * HEIGHT;
             for (i = 0; i < pixels; i++) {
-                buffer[i*3] = r;
-                buffer[i*3+1] = g;
-                buffer[i*3+2] = b;
+                buffer[i*BYTES_PER_PIXEL] = r;
+                buffer[i*BYTES_PER_PIXEL+1] = g;
+                buffer[i*BYTES_PER_PIXEL+2] = b;
             }
         }
     }
