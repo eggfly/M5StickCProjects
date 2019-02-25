@@ -25,3 +25,5 @@
 
 # Executables
 *.app
+
+.DS_Store
