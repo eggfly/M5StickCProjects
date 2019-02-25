@@ -35,13 +35,9 @@
 #define TFT_DC        23  // Data/command line for TFT on Shield
 #define TFT_RST       18  // Reset line for TFT is handled by seesaw!
 
-
 GFXcanvas24 canvas = GFXcanvas24(LCD_WIDTH, LCD_HEIGHT);
 
 // End of constructor list
-
-uint32_t vbat = 0;
-float vbat_mv = 0.0;
 
 int stateA = 0;
 
@@ -94,7 +90,7 @@ void setup(void) {
   SPI.begin (TFT_CLK, -1, TFT_MOSI, -1);
   SPI.beginTransaction(SPISettings(70000000, MSBFIRST, SPI_MODE0));
 
-  Serial.begin(1500*1000);
+  Serial.begin(115200);
   while (!Serial);             // Leonardo: wait for serial monitor
 
   ++bootCount;
@@ -152,37 +148,64 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), blink, FALLING);
   canvas.setRotation(1);
 
+  canvas.fillScreen(0xAA333333); // fill screen bg
+
   // u8g2.begin();
-  runGraphicTest();
+  // runGraphicTest();
 }
 
 long loopTime, startTime, endTime, fps;
 
+#define VIDEO_WIDTH 104
+#define VIDEO_HEIGHT 78
+
+uint8_t serial_buf[VIDEO_WIDTH * VIDEO_HEIGHT / 8];
+uint8_t serial_gram[VIDEO_WIDTH * VIDEO_HEIGHT * 3];
 
 void loop(void) {
+  size_t count = Serial.readBytes(serial_buf, sizeof(serial_buf));
+  Serial.printf("s: %d, so: %d\r\n\r\n", count, sizeof(serial_buf));
+
+  for (int i = 0; i < sizeof(serial_buf); i++) {
+    uint8_t _8_pixels_data = serial_buf[i];
+    for (int8_t bit_offset = 0; bit_offset < 8; bit_offset++) {
+      uint8_t color = 0;
+      if (_8_pixels_data & (1 << (7 - bit_offset))) {
+        color = 255;
+      } else {
+        color = 0;
+      }
+      int pixel_index = i * 8 + bit_offset;
+      serial_gram[3 * pixel_index] = color;
+      serial_gram[3 * pixel_index + 1] = color;
+      serial_gram[3 * pixel_index + 2] = color;
+    }
+  }
+
   loopTime = millis();
   startTime = loopTime;
 
-  canvas.fillScreen(ST77XX_WHITE); // fill with white
-  canvas.drawPixel(40, 40, 0x8000);
-  canvas.fillCircle(1, 5, 20, ST77XX_RED);
-  canvas.fillCircle(5, 1, 20, ST77XX_BLUE);
-  canvas.setCursor(10, 10);
-  canvas.setTextColor(ST77XX_GREEN);
-  canvas.setTextSize(2);
-  canvas.print("112233");
-  canvas.setTextSize(1);
-  canvas.print("test");
+  canvas.drawRGBBitmap(30, 1, (uint8_t *)serial_gram, VIDEO_WIDTH, VIDEO_HEIGHT);
 
-  canvas.drawRGBBitmap(20, 10, (uint8_t *)imagen_888, 160, 80);
+  canvas.drawPixel(159, 79, ST77XX_CYAN);
+  canvas.fillCircle(1, 11, 5, ST77XX_RED);
+  canvas.fillCircle(11, 1, 5, ST77XX_GREEN);
+  canvas.setCursor(0, 30);
+  canvas.setTextColor(0xAAFFFFFF);
+  canvas.setTextSize(1);
+  canvas.print("Bad");
+  canvas.setCursor(0, 40);
+  canvas.setTextSize(1);
+  canvas.print("Apple");
+
   sendGRAM();
 
   loopTime = millis();
   endTime = loopTime;
   unsigned long delta = endTime - startTime;
   fps = 1000 / delta;
-  Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
-  delay(10);
+  // Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
+  delay(25); // fps wrong fix
 
   if (digitalRead(BUTTON_HOME) == 0) {
     Serial.println("\r\nGoing to sleep now\r\n");

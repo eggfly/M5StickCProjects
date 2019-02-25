@@ -7,3 +7,6 @@ VUSB: ACIN
 BM8563: RTC
 
 BUZZER: GPIO19
+
+https://github.com/diodep/ch55x_esp
+https://github.com/rgwan/librech551
