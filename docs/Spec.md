@@ -10,3 +10,11 @@ BUZZER: GPIO19
 
 https://github.com/diodep/ch55x_esp
 https://github.com/rgwan/librech551
+
+
+
+0x34: AXP192 (0x68 >> 1)
+
+0x6C: IMU (The default I2C address of SH200Q is 0b1101100)
+
+0x51: RTC (0xA3 >> 1)

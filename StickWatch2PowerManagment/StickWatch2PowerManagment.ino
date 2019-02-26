@@ -313,7 +313,7 @@ void testAXP() {
   ucg.print("temp:");
   ucg.print(temp);
   ucg.print(" C");
-  
+
   ucg.setPrintPos(2, 90);
   ucg.print("watt:");
   ucg.print(bat_mw, 3);
@@ -329,6 +329,29 @@ uint8_t read_register(uint8_t deviceAddr, uint8_t regAddr) {
   return data;
 }
 
+void sleepSH200Q() {
+  // Wire.beginTransmission(0x6C);
+  // Wire.requestFrom(0x6C, 1);
+
+
+  Wire.beginTransmission(0x6C);
+  Wire.write(0x0E);
+  byte success = Wire.endTransmission(false);
+  Serial.printf("success: %d \n", success);
+  byte byteCount = Wire.requestFrom(0x6C, 1);
+  Serial.printf("byteCount: %d \n", byteCount);
+  uint8_t data = Wire.read();
+  // uint8_t b = read_register(0x6C, 0x0E);
+  Serial.print("byte: ");
+  Serial.println(data, BIN);
+
+
+  Wire.beginTransmission(0x6C);
+  Wire.write(0x0E);
+  Wire.write(0x04);  // SH200Q low-power mode
+  byte succ = Wire.endTransmission();
+  Serial.printf("succ: %d \n", succ);
+}
 
 void beginPower() {
   Wire.begin();
@@ -340,7 +363,7 @@ void beginPower() {
 
   Wire.beginTransmission(0x34);
   Wire.write(0x28);
-  Wire.write(0xff); //Enable LDO2&LDO3, LED&TFT 3.3V
+  Wire.write(0x9f); //Enable LDO2&LDO3, LED&TFT 3.3V
   Wire.endTransmission();
 
   Wire.beginTransmission(0x34);
@@ -396,6 +419,7 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), homePressed, FALLING);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, 0);
   beginPower();
+  sleepSH200Q();
   ucg.begin(UCG_FONT_MODE_TRANSPARENT);
   // ucg.setFont(ucg_font_ncenR14_hr);
   // ucg.setFont(ucg_font_7x13_tf);
