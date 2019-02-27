@@ -199,7 +199,7 @@ void hanxiao() {
   float ccc = 65536 * 0.5 * (coin - coout) / 3600.0 / 25.0;
 
   vbat_mv = vbat * 1.1;
-  Serial.printf("COIN: %lu, COOUT: %lu\n\r", coin, coout);
+  // Serial.printf("COIN: %lu, COOUT: %lu\n\r", coin, coout);
   char printbuf[30] = "";
 
   double acin_mv = vin * 1.7;
@@ -329,6 +329,30 @@ uint8_t read_register(uint8_t deviceAddr, uint8_t regAddr) {
   return data;
 }
 
+void shutdownSH200Q() {
+  // Wire.beginTransmission(0x6C);
+  // Wire.requestFrom(0x6C, 1);
+
+
+  Wire.beginTransmission(0x6C);
+  Wire.write(0x75);
+  byte success = Wire.endTransmission(false);
+  Serial.printf("success: %d \n", success);
+  byte byteCount = Wire.requestFrom(0x6C, 1);
+  Serial.printf("byteCount: %d \n", byteCount);
+  uint8_t data = Wire.read();
+  // uint8_t b = read_register(0x6C, 0x0E);
+  Serial.print("byte: ");
+  Serial.println(data, BIN);
+
+
+  Wire.beginTransmission(0x6C);
+  Wire.write(0x75);
+  Wire.write(0x80);  // SH200Q shutdown mode (only i2c alive)
+  byte succ = Wire.endTransmission();
+  Serial.printf("succ: %d \n", succ);
+}
+
 void sleepSH200Q() {
   // Wire.beginTransmission(0x6C);
   // Wire.requestFrom(0x6C, 1);
@@ -419,7 +443,6 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), homePressed, FALLING);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, 0);
   beginPower();
-  sleepSH200Q();
   ucg.begin(UCG_FONT_MODE_TRANSPARENT);
   // ucg.setFont(ucg_font_ncenR14_hr);
   // ucg.setFont(ucg_font_7x13_tf);
@@ -435,6 +458,7 @@ void loop(void) {
   DLY();
   ucg.setMaxClipRange();
   if (need_shutdown) {
+    shutdownSH200Q();
     shutdown_all_except_self();
     Serial.println("\r\nGoing to sleep now\r\n");
     esp_deep_sleep_start();
