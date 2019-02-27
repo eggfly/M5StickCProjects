@@ -1,1 +1,6 @@
 # StickWatchPrivate
+
+TODO:
+
+WifiLocation
+
