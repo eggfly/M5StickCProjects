@@ -330,10 +330,6 @@ uint8_t read_register(uint8_t deviceAddr, uint8_t regAddr) {
 }
 
 void shutdownSH200Q() {
-  // Wire.beginTransmission(0x6C);
-  // Wire.requestFrom(0x6C, 1);
-
-
   Wire.beginTransmission(0x6C);
   Wire.write(0x75);
   byte success = Wire.endTransmission(false);
@@ -354,10 +350,6 @@ void shutdownSH200Q() {
 }
 
 void sleepSH200Q() {
-  // Wire.beginTransmission(0x6C);
-  // Wire.requestFrom(0x6C, 1);
-
-
   Wire.beginTransmission(0x6C);
   Wire.write(0x0E);
   byte success = Wire.endTransmission(false);
