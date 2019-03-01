@@ -325,6 +325,13 @@ void beginPower() {
   Wire.endTransmission();
 }
 
+void set_axp_pek() {
+  Wire.beginTransmission(0x34);
+  Wire.write(0x31); // enable sleep button short press
+  Wire.write(0x0C); // 0b00001100
+  Wire.endTransmission();
+}
+
 void shutdown_axp() {
   Wire.beginTransmission(0x34);
   Wire.write(0x31); // enable sleep button short press
@@ -451,6 +458,7 @@ void loop(void) {
   }
   if (need_shutdown || loop_start - active_time > 30 * 1000) {
     // shutdown_all_except_self();
+    set_axp_pek();
     shutdown_axp();
     Serial.println("\r\nGoing to sleep now\r\n");
     // esp_deep_sleep_start();
