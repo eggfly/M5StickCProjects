@@ -1,297 +1,149 @@
-#include <SPI.h>
-#include "src/Ucglib/src/Ucglib.h"
+#include "src/Adafruit_GFX/Adafruit_GFX.h"
+#include "src/Adafruit_GFX/ext_canvas.h"
+#include "src/Adafruit_GFX/config.h"
+#include "src/image_data.h"
+
+#include <stdio.h>
+#include "esp_sleep.h"
+#include "soc/rtc_cntl_reg.h"
+#include "soc/rtc_io_reg.h"
+#include "soc/sens_reg.h"
+#include "soc/soc.h"
+#include "driver/gpio.h"
+#include "driver/rtc_io.h"
+#include "esp32/ulp.h"
+
 #include "src/RTCLib/RTClib.h"
 
-#include <Wire.h>
+#include "res.h"
 
 PCF8563 rtc;
 
-#define AXP192_ADDR  0x34
+#define ST77XX_BLACK      0x000000
+#define ST77XX_WHITE      0xFFFFFF
+#define ST77XX_RED        0xFF0000
+#define ST77XX_GREEN      0x00FF00
+#define ST77XX_BLUE       0x0000FF
+#define ST77XX_CYAN       0x00FFFF
+#define ST77XX_MAGENTA    0xFF00FF
+#define ST77XX_YELLOW     0xFFFF00
+#define ST77XX_ORANGE     0xFFA500
 
-Ucglib_ST7735_18x128x160_HWSPI ucg(/*cd=*/ 23, /*cs=*/ 5, /*reset=*/ 18);
+const uint32_t COLORS_LIGHT[10] = {
+  0xff4aad, 0x0e88fe, 0xcc03fc, 0xfe49ad, 0xff0505,
+  0xfa660d, 0xfff800, 0x14fa00, 0x0496ff, 0xc900ff
+};
+const uint32_t COLORS_DARK[10] = {
+  0x471f32, 0x002548, 0x3b004b, 0x3e1a2c, 0x4a000c,
+  0x4a1e00, 0x4b4500, 0x004700, 0x022242, 0x380249
+};
 
-#define T 4000
-#define DLY() delay(500)
+#include <Wire.h>
 
-int BUTTON_HOME = GPIO_NUM_37;
-int BUTTON_PIN = GPIO_NUM_39;
+#include <SPI.h>
+#include "src/Lcd_Driver.h"
 
-void color_test() {
-  uint16_t c, x;
-  for ( c = 0, x = 2; c <= 255; c += 17, x += 4 ) {
-    ucg.setColor(0, c, c, c);
-    ucg.drawBox(x, -12, 4, 8);
-    ucg.setColor(0, c, 0, 0);
-    ucg.drawBox(x, -12 + 8, 4, 8);
-    ucg.setColor(0, 0, c, 0);
-    ucg.drawBox(x, -12 + 2 * 8, 4, 8);
-    ucg.setColor(0, 0, 0, c);
-    ucg.drawBox(x, -12 + 3 * 8, 4, 8);
-    ucg.setColor(0, c, 255 - c, 0);
-    ucg.drawBox(x, -12 + 4 * 8, 4, 8);
+#define TFT_MOSI      15
+#define TFT_CLK       13
+#define TFT_CS        5   // Chip select line for TFT display on Shield
+#define TFT_DC        23  // Data/command line for TFT on Shield
+#define TFT_RST       18  // Reset line for TFT is handled by seesaw!
+
+GFXcanvas24 canvas = GFXcanvas24(LCD_WIDTH, LCD_HEIGHT);
+
+// End of constructor list
+
+int stateA = 0;
+
+int LED_RI = 9;
+int LED_BUILTIN = 10;
+int BUTTON_HOME = 37;
+int BUTTON_PIN = 39;
+
+//int BUTTON_HOME = 34;
+//int BUTTON_PIN = 39;
+RTC_DATA_ATTR int bootCount = 0;
+
+void print_wakeup_reason() {
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch (wakeup_reason)
+  {
+    case 1  : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
+    case 2  : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
+    case 3  : Serial.println("Wakeup caused by timer"); break;
+    case 4  : Serial.println("Wakeup caused by touchpad"); break;
+    case 5  : Serial.println("Wakeup caused by ULP program"); break;
+    default : Serial.println("Wakeup was not caused by deep sleep"); break;
   }
 }
 
-#define COLOR_COUNT 6
+void show_time() {
+  DateTime now = rtc.now();
+  char buf[100];
+  strncpy(buf, "YYYY.MM.DD hh:mm:ss\0", 100);
+  now.format(buf);
+  // Serial.printf("time now: %s\n", buf);
 
-int color_index = 0;
-uint8_t color_r[COLOR_COUNT] = {255,   0,   0, 255, 0,   255};
-uint8_t color_g[COLOR_COUNT] = {  0, 255,   0, 255, 255,   0};
-uint8_t color_b[COLOR_COUNT] = {  0,   0, 255,   0, 255, 255};
-
-void draw_background(void) {
-  // Serial.printf("w=%d, h=%d\n", ucg.getWidth(), ucg.getHeight());
-  color_index++;
-  int i = color_index % COLOR_COUNT;
-  // Serial.printf("color index: %d", i);
-  ucg.setColor(0, color_r[i], color_g[i], color_b[i]);
-  ucg.setColor(1, color_r[(i + 1) % COLOR_COUNT], color_g[(i + 1) % COLOR_COUNT], color_b[(i + 1) % COLOR_COUNT]);
-  ucg.setColor(2, color_r[(i + 2) % COLOR_COUNT], color_g[(i + 2) % COLOR_COUNT], color_b[(i + 2) % COLOR_COUNT]);
-  ucg.setColor(3, color_r[(i + 3) % COLOR_COUNT], color_g[(i + 3) % COLOR_COUNT], color_b[(i + 3) % COLOR_COUNT]);
-  // ucg.drawBox(0, 0, ucg.getWidth(), ucg.getHeight());
-  ucg.drawGradientBox(2, 23, 157, 78);
-}
-
-double acin_mv = 0;
-double acin_current = 0;
-double vbus_v = 0;
-double ibus_ma = 0;
-
-double temperature = 0;
-double bat_mw = 0;
-int charge = 0;
-int discharge = 0;
-
-char data0_bin[33] = "?";
-char data1_bin[33] = "?";
-
-uint32_t coin = 0;
-uint32_t coout = 0;
-double ccc = 0.0;
-double vbat_v = 0.0;
-
-
-void readAXP() {
-  uint8_t data0 = read_register(AXP192_ADDR, 0x00);
-  uint8_t data1 = read_register(AXP192_ADDR, 0x01);
-
-  uint8_t data56 = read_register(AXP192_ADDR, 0x56);
-  uint8_t data57 = read_register(AXP192_ADDR, 0x57);
-  int vin = (data56 << 4) | data57;
-  acin_mv = vin * 1.7;
-
-  uint8_t data58 = read_register(AXP192_ADDR, 0x58);
-  uint8_t data59 = read_register(AXP192_ADDR, 0x59);
-  int iin = (data58 << 4) | data59;
-  acin_current = iin * 0.625;
-
-  uint8_t data5a = read_register(AXP192_ADDR, 0x5A);
-  uint8_t data5b = read_register(AXP192_ADDR, 0x5B);
-  int vbus = (data5a << 4) | data5b;
-  vbus_v = vbus * 1.7 / 1000.0;
-
-  uint8_t data5c = read_register(AXP192_ADDR, 0x5C);
-  uint8_t data5d = read_register(AXP192_ADDR, 0x5D);
-  int ibus = (data5c << 4) | data5d;
-  ibus_ma = ibus * 0.375;
-
-  // axp temp
-  uint8_t data5e = read_register(AXP192_ADDR, 0x5e); //
-  uint8_t data5f = read_register(AXP192_ADDR, 0x5f); //
-  temperature = -144.7 + ((data5e << 4) + data5f) * 0.1; // 'C
-
-  uint8_t data70 = read_register(AXP192_ADDR, 0x70); //
-  uint8_t data71 = read_register(AXP192_ADDR, 0x71); //
-  uint8_t data72 = read_register(AXP192_ADDR, 0x72); //
-  uint32_t watt = (data70 << 16) + (data71 << 8) + data72;
-  bat_mw = watt * 1.1 * 0.5 / 1000;
-
-  // vbat
-  uint8_t data78 = read_register(AXP192_ADDR, 0x78); //
-  uint8_t data79 = read_register(AXP192_ADDR, 0x79); //
-  vbat_v = ((data78 << 4) | data79) * 1.1 / 1000; // V
-  // charge current
-  uint8_t data7a = read_register(AXP192_ADDR, 0x7a); //
-  uint8_t data7b = read_register(AXP192_ADDR, 0x7b); //
-  charge = ((data7a << 5) + data7b) / 2; // mA
-  // discharge current
-  uint8_t data7c = read_register(AXP192_ADDR, 0x7c); //
-  uint8_t data7d = read_register(AXP192_ADDR, 0x7d); //
-  discharge = ((data7c << 5) + data7d) / 2;
-
-  itoa(data0, data0_bin, 2);
-  itoa(data1, data1_bin, 2);
-
-  uint8_t datab0 = read_register(AXP192_ADDR, 0xb0);
-  uint8_t datab1 = read_register(AXP192_ADDR, 0xb1);
-  uint8_t datab2 = read_register(AXP192_ADDR, 0xb2);
-  uint8_t datab3 = read_register(AXP192_ADDR, 0xb3);
-  coin = (datab0 << 24) | (datab1 << 16) || (datab2 << 8) |  datab3;
-
-  uint8_t datab4 = read_register(AXP192_ADDR, 0xb4);
-  uint8_t datab5 = read_register(AXP192_ADDR, 0xb5);
-  uint8_t datab6 = read_register(AXP192_ADDR, 0xb6);
-  uint8_t datab7 = read_register(AXP192_ADDR, 0xb7);
-  coout = (datab4 << 24) | (datab5 << 16) || (datab6 << 8) |  datab7;
-
-  ccc = 65536 * 0.5 * (coin - coout) / 3600.0 / 25.0;
-}
-
-void drawAXP() {
-  unsigned long loop_start = millis();
-  ucg.setColor(255, 255, 255);
-
-  ucg.setPrintDir(0);
-  ucg.setPrintPos(2, 40);
-  ucg.print(data0_bin);
-
-  ucg.setPrintPos(42, 40);
-  ucg.print(data1_bin);
-
-  ucg.setPrintPos(2, 50);
-  ucg.print("vbat:");
-  ucg.print(vbat_v, 4);
-  ucg.print("V");
-
-  ucg.setPrintPos(2, 60);
-  ucg.print("charge:");
-  ucg.print(charge);
-  ucg.print("mA");
-
-  ucg.setPrintPos(2, 70);
-  ucg.print("disCHG:");
-  ucg.print(discharge);
-  ucg.print("mA");
-
-  ucg.setPrintPos(2, 80);
-  ucg.print("temp:");
-  ucg.print(temperature);
-  ucg.print(" C");
-
-  //  ucg.setPrintPos(2, 90);
-  //  ucg.print("watt:");
-  //  ucg.print(bat_mw, 3);
-  //  ucg.print("mW");
-
-  ucg.setPrintPos(85, 40);
-  ucg.print("Vin:");
-  ucg.print(vbus_v, 4);
-  ucg.print("V");
-
-  ucg.setPrintPos(85, 50);
-  ucg.print("Iin:");
-  ucg.print(ibus_ma, 2);
-  ucg.print("mA");
-
-  //  ucg.setPrintPos(85, 60);
-  //  ucg.print("CoIn:");
-  //  ucg.print(coin);
-  //
-  //  ucg.setPrintPos(85, 70);
-  //  ucg.print("CoOut:");
-  //  ucg.print(coout);
-  //
-  //  ucg.setPrintPos(85, 80);
-  //  ucg.print("ccc:");
-  //  ucg.print(ccc, 2);
-  //  ucg.print("mAh");
-
-  char charge_status[128] = "";
-  boolean battery_charging = is_charging();
-  boolean has_usb = usb_plugged_in();
-  if (has_usb) {
-    if (battery_charging) {
-      sprintf(charge_status, "Charging..");
-    } else {
-      sprintf(charge_status, "Charge full");
-    }
-  } else {
-    sprintf(charge_status, "Using battery.");
-  }
-  ucg.setPrintPos(70, 30);
-  ucg.print(charge_status);
-
-  Serial.printf("time0: %ld\n", millis() - loop_start);
+  canvas.setCursor(28, 70);
+  canvas.setTextColor(0xAAFFFFFF);
+  canvas.print(buf);
 }
 
 
-
-void drawAXP2() {
-  unsigned long loop_start = millis();
-
-  ucg.setColor(255, 255, 255);
-
-  ucg.drawString(2, 40, 0, data0_bin);
-  ucg.drawString(42, 40, 0, data1_bin);
-
-  char buf[64] = "";
-
-  sprintf(buf, "vbat:%.4fV", vbat_v);
-  ucg.drawString(2, 50, 0, buf);
-
-  sprintf(buf, "charge:%dmA", charge);
-  ucg.drawString(2, 60, 0, buf);
-
-  sprintf(buf, "disCHG:%dmA", discharge);
-  ucg.drawString(2, 70, 0, buf);
-
-  sprintf(buf, "temp:%f C", temperature);
-  ucg.drawString(2, 80, 0, buf);
-
-  sprintf(buf, "temp:%.1f C", temperature);
-  ucg.setPrintPos(2, 90);
-  ucg.print("watt:");
-  ucg.print(bat_mw, 3);
-  ucg.print("mW");
-
-  ucg.setPrintPos(85, 40);
-  ucg.print("Vin:");
-  ucg.print(vbus_v, 2);
-  ucg.print("V");
-
-  ucg.setPrintPos(85, 50);
-  ucg.print("Iin:");
-  ucg.print(ibus_ma, 2);
-  ucg.print("mA");
-
-  ucg.setPrintPos(85, 60);
-  ucg.print("CoIn:");
-  ucg.print(coin);
-  // ucg.print("?");
-
-  ucg.setPrintPos(85, 70);
-  ucg.print("CoOut:");
-  ucg.print(coout);
-  // ucg.print("?");
-
-  ucg.setPrintPos(85, 80);
-  ucg.print("ccc:");
-  ucg.print(ccc, 2);
-  ucg.print("mAh");
-  Serial.printf("AXP2 time0: %ld\n", millis() - loop_start);
-}
-
-uint8_t read_register(uint8_t deviceAddr, uint8_t regAddr) {
-  Wire.beginTransmission(deviceAddr);
-  Wire.write(regAddr);
-  Wire.endTransmission(false);
-  Wire.requestFrom(deviceAddr, 1);
-  uint8_t data = Wire.read();
-  return data;
-}
-
-void beginPower() {
+void setup(void) {
   Wire.begin();
+  rtc.begin();
+  DateTime now = rtc.now();
+  if (now.year() < 2018) {
+    Serial.println("RTC need factory reset!");
+    // following line sets the RTC to the date & time this sketch was compiled
+    rtc.adjust(DateTime(__DATE__, __TIME__));
+  }
+
+  pinMode(LED_RI, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  pinMode(BUTTON_HOME, INPUT | PULLUP);
+  pinMode(BUTTON_PIN, INPUT | PULLUP);
+
+  pinMode(TFT_MOSI, OUTPUT);
+  pinMode(TFT_CLK, OUTPUT);
+  pinMode(TFT_CS, OUTPUT);
+  pinMode(TFT_DC, OUTPUT);
+  pinMode(TFT_RST, OUTPUT);
+
+  digitalWrite(TFT_CS, LOW);
+
+
+  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+  delay(10);
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+
+  SPI.begin (TFT_CLK, -1, TFT_MOSI, -1);
+  SPI.beginTransaction(SPISettings(70000000, MSBFIRST, SPI_MODE0));
+
+  Serial.begin(115200);
+  while (!Serial);             // Leonardo: wait for serial monitor
+
+  ++bootCount;
+  Serial.println("Boot number: " + String(bootCount));
+
+  //Print the wakeup reason for ESP32
+  print_wakeup_reason();
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_39, 0);
 
   Wire.beginTransmission(0x34);
   Wire.write(0x10);
-  Wire.write(0xff);  //OLED_VPP Enable
+  Wire.write(0x9f);  //OLED_VPP Enable
   Wire.endTransmission();
 
   Wire.beginTransmission(0x34);
   Wire.write(0x28);
   Wire.write(0x9f); //Enable LDO2&LDO3, LED&TFT 3.3V
-  // 背光亮度通过LDO2调节
+  // Wire.write(0xff); //Enable LDO2&LDO3, LED&TFT 3.3V
   Wire.endTransmission();
 
   Wire.beginTransmission(0x34);
@@ -323,146 +175,124 @@ void beginPower() {
   Wire.write(0x36);
   Wire.write(0x5c); //PEK
   Wire.endTransmission();
+
+  Lcd_Init();
+  // Lcd_Clear(WHITE); // TODO?
+  // Lcd_pic(gImage_001);
+  //attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), blink, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), blink, FALLING);
+  canvas.setRotation(1);
+
+  // u8g2.begin();
+  // runGraphicTest();
 }
 
-void set_axp_pek() {
-  Wire.beginTransmission(0x34);
-  Wire.write(0x31); // enable sleep button short press
-  Wire.write(0x0C); // 0b00001100
-  Wire.endTransmission();
-}
-
-void shutdown_axp() {
-  Wire.beginTransmission(0x34);
-  Wire.write(0x31); // enable sleep button short press
-  Wire.write(0x0B);
-  Wire.endTransmission();
-  delay(100);
-  Wire.beginTransmission(0x34);
-  Wire.write(0x32); // power down!
-  Wire.write(0xC6);
-  Wire.endTransmission();
-}
-
-/**
-   false: 未充电或充电已完成
-   true: 正在充电
-*/
-boolean is_charging() {
-  uint8_t data01 = read_register(AXP192_ADDR, 0x01);
-  return data01 & 0b01000000;
-}
-
-boolean usb_plugged_in() {
-  uint8_t data00 = read_register(AXP192_ADDR, 0x00);
-  return data00 & 0b10100000; // 7 bit or 5 bit
-}
-
-/**
-   true: charge current
-   false: discharge current
-*/
-boolean battery_current_direction() {
-  uint8_t data00 = read_register(AXP192_ADDR, 0x00);
-  return data00 & 0b00000100;
-}
-
-void shutdown_all_except_self() {
-  /**
-     0:关闭； 1:打开:
-
-     7 保留，不可更改 RW X
-     6 EXTEN 开关控制 RW X
-     5 保留，不可更改 RW X
-     4 DC-DC2 开关控制 RW X
-     3 LDO3 开关控制 RW X
-     2 LDO2 开关控制 RW X
-     1 DC-DC3 开关控制 RW X
-     0 DC-DC1 开关控制 RW X
-     注：REG12Hbit6/4 分别对应 REG10Hbit2/0
-  */
-  Wire.beginTransmission(0x34);
-  Wire.write(0x12); // REG 12H:电源输出控制
-  Wire.write(0x01); // 除了DCDC1，其他设置0
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x10);
-  Wire.write(0x00);  // OLED_VPP DISABLE
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x82);  // disable all the ADCs
-  Wire.write(0x00);
-  Wire.endTransmission();
-}
-
-boolean need_shutdown = false;
-
-//中断函数
-void homePressed() {
-  need_shutdown = true;
-}
-
-void setup(void) {
-  Serial.begin(115200);
-  rtc.begin();
-  rtc.isrunning();
-  DateTime now = rtc.now();
-  if (now.year() < 2018) {
-    Serial.println("RTC need factory reset!");
-    // following line sets the RTC to the date & time this sketch was compiled
-    rtc.adjust(DateTime(__DATE__, __TIME__));
-  }
-  pinMode(BUTTON_HOME, INPUT | PULLUP);
-  pinMode(BUTTON_PIN, INPUT | PULLUP);
-
-  attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), homePressed, FALLING);
-  // esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, 0);
-  beginPower();
-  ucg.begin(UCG_FONT_MODE_TRANSPARENT);
-  // ucg.setFont(ucg_font_ncenR14_hr);
-  // ucg.setFont(ucg_font_7x13_tf);
-  ucg.setFont(ucg_font_6x12_tf);
-  ucg.clearScreen();
-}
-
-void show_time() {
-  DateTime now = rtc.now();
-  char buf[100];
-  strncpy(buf, "YYYY.MM.DD hh:mm:ss\0", 100);
-  now.format(buf);
-  // Serial.printf("time now: %s\n", buf);
-  ucg.setColor(255, 255, 255);
-  ucg.drawString(40, 100, 0, buf);
-}
-
-unsigned long active_time = millis();
+long loopTime, startTime, endTime, fps;
 
 void loop(void) {
-  unsigned long loop_start = millis();
-  ucg.setRotate90();
-  Serial.printf("time-1: %ld\n", millis() - loop_start);
-  draw_background();
-  Serial.printf("time0: %ld\n", millis() - loop_start);
-  readAXP();
-  Serial.printf("time1: %ld\n", millis() - loop_start);
-  drawAXP2();
-  Serial.printf("time2: %ld\n", millis() - loop_start);
-  show_time();
-  Serial.printf("time3: %ld\n", millis() - loop_start);
-  ucg.setMaxClipRange();
-  if (usb_plugged_in()) {
-    // won't go so sleep when usb
-    active_time = loop_start;
+  canvas.fillScreen(0x00000000); // fill screen bg
+
+  loopTime = millis();
+  // 4 digit 100ms counter
+  int count = (loopTime / 100) % 10000;
+  startTime = loopTime;
+
+  //  canvas.drawPixel(159, 79, ST77XX_CYAN);
+  //  canvas.fillCircle(1, 11, 5, ST77XX_RED);
+  //  canvas.fillCircle(11, 1, 5, ST77XX_GREEN);
+  //  canvas.setCursor(0, 30);
+  //  canvas.setTextColor(0xAAFFFFFF);
+  //  canvas.setTextSize(1);
+  //  canvas.print("Bad");
+  //  canvas.setCursor(0, 40);
+  //  canvas.setTextSize(1);
+  //  canvas.print("Apple");
+
+  // canvas.drawRGBBitmap(0, 15, clock_data, VIDEO_WIDTH, VIDEO_HEIGHT);
+
+  int x_start = 6;
+  int x_delta = 7;
+  int r = 2;
+  canvas.fillCircle(x_start + x_delta * 0, 4, r, COLORS_LIGHT[0]);
+  canvas.fillCircle(x_start + x_delta * 1, 4, r, COLORS_LIGHT[1]);
+  canvas.fillCircle(x_start + x_delta * 2, 4, r, COLORS_LIGHT[2]);
+  canvas.fillCircle(x_start + x_delta * 3, 4, r, COLORS_LIGHT[3]);
+  canvas.fillCircle(x_start + x_delta * 4, 4, r, COLORS_LIGHT[4]);
+  canvas.fillCircle(x_start + x_delta * 5, 4, r, COLORS_LIGHT[5]);
+  canvas.fillCircle(x_start + x_delta * 6, 4, r, COLORS_LIGHT[6]);
+  canvas.fillCircle(x_start + x_delta * 7, 4, r, COLORS_LIGHT[7]);
+  canvas.fillCircle(x_start + x_delta * 8, 4, r, COLORS_LIGHT[8]);
+  canvas.fillCircle(x_start + x_delta * 9, 4, r, COLORS_LIGHT[9]);
+
+  int y2 = 11;
+  canvas.fillCircle(x_start + x_delta * 0, y2, r, COLORS_DARK[0]);
+  canvas.fillCircle(x_start + x_delta * 1, y2, r, COLORS_DARK[1]);
+  canvas.fillCircle(x_start + x_delta * 2, y2, r, COLORS_DARK[2]);
+  canvas.fillCircle(x_start + x_delta * 3, y2, r, COLORS_DARK[3]);
+  canvas.fillCircle(x_start + x_delta * 4, y2, r, COLORS_DARK[4]);
+  canvas.fillCircle(x_start + x_delta * 5, y2, r, COLORS_DARK[5]);
+  canvas.fillCircle(x_start + x_delta * 6, y2, r, COLORS_DARK[6]);
+  canvas.fillCircle(x_start + x_delta * 7, y2, r, COLORS_DARK[7]);
+  canvas.fillCircle(x_start + x_delta * 8, y2, r, COLORS_DARK[8]);
+  canvas.fillCircle(x_start + x_delta * 9, y2, r, COLORS_DARK[9]);
+
+
+  int y_start = 19;
+  for (int pos = 0; pos < 4; pos++) {
+    uint8_t curr_digit = 0;
+    if (pos == 0) {
+      curr_digit = count / 1000;
+    } else if (pos == 1) {
+      curr_digit = count / 100 % 10;
+    } else if (pos == 2) {
+      curr_digit = count / 10 % 10;
+    } else if (pos == 3) {
+      curr_digit = count % 10;
+    }
+    for (int row = 0; row < 7; row++) {
+      for (int col = 0; col < 5; col++) {
+        uint32_t color = DIGITS[curr_digit][row][col] ?
+                         COLORS_LIGHT[curr_digit] : COLORS_DARK[curr_digit];
+        canvas.fillCircle(x_start + col * 7, y_start + row * 7, r, color);
+      }
+    }
+    x_start += 39;
   }
-  if (need_shutdown || loop_start - active_time > 30 * 1000) {
-    // shutdown_all_except_self();
-    set_axp_pek();
-    shutdown_axp();
+
+  show_time();
+  sendGRAM();
+
+  loopTime = millis();
+  endTime = loopTime;
+  unsigned long delta = endTime - startTime;
+  fps = 1000 / delta;
+  // Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
+  delay(25); // fps wrong fix
+
+  if (digitalRead(BUTTON_HOME) == 0) {
     Serial.println("\r\nGoing to sleep now\r\n");
-    // esp_deep_sleep_start();
+    esp_deep_sleep_start();
     Serial.println("This will never be printed");
   }
-  DLY();
+}
+
+void blink() //中断函数
+{
+  stateA = !stateA;
+  delay(10);
+  if (stateA) {
+    digitalWrite(LED_RI, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
+  }
+  else
+  {
+    digitalWrite(LED_RI, LOW);
+    digitalWrite(LED_BUILTIN, LOW);
+  }
+
+}
+
+
+void sendGRAM() {
+  Lcd_pic(canvas.getBuffer(), GRAM_BUFFER_SIZE);
 }
