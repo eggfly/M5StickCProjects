@@ -1,4 +1,4 @@
-# M5StickC demo propjects
+# M5StickC demo projects
 * Gauge: 官方最早的demo
 * 8563_RTC: RTC
 * StickWatch2: 2代手表demo
