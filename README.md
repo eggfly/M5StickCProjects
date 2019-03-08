@@ -1,6 +1,1 @@
-# StickWatchPrivate
-
-TODO:
-
-WifiLocation
-
+# M5Stick2 demo propjects
