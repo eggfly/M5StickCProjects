@@ -67,6 +67,8 @@ void hanxiao() {
   uint32_t dibat = 0;
   uint32_t vin = 0;
   uint32_t iin = 0;
+  uint32_t vbus = 0;
+  uint32_t ibus = 0;
   uint32_t coin = 0;
   uint32_t coout = 0;
   Wire.beginTransmission(0x34);
@@ -152,6 +154,35 @@ void hanxiao() {
   Wire.requestFrom(0x34, 1);
   iin |= Wire.read();
 
+
+  Wire.beginTransmission(0x34);
+  Wire.write(0x5a);
+  Wire.endTransmission();
+  Wire.requestFrom(0x34, 1);
+  vbus = ((uint32_t)(Wire.read())) << 4;
+
+
+  Wire.beginTransmission(0x34);
+  Wire.write(0x5b);
+  Wire.endTransmission();
+  Wire.requestFrom(0x34, 1);
+  vbus |= Wire.read();
+
+  
+  Wire.beginTransmission(0x34);
+  Wire.write(0x5c);
+  Wire.endTransmission();
+  Wire.requestFrom(0x34, 1);
+  ibus = ((uint32_t)(Wire.read())) << 4;
+
+
+  Wire.beginTransmission(0x34);
+  Wire.write(0x5d);
+  Wire.endTransmission();
+  Wire.requestFrom(0x34, 1);
+  ibus |= Wire.read();
+
+  
   Wire.beginTransmission(0x34);
   Wire.write(0xB0);
   Wire.endTransmission();
@@ -204,21 +235,25 @@ void hanxiao() {
 
   double acin_mv = vin * 1.7;
   double acin_current = iin * 0.625;
+  double vbus_mv = vbus * 1.7;
+  double ibus_ma = ibus * 0.375;
   Serial.printf("VBat: %.03fmV\n", vbat_mv);
   Serial.printf("CHG: %.03fmA\n",  ibat * 0.5);
   Serial.printf("DisCHG: %.03fmA\n",  dibat * 0.5);
   Serial.printf("Vin: %.03fmV\n", acin_mv);
   Serial.printf("Iin: %.03fmA\n", acin_current);
+  Serial.printf("VBus: %.03fmV\n", vbus_mv);
+  Serial.printf("IBus: %.03fmA\n", ibus_ma);
   Serial.printf("Remain: %.03fmAh\n",  ccc);
 
   ucg.setPrintPos(85, 40);
-  ucg.print("Vin:");
-  ucg.print(acin_mv, 2);
+  ucg.print("VBus:");
+  ucg.print(vbus_mv, 2);
   ucg.print("mV");
 
   ucg.setPrintPos(85, 50);
-  ucg.print("Iin:");
-  ucg.print(acin_current, 2);
+  ucg.print("IBus:");
+  ucg.print(ibus_ma, 2);
   ucg.print("mA");
 
   ucg.setPrintPos(85, 60);

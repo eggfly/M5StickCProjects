@@ -8,10 +8,10 @@
 
 #include <WiFi.h>
 
-const char* ssid     = "eggfly";
+const char* ssid     = "MIWIFI8";
 const char* password = "12345678";
 
-const char* host = "mirrors.aliyun.com";
+const char* host = "192.168.31.233";
 
 void setup()
 {
@@ -51,14 +51,14 @@ void loop() {
 
   // Use WiFiClient class to create TCP connections
   WiFiClient client;
-  const int httpPort = 80;
+  const int httpPort = 8000;
   if (!client.connect(host, httpPort)) {
     Serial.println("connection failed");
     return;
   }
 
   // We now create a URI for the request
-  String url = "/ubuntu-releases/18.04.2/ubuntu-18.04.2-desktop-amd64.iso";
+  String url = "/genymotion-3.0.0.dmg";
 
   Serial.print("Requesting URL: ");
   Serial.println(url);

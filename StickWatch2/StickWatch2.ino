@@ -3,19 +3,26 @@
 #include "src/Adafruit_GFX/config.h"
 #include "src/image_data.h"
 
-#include <stdio.h>
-#include "esp_sleep.h"
-#include "soc/rtc_cntl_reg.h"
-#include "soc/rtc_io_reg.h"
-#include "soc/sens_reg.h"
-#include "soc/soc.h"
-#include "driver/gpio.h"
-#include "driver/rtc_io.h"
-#include "esp32/ulp.h"
+// #include <stdio.h>
+// #include "esp_sleep.h"
+// #include "soc/rtc_cntl_reg.h"
+// #include "soc/rtc_io_reg.h"
+// #include "soc/sens_reg.h"
+// #include "soc/soc.h"
+// #include "driver/gpio.h"
+// #include "driver/rtc_io.h"
+// #include "esp32/ulp.h"
 
 #include "src/RTCLib/RTClib.h"
 
 #include "res.h"
+#include "imu.h"
+
+#define calibration_x 15
+#define calibration_y 0
+
+#define sensitivity_x 1.9
+#define sensitivity_y 1.2
 
 PCF8563 rtc;
 
@@ -55,7 +62,7 @@ GFXcanvas24 canvas = GFXcanvas24(LCD_WIDTH, LCD_HEIGHT);
 
 int stateA = 0;
 
-int LED_RI = 9;
+// int LED_RI = 9;
 int LED_BUILTIN = 10;
 int BUTTON_HOME = 37;
 int BUTTON_PIN = 39;
@@ -66,11 +73,8 @@ RTC_DATA_ATTR int bootCount = 0;
 
 void print_wakeup_reason() {
   esp_sleep_wakeup_cause_t wakeup_reason;
-
   wakeup_reason = esp_sleep_get_wakeup_cause();
-
-  switch (wakeup_reason)
-  {
+  switch (wakeup_reason) {
     case 1  : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
     case 2  : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
     case 3  : Serial.println("Wakeup caused by timer"); break;
@@ -80,8 +84,11 @@ void print_wakeup_reason() {
   }
 }
 
+DateTime now;
+
 void show_time() {
-  DateTime now = rtc.now();
+  now = rtc.now();
+  now.hour();
   char buf[100];
   strncpy(buf, "YYYY.MM.DD hh:mm:ss\0", 100);
   now.format(buf);
@@ -97,13 +104,13 @@ void setup(void) {
   Wire.begin();
   rtc.begin();
   DateTime now = rtc.now();
-  if (now.year() < 2018) {
+  if (now.year() < 2019) {
     Serial.println("RTC need factory reset!");
     // following line sets the RTC to the date & time this sketch was compiled
     rtc.adjust(DateTime(__DATE__, __TIME__));
   }
 
-  pinMode(LED_RI, OUTPUT);
+  // pinMode(LED_RI, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
   pinMode(BUTTON_HOME, INPUT | PULLUP);
@@ -116,7 +123,6 @@ void setup(void) {
   pinMode(TFT_RST, OUTPUT);
 
   digitalWrite(TFT_CS, LOW);
-
 
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
   delay(10);
@@ -133,7 +139,7 @@ void setup(void) {
 
   //Print the wakeup reason for ESP32
   print_wakeup_reason();
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_39, 0);
+  // esp_sleep_enable_ext0_wakeup(GPIO_NUM_39, 0);
 
   Wire.beginTransmission(0x34);
   Wire.write(0x10);
@@ -179,22 +185,82 @@ void setup(void) {
   Lcd_Init();
   // Lcd_Clear(WHITE); // TODO?
   // Lcd_pic(gImage_001);
-  //attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), blink, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), blink, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), home_isr, FALLING);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button_isr, FALLING);
   canvas.setRotation(1);
 
-  // u8g2.begin();
+  sh200i_init();
   // runGraphicTest();
 }
 
 long loopTime, startTime, endTime, fps;
 
-void loop(void) {
-  canvas.fillScreen(0x00000000); // fill screen bg
+#define PAGE_CLOCK 0
+#define PAGE_TIMER 1
+#define PAGE_KEYBOARD 2
 
+#define PAGE_COUNT 3
+
+int current_page = PAGE_CLOCK;
+
+int cursorX, cursorY;
+int clicked_cursor_x = -1, clicked_cursor_y = -1;
+
+void draw_cursor() {
+  int times = 1;
+  int average_accX = 0, average_accY = 0;
+  for (int i = 0; i < times; i++) {
+    read_imu();
+    average_accX += accX;
+    average_accY += accY;
+  }
+  average_accX /= times;
+  average_accY /= times;
+  cursorX = 80 + calibration_x - sensitivity_x * average_accY / 50;
+  cursorY = 40 + calibration_y - sensitivity_y * average_accX / 50;
+  if (cursorX < 0) {
+    cursorX = 0;
+  } else  if (cursorX > 159) {
+    cursorX = 159;
+  }
+  if (cursorY < 0) {
+    cursorY = 0;
+  } else if (cursorY > 79) {
+    cursorY = 79;
+  }
+  // Serial.printf("%ld,%ld\r\n", cursorX, cursorY);
+  // draw cursor
+  canvas.fillCircle(cursorX, cursorY, 1, ST77XX_WHITE);
+}
+
+void draw_menu() {
+  canvas.drawRect(0, 0, 33, 11, ST77XX_WHITE);
+
+  canvas.setCursor(2, 2);
+  canvas.setTextColor(0xAAFFFFFF);
+  canvas.print("Timer");
+
+  canvas.drawRect(35, 0, 35, 11, ST77XX_WHITE);
+  canvas.setCursor(38, 2);
+  canvas.setTextColor(0xAAFFFFFF);
+  canvas.print("Clock");
+
+  canvas.drawRect(36 + 35, 0, 50, 11, ST77XX_WHITE);
+  canvas.setCursor(38 + 35, 2);
+  canvas.setTextColor(0xAAFFFFFF);
+  canvas.print("Keyboard");
+}
+
+void page_1_2() {
+  show_time();
   loopTime = millis();
-  // 4 digit 100ms counter
-  int count = (loopTime / 100) % 10000;
+  int count = 0;
+  if (current_page == PAGE_CLOCK) {
+    count = now.hour() * 100 + now.minute();
+  } else {
+    // 4 digit 100ms counter
+    count = (loopTime / 100) % 10000;
+  }
   startTime = loopTime;
 
   //  canvas.drawPixel(159, 79, ST77XX_CYAN);
@@ -213,29 +279,14 @@ void loop(void) {
   int x_start = 6;
   int x_delta = 7;
   int r = 2;
-  canvas.fillCircle(x_start + x_delta * 0, 4, r, COLORS_LIGHT[0]);
-  canvas.fillCircle(x_start + x_delta * 1, 4, r, COLORS_LIGHT[1]);
-  canvas.fillCircle(x_start + x_delta * 2, 4, r, COLORS_LIGHT[2]);
-  canvas.fillCircle(x_start + x_delta * 3, 4, r, COLORS_LIGHT[3]);
-  canvas.fillCircle(x_start + x_delta * 4, 4, r, COLORS_LIGHT[4]);
-  canvas.fillCircle(x_start + x_delta * 5, 4, r, COLORS_LIGHT[5]);
-  canvas.fillCircle(x_start + x_delta * 6, 4, r, COLORS_LIGHT[6]);
-  canvas.fillCircle(x_start + x_delta * 7, 4, r, COLORS_LIGHT[7]);
-  canvas.fillCircle(x_start + x_delta * 8, 4, r, COLORS_LIGHT[8]);
-  canvas.fillCircle(x_start + x_delta * 9, 4, r, COLORS_LIGHT[9]);
+  for (int n = 0; n < 10; n++) {
+    // canvas.fillCircle(x_start + x_delta * n, 4, r, COLORS_LIGHT[n]);
+  }
 
   int y2 = 11;
-  canvas.fillCircle(x_start + x_delta * 0, y2, r, COLORS_DARK[0]);
-  canvas.fillCircle(x_start + x_delta * 1, y2, r, COLORS_DARK[1]);
-  canvas.fillCircle(x_start + x_delta * 2, y2, r, COLORS_DARK[2]);
-  canvas.fillCircle(x_start + x_delta * 3, y2, r, COLORS_DARK[3]);
-  canvas.fillCircle(x_start + x_delta * 4, y2, r, COLORS_DARK[4]);
-  canvas.fillCircle(x_start + x_delta * 5, y2, r, COLORS_DARK[5]);
-  canvas.fillCircle(x_start + x_delta * 6, y2, r, COLORS_DARK[6]);
-  canvas.fillCircle(x_start + x_delta * 7, y2, r, COLORS_DARK[7]);
-  canvas.fillCircle(x_start + x_delta * 8, y2, r, COLORS_DARK[8]);
-  canvas.fillCircle(x_start + x_delta * 9, y2, r, COLORS_DARK[9]);
-
+  for (int n = 0; n < 10; n++) {
+    // canvas.fillCircle(x_start + x_delta * n, y2, r, COLORS_DARK[n]);
+  }
 
   int y_start = 19;
   for (int pos = 0; pos < 4; pos++) {
@@ -259,7 +310,98 @@ void loop(void) {
     x_start += 39;
   }
 
-  show_time();
+  draw_cursor();
+}
+
+char input_text[128] = {};
+
+int keyboard_start_x = 3;
+int keyboard_start_y = 33;
+int keyboard_offset_x = 5;
+
+int _1_center_x = keyboard_start_x + 2;
+int _1_center_y = keyboard_start_y + 3;
+
+double keyboard_x_space = 12.0;
+double keyboard_y_space = 12.0;
+
+char keyboard[4][14] = {
+  {'`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', ' '},
+  {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'},
+  {'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', ' ', ' '},
+  {'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', ' ', ' ', ' '}
+};
+
+void handle_keyboard_click(int x, int y) {
+  // calculate y first so that offset is right
+  double y_delta_count = (y - _1_center_y) / keyboard_y_space;
+  double x_delta_count = (x - _1_center_x - y_delta_count * keyboard_offset_x /* x has some offset */) / keyboard_x_space;
+  int xx = int(x_delta_count + 0.5);
+  int yy = int(y_delta_count + 0.5);
+  char clicked_char = keyboard[yy][xx];
+  Serial.printf("debug: y=%lf, x=%lf, char: %c\r\n", y_delta_count, x_delta_count, clicked_char);
+  int len = strlen(input_text);
+  input_text[len] = clicked_char;
+  input_text[len + 1] = '\0';
+}
+
+void handle_other_area_click(int x, int y) {
+  if (x >= 111 && x <= 124 && y >= 16 && y <= 27) {
+    Serial.println("cl clicked");
+    input_text[0] = '\0';
+  }
+  if (x >= 126 && x <= 157 && y >= 16 && y <= 27) {
+    Serial.println("<- clicked");
+    int len = strlen(input_text);
+    input_text[len - 1] = '\0';
+  }
+}
+
+void page_keyboard() {
+  int input_start_x = 0;
+  canvas.drawRect(input_start_x, 15, 110, 13, 0xAAFFFFFF);
+  canvas.setTextColor(0xAAFFFFFF);
+  // print cl button
+  canvas.drawRect(input_start_x + 111, 15, 14, 13, 0xAAFFFFFF);
+  canvas.setCursor(input_start_x + 111 + 2, 15 + 2);
+  canvas.print("cl");
+  // print backspace button
+  canvas.drawRect(input_start_x + 112 + 14, 15, 32, 13, 0xAAFFFFFF);
+  canvas.setCursor(input_start_x + 112 + 14 + 2, 15 + 2);
+  canvas.print("<-");
+  // print input text
+  canvas.setCursor(input_start_x + 3, 18);
+  canvas.print(input_text);
+
+  canvas.setCursor(keyboard_start_x, keyboard_start_y);
+  canvas.print("` 1 2 3 4 5 6 7 8 9 0 - =");
+  canvas.setCursor(keyboard_start_x + keyboard_offset_x, keyboard_start_y + 12);
+  canvas.print("Q W E R T Y U I O P [ ] \\");
+  canvas.setCursor(keyboard_start_x + keyboard_offset_x * 2, keyboard_start_y + 24);
+  canvas.print("A S D F G H J K L ; '    ");
+  canvas.setCursor(keyboard_start_x + keyboard_offset_x * 3, keyboard_start_y + 36);
+  canvas.print("Z X C V B N M , . /      ");
+  canvas.setTextSize(1);
+  if (clicked_cursor_x >= 0 && clicked_cursor_y >= 0) {
+    if (clicked_cursor_y > 33) {
+      handle_keyboard_click(clicked_cursor_x, clicked_cursor_y);
+    } else {
+      handle_other_area_click(clicked_cursor_x, clicked_cursor_y);
+    }
+    clicked_cursor_x = clicked_cursor_y = -1;
+  }
+}
+
+void loop(void) {
+  canvas.fillScreen(0x00000000); // fill screen bg
+  draw_menu();
+  if (current_page == PAGE_CLOCK | current_page == PAGE_TIMER) {
+    page_1_2();
+  } else if (current_page == PAGE_KEYBOARD) {
+    page_keyboard();
+  }
+  draw_cursor();
+  // send frame then delay
   sendGRAM();
 
   loopTime = millis();
@@ -269,29 +411,30 @@ void loop(void) {
   // Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
   delay(25); // fps wrong fix
 
-  if (digitalRead(BUTTON_HOME) == 0) {
-    Serial.println("\r\nGoing to sleep now\r\n");
-    esp_deep_sleep_start();
-    Serial.println("This will never be printed");
-  }
-}
-
-void blink() //中断函数
-{
-  stateA = !stateA;
-  delay(10);
-  if (stateA) {
-    digitalWrite(LED_RI, HIGH);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else
-  {
-    digitalWrite(LED_RI, LOW);
-    digitalWrite(LED_BUILTIN, LOW);
-  }
+  //  if (digitalRead(BUTTON_HOME) == 0) {
+  //    Serial.println("\r\nGoing to sleep now\r\n");
+  //    esp_deep_sleep_start();
+  //    Serial.println("This will never be printed");
+  //  }
 
 }
 
+// 中断函数
+void home_isr() {
+  current_page++;
+  if (current_page > PAGE_COUNT - 1) {
+    current_page = 0;
+  }
+}
+
+// 中断函数
+void button_isr() {
+  Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
+  if (current_page == PAGE_KEYBOARD) {
+    clicked_cursor_x = cursorX;
+    clicked_cursor_y = cursorY;
+  }
+}
 
 void sendGRAM() {
   Lcd_pic(canvas.getBuffer(), GRAM_BUFFER_SIZE);
