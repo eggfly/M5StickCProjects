@@ -26,6 +26,9 @@
 
 PCF8563 rtc;
 
+#define SCREEN_WIDTH  160
+#define SCREEN_HEIGHT  80
+
 #define ST77XX_BLACK      0x000000
 #define ST77XX_WHITE      0xFFFFFF
 #define ST77XX_RED        0xFF0000
@@ -68,7 +71,6 @@ int BUTTON_HOME = 37;
 int BUTTON_PIN = 39;
 
 //int BUTTON_HOME = 34;
-//int BUTTON_PIN = 39;
 RTC_DATA_ATTR int bootCount = 0;
 
 void print_wakeup_reason() {
@@ -98,7 +100,6 @@ void show_time() {
   canvas.setTextColor(0xAAFFFFFF);
   canvas.print(buf);
 }
-
 
 void setup(void) {
   Wire.begin();
@@ -198,8 +199,9 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_CLOCK 0
 #define PAGE_TIMER 1
 #define PAGE_KEYBOARD 2
+#define PAGE_GAME 3
 
-#define PAGE_COUNT 3
+#define PAGE_COUNT 4
 
 int current_page = PAGE_CLOCK;
 
@@ -228,7 +230,6 @@ void draw_cursor() {
   } else if (cursorY > 79) {
     cursorY = 79;
   }
-  // Serial.printf("%ld,%ld\r\n", cursorX, cursorY);
   // draw cursor
   canvas.fillCircle(cursorX, cursorY, 1, ST77XX_WHITE);
 }
@@ -263,19 +264,6 @@ void page_1_2() {
   }
   startTime = loopTime;
 
-  //  canvas.drawPixel(159, 79, ST77XX_CYAN);
-  //  canvas.fillCircle(1, 11, 5, ST77XX_RED);
-  //  canvas.fillCircle(11, 1, 5, ST77XX_GREEN);
-  //  canvas.setCursor(0, 30);
-  //  canvas.setTextColor(0xAAFFFFFF);
-  //  canvas.setTextSize(1);
-  //  canvas.print("Bad");
-  //  canvas.setCursor(0, 40);
-  //  canvas.setTextSize(1);
-  //  canvas.print("Apple");
-
-  // canvas.drawRGBBitmap(0, 15, clock_data, VIDEO_WIDTH, VIDEO_HEIGHT);
-
   int x_start = 6;
   int x_delta = 7;
   int r = 2;
@@ -309,8 +297,6 @@ void page_1_2() {
     }
     x_start += 39;
   }
-
-  draw_cursor();
 }
 
 char input_text[128] = {};
@@ -353,7 +339,9 @@ void handle_other_area_click(int x, int y) {
   if (x >= 126 && x <= 157 && y >= 16 && y <= 27) {
     Serial.println("<- clicked");
     int len = strlen(input_text);
-    input_text[len - 1] = '\0';
+    if (len > 0) {
+      input_text[len - 1] = '\0';
+    }
   }
 }
 
@@ -392,15 +380,111 @@ void page_keyboard() {
   }
 }
 
+#define GAME_STATE_INIT     0
+#define GAME_STATE_PLAYING  1
+int game_state = GAME_STATE_INIT;
+
+#define STICK_STILL 0
+#define STICK_LEFT  1
+#define STICK_RIGHT 2
+
+int game_stick_state = STICK_STILL;
+
+#define STICK_LENGTH_SHORT   25
+#define STICK_LENGTH_NORMAL  40
+#define STICK_LENGTH_LONG    80
+
+#define STICK_START_Y  72
+#define STICK_HEIGHT    3
+int stick_length = STICK_LENGTH_NORMAL;
+
+#define BALL_R 2
+
+double stick_pos = 80.0;
+double ball_x = 80.0;
+double ball_y = STICK_START_Y - BALL_R * 2;
+double ball_speed_x = 2.0;
+double ball_speed_y = -2.0;
+
+void page_game() {
+  if (game_state == GAME_STATE_INIT) {
+    canvas.setTextSize(2);
+    canvas.setTextColor(0xAAFF8888);
+    canvas.setCursor(14, 18);
+    canvas.print("DxBall Game");
+    canvas.setCursor(18, 50);
+    canvas.setTextSize(1);
+    canvas.setTextColor(0xAAFFFFFF);
+    canvas.print("press button to start");
+    int arrow_center_x = 77;
+    canvas.drawFastVLine(arrow_center_x, 65, 5, 0xAAFFFFFF);
+    canvas.fillTriangle(arrow_center_x - 3, 70,
+                        arrow_center_x + 3, 70,
+                        arrow_center_x, 75, 0xAAFFFFFF);
+  } else if (game_state == GAME_STATE_PLAYING) {
+    // update stick position
+    if (game_stick_state == STICK_LEFT) {
+      stick_pos -= 4;
+    } else if (game_stick_state == STICK_RIGHT) {
+      stick_pos += 4;
+    }
+    ball_x += ball_speed_x;
+    ball_y += ball_speed_y;
+    if (ball_x <= BALL_R || ball_x >= SCREEN_WIDTH - BALL_R) {
+      ball_speed_x = -ball_speed_x;
+      Serial.printf("case 1: %lf\r\n", ball_speed_x);
+    } else if (ball_y <= BALL_R || ball_y >= STICK_START_Y - BALL_R) {
+      ball_speed_y = -ball_speed_y;
+      Serial.printf("case 2: %lf\r\n", ball_speed_y);
+    }
+    // update ball position
+    canvas.fillRect(stick_pos - stick_length / 2 , STICK_START_Y,
+                    stick_length, STICK_HEIGHT, 0xAAFF0000);
+    canvas.fillCircle(ball_x, ball_y, BALL_R, 0xAA00FF00);
+  }
+  if (digitalRead(BUTTON_HOME) == 0) {
+    // Serial.println("button 1 is down");
+    game_button1_pressed();
+  } else if (digitalRead(BUTTON_PIN) == 0) {
+    // Serial.println("button 2 is down");
+    game_button2_pressed();
+  } else {
+    game_no_button_pressed();
+  }
+}
+
+void game_button1_pressed() {
+  if (game_state == GAME_STATE_PLAYING) {
+    game_stick_state = STICK_LEFT;
+  }
+}
+
+void game_button2_pressed() {
+  if (game_state == GAME_STATE_INIT) {
+    game_state = GAME_STATE_PLAYING;
+  } else if (game_state == GAME_STATE_PLAYING) {
+    game_stick_state = STICK_RIGHT;
+  }
+}
+void game_no_button_pressed() {
+  if (game_state == GAME_STATE_PLAYING) {
+    game_stick_state = STICK_STILL;
+  }
+}
+
 void loop(void) {
   canvas.fillScreen(0x00000000); // fill screen bg
-  draw_menu();
   if (current_page == PAGE_CLOCK | current_page == PAGE_TIMER) {
+    draw_menu();
     page_1_2();
+    draw_cursor();
   } else if (current_page == PAGE_KEYBOARD) {
+    draw_menu();
     page_keyboard();
+    draw_cursor();
+  } else if (current_page == PAGE_GAME) {
+    page_game();
   }
-  draw_cursor();
   // send frame then delay
   sendGRAM();
 
@@ -410,29 +494,37 @@ void loop(void) {
   fps = 1000 / delta;
   // Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
   delay(25); // fps wrong fix
-
-  //  if (digitalRead(BUTTON_HOME) == 0) {
-  //    Serial.println("\r\nGoing to sleep now\r\n");
-  //    esp_deep_sleep_start();
-  //    Serial.println("This will never be printed");
-  //  }
-
 }
+
+unsigned long last_isr_time;
+#define ISR_DITHERING_TIME_MS 10
 
 // 中断函数
 void home_isr() {
-  current_page++;
-  if (current_page > PAGE_COUNT - 1) {
-    current_page = 0;
+  if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
+    return;
+  }
+  last_isr_time = millis();
+  if (current_page != PAGE_GAME) {
+    current_page++;
+    if (current_page > PAGE_COUNT - 1) {
+      current_page = 0;
+    }
   }
 }
 
 // 中断函数
 void button_isr() {
-  Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
-  if (current_page == PAGE_KEYBOARD) {
-    clicked_cursor_x = cursorX;
-    clicked_cursor_y = cursorY;
+  if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
+    return;
+  }
+  last_isr_time = millis();
+  if (current_page != PAGE_GAME) {
+    Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
+    if (current_page == PAGE_KEYBOARD) {
+      clicked_cursor_x = cursorX;
+      clicked_cursor_y = cursorY;
+    }
   }
 }
 
