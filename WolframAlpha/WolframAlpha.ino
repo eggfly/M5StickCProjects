@@ -165,19 +165,6 @@ static char hex_digit(unsigned char c) {
   return "01234567890ABCDEF"[c & 0x0F];
 }
 
-char *urlencode(char *dst, const char *src) {
-  char c, *d = dst;
-  while (c = *src++) {
-    if (strchr(specials, c)) {
-      *d++ = '%';
-      *d++ = hex_digit(c >> 4);
-      *d++ = hex_digit(c);
-    }
-    else *d++ = c;
-  }
-  return dst;
-}
-
 String urlencode(String str) {
   String encodedString = "";
   char c;
