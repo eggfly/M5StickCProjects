@@ -1,188 +1,223 @@
+
 #include <WiFi.h>
+#include <WiFiMulti.h>
 
-#include <SPI.h>
-#include <Wire.h>
+#include <HTTPClient.h>
+#include "power.h"
+#include "lcd.h"
 
-#include "src/Lcd_Driver.h"
+#define USE_SERIAL Serial
 
-#include "src/Adafruit_GFX/Adafruit_GFX.h"
-#include "src/Adafruit_GFX/ext_canvas.h"
-#include "src/Adafruit_GFX/config.h"
+#define WIFI_SSID "your_wifi"
+#define WIFI_PASSWORD "your_password"
 
-#define TFT_MOSI      15
-#define TFT_CLK       13
-#define TFT_CS        5   // Chip select line for TFT display on Shield
-#define TFT_DC        23  // Data/command line for TFT on Shield
-#define TFT_RST       18  // Reset line for TFT is handled by seesaw!
+int BUTTON_HOME = 37;
 
-GFXcanvas24 canvas = GFXcanvas24(LCD_WIDTH, LCD_HEIGHT);
+WiFiMulti wifiMulti;
 
-const char* ssid     = "MIWIFI8";
-const char* password = "12345678";
-
-const char* host = "www.baidu.com";
-
-
-#define VIDEO_WIDTH 104
-#define VIDEO_HEIGHT 78
-
-uint8_t _data[VIDEO_WIDTH * VIDEO_HEIGHT * 3];
-
-#define ST77XX_BLACK      0x000000
-#define ST77XX_WHITE      0xFFFFFF
-#define ST77XX_RED        0xFF0000
-#define ST77XX_GREEN      0x00FF00
-#define ST77XX_BLUE       0x0000FF
-#define ST77XX_CYAN       0x00FFFF
-#define ST77XX_MAGENTA    0xFF00FF
-#define ST77XX_YELLOW     0xFFFF00
-#define ST77XX_ORANGE     0xFFA500
+#define SCREEN_WIDTH   160
+#define SCREEN_HEIGHT   80
+#define IMAGE_MAX_SIZE  (SCREEN_WIDTH * SCREEN_HEIGHT * 3)
+uint8_t image_data[IMAGE_MAX_SIZE] = { 0 };
 
 void setup() {
-  Wire.begin();
-  Serial.begin(115200);
-  delay(10);
-
-  pinMode(TFT_MOSI, OUTPUT);
-  pinMode(TFT_CLK, OUTPUT);
-  pinMode(TFT_CS, OUTPUT);
-  pinMode(TFT_DC, OUTPUT);
-  pinMode(TFT_RST, OUTPUT);
-
-  digitalWrite(TFT_CS, LOW);
-
-  SPI.begin (TFT_CLK, -1, TFT_MOSI, -1);
-  SPI.beginTransaction(SPISettings(70000000, MSBFIRST, SPI_MODE0));
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x10);
-  Wire.write(0x9f);  //OLED_VPP Enable
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x28);
-  Wire.write(0x9f); //Enable LDO2&LDO3, LED&TFT 3.3V
-  // Wire.write(0xff); //Enable LDO2&LDO3, LED&TFT 3.3V
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x82);  //Enable all the ADCs
-  Wire.write(0xff);
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x33);  //Enable Charging, 100mA, 4.2V, End at 0.9
-  Wire.write(0xC0);
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x33);
-  Wire.write(0xC3);
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0xB8);  //Enable Colume Counter
-  Wire.write(0x80);
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x12);
-  Wire.write(0x4d); //Enable DC-DC1, OLED_VDD, 5B V_EXT
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x36);
-  Wire.write(0x5c); //PEK
-  Wire.endTransmission();
-
-  Lcd_Init();
-  canvas.setRotation(1);
-
-  canvas.fillScreen(0xAAFF0000); // fill screen bg
-  sendGRAM();
-
-  // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  WiFi.disconnect(true);  //disconnect form wifi to set new wifi connection
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  init_power();
+  lcd_init();
+  USE_SERIAL.begin(115200);
+  USE_SERIAL.println();
+  for (uint8_t t = 4; t > 0; t--) {
+    USE_SERIAL.printf("[SETUP] WAIT %d...\n", t);
+    USE_SERIAL.flush();
+    delay(1000);
   }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  int r = WiFi.disconnect(true);  //disconnect form wifi to set new wifi connection
+  wifiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
+  pinMode(BUTTON_HOME, INPUT | PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), home_isr, FALLING);
 }
 
-int value = 0;
-
-
+String query = "lim ((x+h)^5 - x^5)/h as h->0";
+// sin(x)dx
+// Poisson distribution
+// Xiaomi
+// plot 1+x-(x^2(1-sqrt(7)x^2)^2)^(1/3)
+// d^2(x*ln(x)+cos(x))/dx^2
+// C60
+// CO2
+// H2O
+// solve a x^2 + b x + c = 0 for x
+// solve x^2 + 4x + 6 = 0
+// integrate sin x dx from x=0 to pi
+// derivative of x^4 sin x
+// d/dx x^2 y^4, d/dy x^2 y^4
+// annulus, inner radius=2, outer radius=5  ----- 90
+// plot e^x from x=0 to 10 ---- 50
+// cone ---- 50
+// tetrahedron -- 90
+// platinum image -- 90
+// simplify x^5-20x^4+163x^3-676x^2+1424x-1209 --- 化简 100
+// int sinx/x dx, x=0..infinity -- 定积分 100
+// sphere, surface area=1 ----球 100
+// truncated icosahedron -- 截角二十面体 100
+// great rhombicosidodecahedron --- 大斜方截半二十面体 120
+// structure of aspirin -- 阿斯匹林结构 120
+// Structure diagram of H2SO4 -- 硫酸分子结构 120
+// 3d structure of H2SO4 -- 硫酸3D结构 120
+// 3d structure of benzene -- 苯3D结构 110
+// 3d structure of C60 -- 碳60的3D结构 100
+// 3d of insulin -- 胰岛素3D结构 100
+// H Periodic table location -- H元素 位置
+// Photo of Linkin Park -- Linkin Park照片
 void loop() {
-  ++value;
+  if (query.length() <= 0) {
+    USE_SERIAL.println("[Debug] waiting for query from serial..");
+    query = Serial.readStringUntil('\n');
+    query.trim();
+  } else {
+    USE_SERIAL.println("[Debug] Query: " + query);
+    USE_SERIAL.println("[HTTP] ENCODED " + urlencode(query));
+    // wait for WiFi connection
+    if ((wifiMulti.run() == WL_CONNECTED)) {
+      HTTPClient http;
+      USE_SERIAL.print("[HTTP] begin...\n");
 
-  delay(1000);
-  Serial.print("connecting to ");
-  Serial.println(host);
+      canvas.fillScreen(0xAAFFFFFF); // fill screen bg
+      sendGRAM();
+      String url = "http://music.kagura.space/watch/query/?t=" + String(millis()) + "&i=" + urlencode(query);
+      http.begin(url);
 
-  // Use WiFiClient class to create TCP connections
-  WiFiClient client;
-  const int httpPort = 80;
-  if (!client.connect(host, httpPort)) {
-    Serial.println("connection failed");
-    return;
-  }
+      USE_SERIAL.println("[HTTP] GET " + url);
+      // start connection and send HTTP header
+      unsigned long request_start_time = millis();
+      http.setTimeout(12 * 1000);
+      const char * headerKeys[] = {
+        "X-Image-Width", "X-Image-Height", "X-Image-X", "X-Image-Y", "X-Image-Title"
+      };
+      size_t headerKeySize = sizeof(headerKeys) / sizeof(char*);
+      http.collectHeaders(headerKeys, headerKeySize);
+      int httpCode = http.GET();
+      if (httpCode > 0) {
+        // HTTP header has been send and Server response header has been handled
+        USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
+        // file found at server
+        if (httpCode == HTTP_CODE_OK) {
+          for (int i = 0; i < http.headers(); i++) {
+            Serial.println(http.header(i));
+          }
+          const char * image_width_str = http.header("X-Image-Width").c_str();
+          int image_width = atoi(image_width_str);
+          const char * image_height_str = http.header("X-Image-Height").c_str();
+          int image_height = atoi(image_height_str);
+          const char * image_x_str = http.header("X-Image-X").c_str();
+          int image_x = atoi(image_x_str);
+          const char * image_y_str = http.header("X-Image-Y").c_str();
+          int image_y = atoi(image_y_str);
+          USE_SERIAL.printf("[Debug] width=%d, height=%d, x=%d, y=%d\n", image_width, image_height, image_x, image_y);
 
-  // We now create a URI for the request
-  String url = "/";
-
-  Serial.print("Requesting URL: ");
-  Serial.println(url);
-
-  // This will send the request to the server
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +
-               "Connection: close\r\n\r\n");
-  unsigned long timeout = millis();
-  while (client.available() == 0) {
-    if (millis() - timeout > 5000) {
-      Serial.println(">>> Client Timeout !");
-      client.stop();
-      return;
+          // get lenght of document (is -1 when Server sends no Content-Length header)
+          size_t len = http.getSize();
+          USE_SERIAL.printf("[HTTP] Content-Length: %d\n", len);
+          // create buffer for read
+          // get tcp stream
+          WiFiClient * stream = http.getStreamPtr();
+          // read all data from server
+          int total = 0;
+          while (http.connected() && (len > 0 || len == -1)) {
+            // get available data size
+            size_t available_size = stream->available();
+            if (available_size) {
+              USE_SERIAL.printf("[HTTP] total: %d, available_size: %d\n", total, available_size);
+              int c = stream->readBytes(image_data + total, min(len, available_size));
+              total += c;
+              if (len > 0) {
+                len -= c;
+              }
+            }
+            delay(1);
+          }
+          USE_SERIAL.println();
+          USE_SERIAL.print("[HTTP] connection closed or file end.\n");
+          unsigned long cost = millis() - request_start_time;
+          USE_SERIAL.printf("[HTTP] GET cost: %ld\n", cost);
+          // write buffer and send gram
+          canvas.fillScreen(0xAAFFFFFF); // fill screen bg
+          canvas.drawRGBBitmap(image_x, image_y, image_data, image_width, image_height);
+          sendGRAM();
+          query = "";
+        } else {
+          USE_SERIAL.println("[HTTP] Not 200, clear query");
+          query = "";
+        }
+      } else {
+        USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+      }
+      http.end();
+    } else {
+      USE_SERIAL.println("[LOOP] delay...");
+      delay(10 * 1000);
     }
   }
-  unsigned long total_bytes = 0;
-  unsigned long start_time = millis();
-  while (client.available()) {
-    int bytes = client.readBytes(_data, sizeof(_data));
-    canvas.drawRGBBitmap(30, 1, (uint8_t *)_data, VIDEO_WIDTH, VIDEO_HEIGHT);
-
-    canvas.fillCircle(1, 11, 5, ST77XX_RED);
-    canvas.fillCircle(11, 1, 5, ST77XX_GREEN);
-    canvas.setCursor(0, 30);
-    canvas.setTextColor(0xAAFFFFFF);
-    canvas.setTextSize(1);
-    canvas.print("Bad");
-    canvas.setCursor(0, 40);
-    canvas.setTextSize(1);
-    canvas.print("Apple");
-
-    sendGRAM();
-    total_bytes += bytes;
-    unsigned long current = millis();
-    Serial.printf("%d Bytes data read! total bytes: %ld, speed: %lf KB/s\n", bytes, total_bytes, total_bytes * 1000.0 / (current - start_time) / 1024.0);
-  }
-
-  Serial.println();
-  Serial.println("closing connection");
 }
 
+char specials[] = "$&+,/:;=?@ <>#%{}|\\^~[]`"; /* String containing chars you want encoded */
 
-void sendGRAM() {
-  Lcd_pic(canvas.getBuffer(), GRAM_BUFFER_SIZE);
+static char hex_digit(unsigned char c) {
+  return "01234567890ABCDEF"[c & 0x0F];
+}
+
+char *urlencode(char *dst, const char *src) {
+  char c, *d = dst;
+  while (c = *src++) {
+    if (strchr(specials, c)) {
+      *d++ = '%';
+      *d++ = hex_digit(c >> 4);
+      *d++ = hex_digit(c);
+    }
+    else *d++ = c;
+  }
+  return dst;
+}
+
+String urlencode(String str) {
+  String encodedString = "";
+  char c;
+  char code0;
+  char code1;
+  char code2;
+  for (int i = 0; i < str.length(); i++) {
+    c = str.charAt(i);
+    if (c == ' ') {
+      encodedString += '+';
+    } else if (!strchr(specials, c)) {
+      encodedString += c;
+    } else {
+      code1 = (c & 0xf) + '0';
+      if ((c & 0xf) > 9) {
+        code1 = (c & 0xf) - 10 + 'A';
+      }
+      c = (c >> 4) & 0xf;
+      code0 = c + '0';
+      if (c > 9) {
+        code0 = c - 10 + 'A';
+      }
+      code2 = '\0';
+      encodedString += '%';
+      encodedString += code0;
+      encodedString += code1;
+      //encodedString+=code2;
+    }
+    yield();
+  }
+  return encodedString;
+}
+
+unsigned long last_isr_time;
+#define ISR_DITHERING_TIME_MS 10
+
+// 中断函数
+void home_isr() {
+  if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
+    return;
+  }
+  last_isr_time = millis();
 }
