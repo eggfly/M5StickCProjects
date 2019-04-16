@@ -4,12 +4,15 @@
 #include "power.h"
 #include "lcd.h"
 #include "rtc.h"
+#include "math.h"
 
-#define calibration_x 15
+#define calibration_x 19
 #define calibration_y 0
 
 #define sensitivity_x 1.9
 #define sensitivity_y 1.2
+
+#define level_calibration_y 14
 
 
 #define SCREEN_WIDTH  160
@@ -74,6 +77,9 @@ void show_time() {
 }
 
 void setup(void) {
+  Serial.begin(115200);
+  while (!Serial);             // Leonardo: wait for serial monitor
+
   init_power();
   init_rtc();
   lcd_init();
@@ -87,9 +93,6 @@ void setup(void) {
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
   delay(10);
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-
-  Serial.begin(115200);
-  while (!Serial);             // Leonardo: wait for serial monitor
 
   ++bootCount;
   Serial.println("Boot number: " + String(bootCount));
@@ -133,7 +136,7 @@ void draw_cursor() {
   cursorY = 40 + calibration_y - sensitivity_y * average_accX / 50;
   if (cursorX < 0) {
     cursorX = 0;
-  } else  if (cursorX > 159) {
+  } else if (cursorX > 159) {
     cursorX = 159;
   }
   if (cursorY < 0) {
@@ -143,6 +146,44 @@ void draw_cursor() {
   }
   // draw cursor
   canvas.fillCircle(cursorX, cursorY, 1, ST77XX_WHITE);
+}
+
+
+void draw_level() {
+  int times = 1;
+  int average_accX = 0, average_accY = 0;
+  for (int i = 0; i < times; i++) {
+    read_imu();
+    average_accX += accX;
+    average_accY += accY;
+  }
+  average_accX /= times;
+  average_accY /= times;
+  cursorX = 80 + calibration_x - sensitivity_x * average_accY / 50;
+  cursorY = 40 + calibration_y + level_calibration_y - sensitivity_y * average_accX / 50;
+  if (cursorX < 0) {
+    cursorX = 0;
+  } else if (cursorX > 159) {
+    cursorX = 159;
+  }
+  if (cursorY < 0) {
+    cursorY = 0;
+  } else if (cursorY > 79) {
+    cursorY = 79;
+  }
+
+  // draw cursor
+  float r_percent = 0.9;
+  float r = min(SCREEN_HEIGHT, SCREEN_WIDTH) / 2 * r_percent;
+  int dx = cursorX - SCREEN_WIDTH / 2;
+  int dy = cursorY - SCREEN_HEIGHT / 2;
+  if (dx * dx + dy * dy > r * r) {
+    float scale = r / sqrt(dx * dx + dy * dy);
+    cursorX = SCREEN_WIDTH / 2 + dx * scale;
+    cursorY = SCREEN_HEIGHT / 2 + dy * scale;
+  }
+  canvas.drawCircle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, r, ST77XX_RED);
+  canvas.fillCircle(cursorX, cursorY, 4, ST77XX_GREEN);
 }
 
 void draw_menu() {
@@ -292,6 +333,7 @@ void page_keyboard() {
 }
 
 void page_electronic_level() {
+  draw_level();
 }
 
 #define GAME_STATE_INIT     0
