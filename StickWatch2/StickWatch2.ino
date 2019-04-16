@@ -1,22 +1,9 @@
-#include "src/Adafruit_GFX/Adafruit_GFX.h"
-#include "src/Adafruit_GFX/ext_canvas.h"
-#include "src/Adafruit_GFX/config.h"
-#include "src/image_data.h"
-
-// #include <stdio.h>
-// #include "esp_sleep.h"
-// #include "soc/rtc_cntl_reg.h"
-// #include "soc/rtc_io_reg.h"
-// #include "soc/sens_reg.h"
-// #include "soc/soc.h"
-// #include "driver/gpio.h"
-// #include "driver/rtc_io.h"
-// #include "esp32/ulp.h"
-
-#include "src/RTCLib/RTClib.h"
 
 #include "res.h"
 #include "imu.h"
+#include "power.h"
+#include "lcd.h"
+#include "rtc.h"
 
 #define calibration_x 15
 #define calibration_y 0
@@ -24,7 +11,6 @@
 #define sensitivity_x 1.9
 #define sensitivity_y 1.2
 
-PCF8563 rtc;
 
 #define SCREEN_WIDTH  160
 #define SCREEN_HEIGHT  80
@@ -47,19 +33,6 @@ const uint32_t COLORS_DARK[10] = {
   0x471f32, 0x002548, 0x3b004b, 0x3e1a2c, 0x4a000c,
   0x4a1e00, 0x4b4500, 0x004700, 0x022242, 0x380249
 };
-
-#include <Wire.h>
-
-#include <SPI.h>
-#include "src/Lcd_Driver.h"
-
-#define TFT_MOSI      15
-#define TFT_CLK       13
-#define TFT_CS        5   // Chip select line for TFT display on Shield
-#define TFT_DC        23  // Data/command line for TFT on Shield
-#define TFT_RST       18  // Reset line for TFT is handled by seesaw!
-
-GFXcanvas24 canvas = GFXcanvas24(LCD_WIDTH, LCD_HEIGHT);
 
 // End of constructor list
 
@@ -86,7 +59,6 @@ void print_wakeup_reason() {
   }
 }
 
-DateTime now;
 
 void show_time() {
   now = rtc.now();
@@ -102,14 +74,9 @@ void show_time() {
 }
 
 void setup(void) {
-  Wire.begin();
-  rtc.begin();
-  DateTime now = rtc.now();
-  if (now.year() < 2019) {
-    Serial.println("RTC need factory reset!");
-    // following line sets the RTC to the date & time this sketch was compiled
-    rtc.adjust(DateTime(__DATE__, __TIME__));
-  }
+  init_power();
+  init_rtc();
+  lcd_init();
 
   // pinMode(LED_RI, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -117,20 +84,9 @@ void setup(void) {
   pinMode(BUTTON_HOME, INPUT | PULLUP);
   pinMode(BUTTON_PIN, INPUT | PULLUP);
 
-  pinMode(TFT_MOSI, OUTPUT);
-  pinMode(TFT_CLK, OUTPUT);
-  pinMode(TFT_CS, OUTPUT);
-  pinMode(TFT_DC, OUTPUT);
-  pinMode(TFT_RST, OUTPUT);
-
-  digitalWrite(TFT_CS, LOW);
-
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
   delay(10);
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-
-  SPI.begin (TFT_CLK, -1, TFT_MOSI, -1);
-  SPI.beginTransaction(SPISettings(70000000, MSBFIRST, SPI_MODE0));
 
   Serial.begin(115200);
   while (!Serial);             // Leonardo: wait for serial monitor
@@ -142,56 +98,10 @@ void setup(void) {
   print_wakeup_reason();
   // esp_sleep_enable_ext0_wakeup(GPIO_NUM_39, 0);
 
-  Wire.beginTransmission(0x34);
-  Wire.write(0x10);
-  Wire.write(0x9f);  //OLED_VPP Enable
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x28);
-  Wire.write(0x9f); //Enable LDO2&LDO3, LED&TFT 3.3V
-  // Wire.write(0xff); //Enable LDO2&LDO3, LED&TFT 3.3V
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x82);  //Enable all the ADCs
-  Wire.write(0xff);
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x33);  //Enable Charging, 100mA, 4.2V, End at 0.9
-  Wire.write(0xC0);
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x33);
-  Wire.write(0xC3);
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0xB8);  //Enable Colume Counter
-  Wire.write(0x80);
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x12);
-  Wire.write(0x4d); //Enable DC-DC1, OLED_VDD, 5B V_EXT
-  Wire.endTransmission();
-
-  Wire.beginTransmission(0x34);
-  Wire.write(0x36);
-  Wire.write(0x5c); //PEK
-  Wire.endTransmission();
-
-  Lcd_Init();
-  // Lcd_Clear(WHITE); // TODO?
-  // Lcd_pic(gImage_001);
   attachInterrupt(digitalPinToInterrupt(BUTTON_HOME), home_isr, FALLING);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button_isr, FALLING);
-  canvas.setRotation(1);
 
   sh200i_init();
-  // runGraphicTest();
 }
 
 long loopTime, startTime, endTime, fps;
@@ -199,9 +109,10 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_CLOCK 0
 #define PAGE_TIMER 1
 #define PAGE_KEYBOARD 2
-#define PAGE_GAME 3
+#define PAGE_ELECTRONIC_LEVEL 3
+#define PAGE_GAME 4
 
-#define PAGE_COUNT 4
+#define PAGE_COUNT 5
 
 int current_page = PAGE_CLOCK;
 
@@ -380,6 +291,9 @@ void page_keyboard() {
   }
 }
 
+void page_electronic_level() {
+}
+
 #define GAME_STATE_INIT     0
 #define GAME_STATE_PLAYING  1
 int game_state = GAME_STATE_INIT;
@@ -466,6 +380,7 @@ void game_button2_pressed() {
     game_stick_state = STICK_RIGHT;
   }
 }
+
 void game_no_button_pressed() {
   if (game_state == GAME_STATE_PLAYING) {
     game_stick_state = STICK_STILL;
@@ -482,6 +397,8 @@ void loop(void) {
     draw_menu();
     page_keyboard();
     draw_cursor();
+  } else if (current_page == PAGE_ELECTRONIC_LEVEL) {
+    page_electronic_level();
   } else if (current_page == PAGE_GAME) {
     page_game();
   }
@@ -526,8 +443,4 @@ void button_isr() {
       clicked_cursor_y = cursorY;
     }
   }
-}
-
-void sendGRAM() {
-  Lcd_pic(canvas.getBuffer(), GRAM_BUFFER_SIZE);
 }
