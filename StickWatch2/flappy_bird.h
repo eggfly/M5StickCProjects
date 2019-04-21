@@ -1,11 +1,12 @@
+#ifndef _FLAPPY_BIRD_H
+#define _FLAPPY_BIRD_H
 
-#include "res.h"
-#include "imu.h"
-#include "power.h"
+#include "config.h"
 #include "lcd.h"
-#include "math.h"
 
-#include <EEPROM.h>
+#include <Preferences.h>
+
+Preferences preferences;
 
 #define TFTW            80     // screen width
 #define TFTH            160     // screen height
@@ -30,7 +31,7 @@
 // grass size
 #define GRASSH            6     // grass height (inside floor, starts at floor y)
 
-int maxScore = 0;
+unsigned int maxScore = 0;
 const int buttonPin = 2;
 // background
 const unsigned int BCKGRDCOL =  (138 << 16) + ( 235 << 8) + 244;
@@ -57,8 +58,6 @@ const unsigned int GRASSCOL2 =  (156 << 16) + ( 239 << 8) + 88;
 #define C4 ST77XX_RED
 #define C5 ((251<<16)+(216<<8)+114)
 
-int BUTTON_HOME = 37;
-
 static unsigned int birdcol[] =
 { C0, C0, C1, C1, C1, C1, C1, C0, C0, C0, C1, C1, C1, C1, C1, C0,
   C0, C1, C2, C2, C2, C1, C3, C1, C0, C1, C2, C2, C2, C1, C3, C1,
@@ -84,7 +83,7 @@ static struct PIPES {
 } pipes;
 
 // score
-int score;
+unsigned int score;
 // temporary x and y var
 static short tmpx, tmpy;
 
@@ -263,6 +262,23 @@ void game_loop() {
   delay(1200);
 }
 
+void game_init() {
+  // clear screen
+  canvas.fillScreen(BCKGRDCOL);
+  sendGRAM();
+  // reset score
+  score = 0;
+  // init bird
+  bird.x = 30;
+  bird.y = bird.old_y = TFTH2 - BIRDH;
+  bird.vel_y = -JUMP_FORCE;
+  tmpx = tmpy = 0;
+  // generate new random seed for the pipe gape
+  randomSeed(analogRead(0));
+  // init pipe
+  pipes.x = 0;
+  pipes.gap_y = random(20, TFTH - 60);
+}
 
 // ---------------
 // game start
@@ -297,43 +313,30 @@ void game_start() {
   game_init();
 }
 
-void game_init() {
-  // clear screen
-  canvas.fillScreen(BCKGRDCOL);
-  sendGRAM();
-  // reset score
-  score = 0;
-  // init bird
-  bird.x = 30;
-  bird.y = bird.old_y = TFTH2 - BIRDH;
-  bird.vel_y = -JUMP_FORCE;
-  tmpx = tmpy = 0;
-  // generate new random seed for the pipe gape
-  randomSeed(analogRead(0));
-  // init pipe
-  pipes.x = 0;
-  pipes.gap_y = random(20, TFTH - 60);
+void EEPROM_Read(unsigned int *num) {
+  *num = preferences.getUInt("max_score", 0);
+  Serial.printf("read eeprom, value: %d\n", *num);
 }
 
+void EEPROM_Write(unsigned int *num) {
+  preferences.putUInt("max_score", *num);
+  Serial.printf("write eeprom, value: %d\n",  *num);
+}
 
 // ---------------
 // game over
 // ---------------
 void game_over() {
   canvas.fillScreen(ST77XX_BLACK);
-  EEPROM_Read(&maxScore, 0);
-
-  if (score > maxScore)
-  {
-    EEPROM_Write(&score, 0);
+  EEPROM_Read(&maxScore);
+  canvas.setTextColor(ST77XX_RED);
+  if (score > maxScore) {
+    EEPROM_Write(&score);
     maxScore = score;
-    canvas.setTextColor(ST77XX_RED);
     canvas.setTextSize(1);
     canvas.setCursor( 0, TFTH2 - 16);
     canvas.print("NEW HIGHSCORE");
   }
-
-  canvas.fillScreen(ST77XX_WHITE);
   canvas.setTextSize(1);
   // half width - num char * char width in pixels
   canvas.setCursor( TFTW2 - 25, TFTH2 - 6);
@@ -347,6 +350,7 @@ void game_over() {
   canvas.setCursor( 1, 21);
   canvas.print("Max Score:");
   canvas.print(maxScore);
+
   sendGRAM();
   while (1) {
     // wait for push button
@@ -355,54 +359,27 @@ void game_over() {
       break;
     }
   }
+  Serial.printf("game_over 8\n");
 }
 
-void resetMaxScore()
-{
-  EEPROM_Write(&maxScore, 0);
+void readMaxScore() {
+  EEPROM_Read(&maxScore);
+  Serial.printf("max score before: %d\n", maxScore);
 }
 
-
-
-void EEPROM_Write(int *num, int MemPos)
-{
-  byte ByteArray[2];
-  memcpy(ByteArray, num, 2);
-  for (int x = 0; x < 2; x++)
-  {
-    EEPROM.write((MemPos * 2) + x, ByteArray[x]);
+void flappy_bird_dead_loop() {
+  while (1) {
+    game_start();
+    game_loop();
+    game_over();
   }
 }
 
-
-
-void EEPROM_Read(int *num, int MemPos)
-{
-  byte ByteArray[2];
-  for (int x = 0; x < 2; x++)
-  {
-    ByteArray[x] = EEPROM.read((MemPos * 2) + x);
-  }
-  memcpy(num, ByteArray, 2);
-}
-
-
-void setup() {
-  Serial.begin(115200);
-  while (!Serial);             // Leonardo: wait for serial monitor
-
-  init_power();
-  lcd_init();
+void page_flappy_bird() {
   canvas.setRotation(2);
-
-  // put your setup code here, to run once:
-  pinMode(BUTTON_HOME, INPUT);
-  resetMaxScore();
+  preferences.begin("flappy-bird", false);
+  readMaxScore();
+  flappy_bird_dead_loop();
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  game_start();
-  game_loop();
-  game_over();
-}
+#endif // _FLAPPY_BIRD_H

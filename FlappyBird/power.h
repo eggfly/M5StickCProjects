@@ -19,7 +19,7 @@ void init_power() {
   Serial.println(conf.div);
   rtc_clk_cpu_freq_set_config(&conf);
 #else
-  // rtc_clk_cpu_freq_set(RTC_CPU_FREQ_80M);
+  rtc_clk_cpu_freq_set(RTC_CPU_FREQ_80M);
 #endif
   Wire.begin();
 

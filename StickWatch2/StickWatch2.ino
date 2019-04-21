@@ -1,10 +1,12 @@
 
+#include "config.h"
 #include "res.h"
 #include "imu.h"
 #include "power.h"
 #include "lcd.h"
 #include "rtc.h"
 #include "math.h"
+#include "flappy_bird.h"
 
 #define calibration_x 19
 #define calibration_y 0
@@ -15,23 +17,11 @@
 #define level_calibration_y 14
 
 
-#define SCREEN_WIDTH  160
-#define SCREEN_HEIGHT  80
-
-#define ST77XX_BLACK      0x000000
-#define ST77XX_WHITE      0xFFFFFF
-#define ST77XX_RED        0xFF0000
-#define ST77XX_GREEN      0x00FF00
-#define ST77XX_BLUE       0x0000FF
-#define ST77XX_CYAN       0x00FFFF
-#define ST77XX_MAGENTA    0xFF00FF
-#define ST77XX_YELLOW     0xFFFF00
-#define ST77XX_ORANGE     0xFFA500
-
 const uint32_t COLORS_LIGHT[10] = {
   0xff4aad, 0x0e88fe, 0xcc03fc, 0xfe49ad, 0xff0505,
   0xfa660d, 0xfff800, 0x14fa00, 0x0496ff, 0xc900ff
 };
+
 const uint32_t COLORS_DARK[10] = {
   0x471f32, 0x002548, 0x3b004b, 0x3e1a2c, 0x4a000c,
   0x4a1e00, 0x4b4500, 0x004700, 0x022242, 0x380249
@@ -40,11 +30,6 @@ const uint32_t COLORS_DARK[10] = {
 // End of constructor list
 
 int stateA = 0;
-
-// int LED_RI = 9;
-int LED_BUILTIN = 10;
-int BUTTON_HOME = 37;
-int BUTTON_PIN = 39;
 
 //int BUTTON_HOME = 34;
 RTC_DATA_ATTR int bootCount = 0;
@@ -113,7 +98,7 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_TIMER 1
 #define PAGE_KEYBOARD 2
 #define PAGE_ELECTRONIC_LEVEL 3
-#define PAGE_GAME 4
+#define PAGE_FLAPPY_BIRD 4
 
 #define PAGE_COUNT 5
 
@@ -362,7 +347,7 @@ double ball_y = STICK_START_Y - BALL_R * 2;
 double ball_speed_x = 2.0;
 double ball_speed_y = -2.0;
 
-void page_game() {
+void page_game_old() {
   if (game_state == GAME_STATE_INIT) {
     canvas.setTextSize(2);
     canvas.setTextColor(0xAAFF8888);
@@ -441,8 +426,8 @@ void loop(void) {
     draw_cursor();
   } else if (current_page == PAGE_ELECTRONIC_LEVEL) {
     page_electronic_level();
-  } else if (current_page == PAGE_GAME) {
-    page_game();
+  } else if (current_page == PAGE_FLAPPY_BIRD) {
+    page_flappy_bird();
   }
   // send frame then delay
   sendGRAM();
@@ -464,7 +449,7 @@ void home_isr() {
     return;
   }
   last_isr_time = millis();
-  if (current_page != PAGE_GAME) {
+  if (current_page != PAGE_FLAPPY_BIRD) {
     current_page++;
     if (current_page > PAGE_COUNT - 1) {
       current_page = 0;
@@ -478,7 +463,7 @@ void button_isr() {
     return;
   }
   last_isr_time = millis();
-  if (current_page != PAGE_GAME) {
+  if (current_page != PAGE_FLAPPY_BIRD) {
     Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
     if (current_page == PAGE_KEYBOARD) {
       clicked_cursor_x = cursorX;
