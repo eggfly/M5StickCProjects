@@ -3,6 +3,7 @@
 #include "res.h"
 #include "imu.h"
 #include "power.h"
+#include "axp.h"
 #include "lcd.h"
 #include "rtc.h"
 #include "math.h"
@@ -70,6 +71,7 @@ void setup(void) {
   init_rtc();
   lcd_init();
 
+  axp_print_power();
   // pinMode(LED_RI, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
 
