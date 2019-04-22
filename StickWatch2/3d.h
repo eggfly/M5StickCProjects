@@ -1,9 +1,5 @@
-//code by bitluni (send me a high five if you like the code)
-
-//#define SKULL
-//#define LOGO
-//#define VENUS
-#define DRAGON
+#ifndef _3D_H
+#define _3D_H
 
 #include "3d/Matrix.h"
 #include "3d/CompositeGraphics.h"
@@ -18,11 +14,6 @@
 
 #include "3d/font6x8.h"
 
-#include "power.h"
-#include "lcd.h"
-
-//PAL MAX, half: 324x268 full: 648x536
-//NTSC MAX, half: 324x224 full: 648x448
 const int XRES = 160;
 const int YRES = 80;
 
@@ -43,43 +34,14 @@ Image<CompositeGraphics> image(lablogo::xres, lablogo::yres, lablogo::pixels);
 
 Font<CompositeGraphics> font(6, 8, font6x8::pixels);
 
-#include <soc/rtc.h>
-
 int color = 0xAAFFFFFF;
-void setup()
-{
-  Serial.begin(115200);
-  //highest clockspeed needed
-  // rtc_clk_cpu_freq_set(RTC_CPU_FREQ_240M);
-
-  init_power();
-  lcd_init();
+void init_3d() {
   canvas.fillScreen(color); // fill screen bg
   sendGRAM();
-
-  //initializing DMA buffers and I2S
-  // composite.init();
   //initializing graphics double buffer
   graphics.init();
   //select font
   graphics.setFont(font);
-
-  //running composite output pinned to first core
-  //xTaskCreatePinnedToCore(compositeCore, "vsync", 1024, NULL, 1, NULL, 0);
-  //rendering the actual graphics in the main loop is done on second core by default
-}
-
-void compositeCore(void *data)
-{
-  while (true)
-  {
-    // just send the graphics frontbuffer whithout any interruption
-    // composite.sendFrameHalfResolution(&graphics.frame);
-    color++;
-    // canvas.fillScreen(color); // fill screen bg
-    sendGRAM();
-    vTaskDelay(1);
-  }
 }
 
 void drawSkull()
@@ -157,6 +119,8 @@ void draw() {
   delay(2);
 }
 
-void loop() {
+void page_3d() {
   draw();
 }
+
+#endif // _3D_H

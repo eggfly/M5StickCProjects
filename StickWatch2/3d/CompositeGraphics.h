@@ -1,7 +1,7 @@
 #pragma once
 #include "Font.h"
 #include "TriangleTree.h"
-#include "lcd.h"
+#include "../lcd.h"
 
 class CompositeGraphics
 {

@@ -6,6 +6,7 @@
 #include "lcd.h"
 #include "rtc.h"
 #include "math.h"
+#include "3d.h"
 #include "flappy_bird.h"
 
 #define calibration_x 19
@@ -98,9 +99,10 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_TIMER 1
 #define PAGE_KEYBOARD 2
 #define PAGE_ELECTRONIC_LEVEL 3
-#define PAGE_FLAPPY_BIRD 4
+#define PAGE_3D 4
+#define PAGE_FLAPPY_BIRD 5
 
-#define PAGE_COUNT 5
+#define PAGE_COUNT 6
 
 int current_page = PAGE_CLOCK;
 
@@ -414,30 +416,44 @@ void game_no_button_pressed() {
   }
 }
 
+boolean _3d_inited = false;
+
 void loop(void) {
   canvas.fillScreen(0x00000000); // fill screen bg
   if (current_page == PAGE_CLOCK | current_page == PAGE_TIMER) {
     draw_menu();
     page_1_2();
     draw_cursor();
+    // send frame then delay
+    sendGRAM();
+    delay(25); // fps wrong fix
   } else if (current_page == PAGE_KEYBOARD) {
     draw_menu();
     page_keyboard();
     draw_cursor();
+    // send frame then delay
+    sendGRAM();
+    delay(25); // fps wrong fix
   } else if (current_page == PAGE_ELECTRONIC_LEVEL) {
     page_electronic_level();
+    // send frame then delay
+    sendGRAM();
+    delay(25); // fps wrong fix
+  } else if (current_page == PAGE_3D) {
+    if (!_3d_inited) {
+      init_3d();
+      _3d_inited = true;
+    }
+    page_3d();
   } else if (current_page == PAGE_FLAPPY_BIRD) {
     page_flappy_bird();
   }
-  // send frame then delay
-  sendGRAM();
 
   loopTime = millis();
   endTime = loopTime;
   unsigned long delta = endTime - startTime;
   fps = 1000 / delta;
   // Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
-  delay(25); // fps wrong fix
 }
 
 unsigned long last_isr_time;
