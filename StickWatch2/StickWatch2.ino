@@ -3,6 +3,7 @@
 #include "res.h"
 #include "imu.h"
 #include "power.h"
+#include "battery.h"
 #include "axp.h"
 #include "lcd.h"
 #include "rtc.h"
@@ -101,10 +102,11 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_TIMER 1
 #define PAGE_KEYBOARD 2
 #define PAGE_ELECTRONIC_LEVEL 3
-#define PAGE_3D 4
-#define PAGE_FLAPPY_BIRD 5
+#define PAGE_AXP_INFO 4
+#define PAGE_3D 5
+#define PAGE_FLAPPY_BIRD 6
 
-#define PAGE_COUNT 6
+#define PAGE_COUNT 7
 
 int current_page = PAGE_CLOCK;
 
@@ -422,10 +424,12 @@ boolean _3d_inited = false;
 
 void loop(void) {
   canvas.fillScreen(0x00000000); // fill screen bg
+  check_update_battery();
   if (current_page == PAGE_CLOCK | current_page == PAGE_TIMER) {
     draw_menu();
     page_1_2();
     draw_cursor();
+    draw_battery_percent();
     // send frame then delay
     sendGRAM();
     delay(25); // fps wrong fix
@@ -433,11 +437,18 @@ void loop(void) {
     draw_menu();
     page_keyboard();
     draw_cursor();
+    draw_battery_percent();
     // send frame then delay
     sendGRAM();
     delay(25); // fps wrong fix
   } else if (current_page == PAGE_ELECTRONIC_LEVEL) {
     page_electronic_level();
+    draw_battery_percent();
+    // send frame then delay
+    sendGRAM();
+    delay(25); // fps wrong fix
+  } else if (current_page == PAGE_AXP_INFO) {
+    page_axp_info();
     // send frame then delay
     sendGRAM();
     delay(25); // fps wrong fix
