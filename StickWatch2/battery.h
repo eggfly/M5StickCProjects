@@ -82,37 +82,38 @@ void page_axp_info() {
   canvas.setTextSize(1);
   canvas.setTextColor(0xAAFFFFFF);
 
-  int start_y = 12;
+  int start_y = 13;
   int delta_y = 9;
-  canvas.setCursor(5, start_y);
+  int start_x = 4;
+  canvas.setCursor(start_x, start_y);
   canvas.print("vbat=");
   canvas.print(d.vbat_v, 3);
   canvas.print("V");
 
-  canvas.setCursor(5, start_y + delta_y);
+  canvas.setCursor(start_x, start_y + delta_y);
   canvas.print("chg=");
   canvas.print(d.icharge_ma);
   canvas.print("mA");
 
-  canvas.setCursor(5, start_y + delta_y * 2);
+  canvas.setCursor(start_x, start_y + delta_y * 2);
   canvas.print("dis=");
   canvas.print(d.idischarge_ma);
   canvas.print("mA");
 
-  canvas.setCursor(5, start_y + delta_y * 3);
+  canvas.setCursor(start_x, start_y + delta_y * 3);
   canvas.print("watt=");
   canvas.print(d.bat_mw, 1);
   canvas.print("mW");
 
-  canvas.setCursor(5, start_y + delta_y * 4);
+  canvas.setCursor(start_x, start_y + delta_y * 4);
   canvas.print("coin=");
   canvas.print(d.coin);
 
-  canvas.setCursor(5, start_y + delta_y * 5);
+  canvas.setCursor(start_x, start_y + delta_y * 5);
   canvas.print("coout=");
   canvas.print(d.coout);
 
-  canvas.setCursor(5, start_y + delta_y * 6);
+  canvas.setCursor(start_x, start_y + delta_y * 6);
   canvas.print("ccc=");
   canvas.print(d.ccc, 2);
 
