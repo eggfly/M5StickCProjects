@@ -74,7 +74,7 @@ void page_axp_info() {
 
   canvas.setTextSize(1);
   canvas.setTextColor(0xAAFF0000);
-  canvas.setCursor(30, 1);
+  canvas.setCursor(40, 2);
   canvas.print("Battery Info");
 
   draw_battery_percent();
@@ -84,7 +84,7 @@ void page_axp_info() {
 
   int start_y = 13;
   int delta_y = 9;
-  int start_x = 4;
+  int start_x = 5;
   canvas.setCursor(start_x, start_y);
   canvas.print("vbat=");
   canvas.print(d.vbat_v, 3);
