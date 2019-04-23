@@ -10,10 +10,11 @@ DateTime now;
 void init_rtc() {
   rtc.begin();
   DateTime now = rtc.now();
-  if (now.year() < 2019) {
+  // following line sets the RTC to the date & time this sketch was compiled
+  DateTime compileTime = DateTime(__DATE__, __TIME__);
+  if (now < compileTime) {
     Serial.println("RTC need factory reset!");
-    // following line sets the RTC to the date & time this sketch was compiled
-    rtc.adjust(DateTime(__DATE__, __TIME__));
+    rtc.adjust(compileTime);
   }
 }
 
