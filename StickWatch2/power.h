@@ -63,6 +63,21 @@ void init_power() {
   Wire.write(0x36);
   Wire.write(0x5c); //PEK
   Wire.endTransmission();
+
+  Wire.beginTransmission(0x34);
+  Wire.write(0x90);
+  Wire.write(0x02); //gpio0
+  Wire.endTransmission();
+  /*
+    Wire1.beginTransmission(0x34);
+    Wire1.write(0x91);
+    Wire1.write(0xFF); //gpio0
+    Wire1.endTransmission();
+  */
+  Wire.beginTransmission(0x34);
+  Wire.write(0x31);
+  Wire.write(0x04);          //3.0v
+  Wire.endTransmission();
 }
 
 #endif // _POWER_H

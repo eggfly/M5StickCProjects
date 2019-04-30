@@ -1,3 +1,4 @@
+
 #include "config.h"
 #include "power.h"
 #include "lcd.h"
@@ -79,9 +80,11 @@ void loop() {
     for (int i = 1; i < min(160, SAMPLES >> 1); i++) {
       double value = vReal[i] / 80;
       canvas.drawPixel(i, 78 - int(value), ST77XX_GREEN);
-      // Serial.println(value, 4);
+      Serial.print(value, 1);
+      Serial.print(",");
       // display.drawLine(i * 2 + x, ylim, i * 2 + x, ylim - dat, WHITE); // draw bar graphics for freqs above 500Hz to buffer
     };
+    Serial.println();
     sendGRAM();
     //Serial.print("---- show in screen, bytes=");
     //Serial.println(bytes);
