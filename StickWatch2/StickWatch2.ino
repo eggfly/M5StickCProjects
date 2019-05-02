@@ -10,6 +10,7 @@
 #include "rtc.h"
 #include "math.h"
 #include "3d.h"
+#include "microphone_fft.h"
 #include "flappy_bird.h"
 
 #include <string.h>
@@ -26,7 +27,6 @@
 #define sensitivity_y 1.2
 
 #define level_calibration_y 14
-
 
 const uint32_t COLORS_LIGHT[10] = {
   0xff4aad, 0x0e88fe, 0xcc03fc, 0xfe49ad, 0xff0505,
@@ -211,15 +211,16 @@ void setup(void) {
 
 long loopTime, startTime, endTime, fps;
 
-#define PAGE_CLOCK 0
-#define PAGE_TIMER 1
-#define PAGE_KEYBOARD 2
-#define PAGE_ELECTRONIC_LEVEL 3
-#define PAGE_AXP_INFO 4
-#define PAGE_3D 5
-#define PAGE_FLAPPY_BIRD 6
+#define PAGE_CLOCK              0
+#define PAGE_TIMER              1
+#define PAGE_KEYBOARD           2
+#define PAGE_ELECTRONIC_LEVEL   3
+#define PAGE_AXP_INFO           4
+#define PAGE_3D                 5
+#define PAGE_MICROPHONE         6
+#define PAGE_FLAPPY_BIRD        7
 
-#define PAGE_COUNT 7
+#define PAGE_COUNT              8
 
 int current_page = PAGE_CLOCK;
 
@@ -571,6 +572,9 @@ void loop(void) {
       _3d_inited = true;
     }
     page_3d();
+  } else if (current_page == PAGE_MICROPHONE) {
+    fft_check_init();
+    page_fft();
   } else if (current_page == PAGE_FLAPPY_BIRD) {
     page_flappy_bird();
   }
