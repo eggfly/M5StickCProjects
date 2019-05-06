@@ -120,4 +120,11 @@ void axp_print_power() {
                 d.ccc);
 }
 
+void axp_backlight(uint8_t brightness){ // input value between 7 - 16
+    Wire.beginTransmission(AXP192_ADDR);
+    Wire.write(0x28);  
+    Wire.write(((brightness & 0x0f) << 4)); //Enable LDO2&LDO3, LED&TFT 3.3V
+    Wire.endTransmission();
+}
+
 #endif // _AXP_H
