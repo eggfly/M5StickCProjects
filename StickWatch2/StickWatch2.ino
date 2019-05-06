@@ -58,19 +58,22 @@ void print_wakeup_reason() {
   }
 }
 
+long last_rtc_update_time = 0;
 
 void show_time() {
-  now = rtc.now();
-  now.hour();
+  if (millis() - last_rtc_update_time > 1000) {
+    last_rtc_update_time = millis();
+    now = rtc.now();
+  }
   char buf[100];
   strncpy(buf, "YYYY.MM.DD hh:mm:ss\0", 100);
   now.format(buf);
-  // Serial.printf("time now: %s\n", buf);
 
   canvas.setCursor(28, 70);
   canvas.setTextColor(0xAAFFFFFF);
   canvas.print(buf);
 }
+
 // Get the string name of type enum values used in this example
 static const char* get_type_str(esp_partition_type_t type)
 {
