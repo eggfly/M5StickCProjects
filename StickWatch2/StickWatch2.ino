@@ -212,6 +212,8 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button_isr, FALLING);
 
   sh200i_init();
+  
+  axp_backlight(8); // Set screen brightness to low - save battery
 }
 
 long loopTime, startTime, endTime, fps;
@@ -565,7 +567,10 @@ void loop() {
     draw_battery_percent();
     // send frame then delay
     sendGRAM();
-    delay(25); // fps wrong fix
+    //delay(25); // fps wrong fix
+    esp_sleep_enable_timer_wakeup(1000000);
+    esp_deep_sleep_start();
+    //esp_light_sleep_start(); // light sleep for 1 second lowers current from 45ma to 10ma
   } else if (current_page == PAGE_KEYBOARD) {
     draw_menu();
     page_keyboard();
