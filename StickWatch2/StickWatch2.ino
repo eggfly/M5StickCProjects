@@ -618,12 +618,12 @@ void home_isr() {
   }
   feed_battery_warning();
   last_isr_time = millis();
-  //if (current_page != PAGE_FLAPPY_BIRD) {
+  if (current_page != PAGE_FLAPPY_BIRD) {
     current_page++;
     if (current_page > PAGE_COUNT - 1) {
       current_page = 0;
     }
-  //}
+  }
 }
 
 // 中断函数

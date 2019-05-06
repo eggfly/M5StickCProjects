@@ -33,7 +33,7 @@ Preferences preferences;
 #define GRASSH            6     // grass height (inside floor, starts at floor y)
 
 unsigned int maxScore = 0;
-//const int buttonPin = 2; //not used anymore
+const int buttonPin = 2;
 // background
 const unsigned int BCKGRDCOL =  (138 << 16) + ( 235 << 8) + 244;
 // bird
@@ -130,7 +130,7 @@ void game_loop() {
   while (1) {
     loops = 0;
     while ( millis() > next_game_tick && loops < MAX_FRAMESKIP) {
-      if (digitalRead(BUTTON_PIN) == LOW) {
+      if (digitalRead(BUTTON_HOME) == LOW) {
         if (bird.y > BIRDH2 * 0.5) bird.vel_y = -JUMP_FORCE;
         // else zero velocity
         else bird.vel_y = 0;
@@ -300,12 +300,12 @@ void game_start() {
   canvas.setCursor( 15, TFTH2 - 21);
   canvas.println("M5StickC");
   canvas.setCursor( TFTW2 - 40, TFTH2 + 21);
-  canvas.println("please press side button");
+  canvas.println("please press home");
   sendGRAM();
   while (1) {
     // wait for push button
-    if (digitalRead(BUTTON_PIN) == LOW) {
-      while (digitalRead(BUTTON_PIN) == LOW);
+    if (digitalRead(BUTTON_HOME) == LOW) {
+      while (digitalRead(BUTTON_HOME) == LOW);
       break;
     }
 
@@ -347,7 +347,7 @@ void game_over() {
   canvas.print("score: ");
   canvas.print(score);
   canvas.setCursor( 5, TFTH2 + 6);
-  canvas.println("please press side button");
+  canvas.print("press button");
   canvas.setCursor( 1, 21);
   canvas.print("Max Score:");
   canvas.print(maxScore);
@@ -356,8 +356,8 @@ void game_over() {
   while (1) {
     check_battery_warning_and_escape();
     // wait for push button
-    if (digitalRead(BUTTON_PIN) == LOW) {
-      while (digitalRead(BUTTON_PIN) == LOW);
+    if (digitalRead(BUTTON_HOME) == LOW) {
+      while (digitalRead(BUTTON_HOME) == LOW);
       break;
     }
   }
@@ -381,11 +381,7 @@ void page_flappy_bird() {
   canvas.setRotation(2);
   preferences.begin("flappy-bird", false);
   readMaxScore();
-  //flappy_bird_dead_loop();
-  game_start();
-  game_loop();
-  game_over();
-  canvas.setRotation(1); // set back to original rotation
+  flappy_bird_dead_loop();
 }
 
 #endif // _FLAPPY_BIRD_H
