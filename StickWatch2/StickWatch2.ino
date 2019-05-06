@@ -210,6 +210,8 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), button_isr, FALLING);
 
   sh200i_init();
+  
+  axp_backlight(8); // Set screen brightness to low - save battery
 }
 
 long loopTime, startTime, endTime, fps;
