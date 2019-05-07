@@ -5,6 +5,8 @@
 #define SCREEN_WIDTH  160
 #define SCREEN_HEIGHT  80
 
+// #define APP_DEBUG
+
 // int LED_RI = 9;
 int LED_BUILTIN = 10;
 int BUTTON_HOME = 37;
