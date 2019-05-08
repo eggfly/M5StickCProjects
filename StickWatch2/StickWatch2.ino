@@ -539,9 +539,20 @@ void game_no_button_pressed() {
 
 boolean _3d_inited = false;
 
+uint8_t lcd_brightness = LCD_DEFAULT_BRIGHTNESS;
+boolean lcd_brightness_changed = false;
+
+void check_lcd_brightness_change() {
+  if (lcd_brightness_changed) {
+    lcd_set_brightness(lcd_brightness);
+    lcd_brightness_changed = false;
+  }
+}
+
 void loop(void) {
   canvas.fillScreen(0x00000000); // fill screen bg
   check_update_battery();
+  check_lcd_brightness_change();
   if (current_page == PAGE_CLOCK || current_page == PAGE_TIMER) {
     draw_menu();
     page_1_2();
@@ -612,11 +623,16 @@ void button_isr() {
     return;
   }
   last_isr_time = millis();
-  if (current_page != PAGE_FLAPPY_BIRD) {
+  if (current_page == PAGE_KEYBOARD) {
     Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
-    if (current_page == PAGE_KEYBOARD) {
-      clicked_cursor_x = cursorX;
-      clicked_cursor_y = cursorY;
+    clicked_cursor_x = cursorX;
+    clicked_cursor_y = cursorY;
+  } else {
+    lcd_brightness++;
+    if (lcd_brightness > LCD_MAX_BRIGHTNESS) {
+      lcd_brightness = LCD_MIN_BRIGHTNESS;
     }
+    Serial.printf("lcd_set_brightness=%d\r\n", lcd_brightness);
+    lcd_brightness_changed = true;
   }
 }

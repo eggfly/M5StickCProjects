@@ -40,6 +40,13 @@ void lcd_init() {
   canvas.setRotation(1);
 }
 
+void lcd_set_brightness(uint8_t brightness) {
+  Wire.beginTransmission(0x34);
+  Wire.write(0x28);
+  Wire.write(((brightness & 0x0f) << 4));
+  Wire.endTransmission();
+}
+
 void sendGRAM() {
   Lcd_pic(canvas.getBuffer(), GRAM_BUFFER_SIZE);
 }

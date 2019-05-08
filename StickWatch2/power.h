@@ -3,6 +3,8 @@
 
 #include "soc/rtc.h"
 #include <Wire.h>
+#include "config.h"
+#include "lcd.h"
 
 // #define LOW_CPU_FREQ
 
@@ -28,11 +30,11 @@ void init_power() {
   Wire.write(0x9f);  //OLED_VPP Enable
   Wire.endTransmission();
 
-  Wire.beginTransmission(0x34);
-  Wire.write(0x28);
-  Wire.write(0x9f); //Enable LDO2&LDO3, LED&TFT 3.3V
-  // Wire.write(0xff); //Enable LDO2&LDO3, LED&TFT 3.3V
-  Wire.endTransmission();
+  lcd_set_brightness(LCD_DEFAULT_BRIGHTNESS);
+  //  Wire.beginTransmission(0x34);
+  //  Wire.write(0x28);
+  //  Wire.write(0xff); //Enable LDO2&LDO3, LED&TFT 3.3V
+  //  Wire.endTransmission();
 
   Wire.beginTransmission(0x34);
   Wire.write(0x82);  //Enable all the ADCs
@@ -40,8 +42,8 @@ void init_power() {
   Wire.endTransmission();
 
   Wire.beginTransmission(0x34);
-  Wire.write(0x33);  //Enable Charging, 100mA, 4.2V, End at 0.9
-  Wire.write(0xC0);
+  Wire.write(0x33);  // Enable Charging, 100mA, 4.2V, End at 0.9
+  Wire.write(0xC8);  // 780mA
   Wire.endTransmission();
 
   Wire.beginTransmission(0x34);
