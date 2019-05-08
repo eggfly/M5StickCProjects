@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "lcd.h"
+#include "warning.h"
 
 #include <Preferences.h>
 
@@ -353,6 +354,7 @@ void game_over() {
 
   sendGRAM();
   while (1) {
+    check_battery_warning_and_escape();
     // wait for push button
     if (digitalRead(BUTTON_HOME) == LOW) {
       while (digitalRead(BUTTON_HOME) == LOW);

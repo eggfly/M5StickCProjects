@@ -12,6 +12,7 @@
 #include "3d.h"
 #include "microphone_fft.h"
 #include "flappy_bird.h"
+#include "warning.h"
 
 #include <string.h>
 #include <assert.h>
@@ -549,7 +550,7 @@ void check_lcd_brightness_change() {
   }
 }
 
-void loop(void) {
+void loop() {
   canvas.fillScreen(0x00000000); // fill screen bg
   check_update_battery();
   check_lcd_brightness_change();
@@ -598,6 +599,7 @@ void loop(void) {
   unsigned long delta = endTime - startTime;
   fps = 1000 / delta;
   // Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
+  check_battery_warning_and_escape();
 }
 
 unsigned long last_isr_time;
@@ -608,6 +610,7 @@ void home_isr() {
   if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
     return;
   }
+  feed_battery_warning();
   last_isr_time = millis();
   if (current_page != PAGE_FLAPPY_BIRD) {
     current_page++;
@@ -622,6 +625,7 @@ void button_isr() {
   if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
     return;
   }
+  feed_battery_warning();
   last_isr_time = millis();
   if (current_page == PAGE_KEYBOARD) {
     Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
