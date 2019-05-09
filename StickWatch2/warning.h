@@ -3,6 +3,8 @@
 
 #include "lcd.h"
 
+#define INACTIVE_TIMEOUT_SECONDS (10 * 60)
+
 long last_button_active_time = -1;
 
 long last_axp_update_time = 0;
@@ -36,7 +38,7 @@ void check_battery_warning_and_escape() {
     // init time
     last_button_active_time = millis();
   }
-  while (!is_usb_plugged_in && millis() - last_button_active_time > 60 * 1000) {
+  while (!is_usb_plugged_in && millis() - last_button_active_time > INACTIVE_TIMEOUT_SECONDS * 1000) {
     canvas.fillScreen(ST77XX_RED);
     canvas.setTextColor(ST77XX_BLACK);
     draw_warning();
