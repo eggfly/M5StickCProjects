@@ -23,6 +23,7 @@
 #define ST77XX_MAGENTA    0xFF00FF
 #define ST77XX_YELLOW     0xFFFF00
 #define ST77XX_ORANGE     0xFFA500
+#define ST77XX_GRAY       0x808080
 
 GFXcanvas24 canvas = GFXcanvas24(LCD_WIDTH, LCD_HEIGHT);
 
