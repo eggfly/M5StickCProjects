@@ -11,6 +11,7 @@
 #include "math.h"
 #include "3d.h"
 #include "microphone_fft.h"
+#include "maze.h"
 #include "flappy_bird.h"
 #include "warning.h"
 
@@ -222,9 +223,10 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_AXP_INFO           4
 #define PAGE_3D                 5
 #define PAGE_MICROPHONE         6
-#define PAGE_FLAPPY_BIRD        7
+#define PAGE_MAZE               7
+#define PAGE_FLAPPY_BIRD        8
 
-#define PAGE_COUNT              8
+#define PAGE_COUNT              9
 
 int current_page = PAGE_CLOCK;
 
@@ -234,8 +236,9 @@ int clicked_cursor_x = -1, clicked_cursor_y = -1;
 void draw_cursor() {
   int times = 1;
   int average_accX = 0, average_accY = 0;
+  int16_t accX = 0, accY = 0;
   for (int i = 0; i < times; i++) {
-    read_imu();
+    read_imu(&accX, &accY);
     average_accX += accX;
     average_accY += accY;
   }
@@ -261,8 +264,9 @@ void draw_cursor() {
 void draw_level() {
   int times = 1;
   int average_accX = 0, average_accY = 0;
+  int16_t accX = 0, accY = 0;
   for (int i = 0; i < times; i++) {
-    read_imu();
+    read_imu(&accX, &accY);
     average_accX += accX;
     average_accY += accY;
   }
@@ -590,6 +594,8 @@ void loop() {
   } else if (current_page == PAGE_MICROPHONE) {
     fft_check_init();
     page_fft();
+  } else if (current_page == PAGE_MAZE) {
+    page_maze();
   } else if (current_page == PAGE_FLAPPY_BIRD) {
     page_flappy_bird();
   }

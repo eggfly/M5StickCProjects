@@ -153,22 +153,18 @@ void sh200i_init(void) {
   delay(10);
 }
 
-
-int16_t accX = 0;
-int16_t accY = 0;
-
-void read_imu(void) {
+void read_imu(int16_t *accX, int16_t *accY) {
   unsigned char tempdata[1];
   I2C_Read_NBytes(SH200I_ADDRESS, SH200I_OUTPUT_ACC_X, 1, tempdata);
-  accX = tempdata[0];
+  *accX = tempdata[0];
   I2C_Read_NBytes(SH200I_ADDRESS, SH200I_OUTPUT_ACC_X + 1, 1, tempdata);
-  accX |= tempdata[0] << 8;
+  *accX |= tempdata[0] << 8;
 
 
   I2C_Read_NBytes(SH200I_ADDRESS, SH200I_OUTPUT_ACC_X + 2, 1, tempdata);
-  accY = tempdata[0];
+  *accY = tempdata[0];
   I2C_Read_NBytes(SH200I_ADDRESS, SH200I_OUTPUT_ACC_X + 3, 1, tempdata);
-  accY |= tempdata[0] << 8;
+  *accY |= tempdata[0] << 8;
 
   // Serial.printf("%ld,%ld\r\n", accX, accY);
 }
