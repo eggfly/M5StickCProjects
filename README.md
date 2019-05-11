@@ -7,15 +7,16 @@
 * tools: 一些工具
 * StickWatch2AdafruitGRAM: BadApple串口接收端代码（BadApple切图打包下载：链接：https://pan.baidu.com/s/1W5UOgj8KgGAxLwByfdQRkw 提取码：49pz）
 * python: 一些python脚本，包括BadApple串口发送端代码（Python3+pyserial）
+* Binary firmware - See https://github.com/eggfly/StickWatch2Binary
 
 ## 图形库
 一些项目中的src/Adafruit_GFX目录，是我对Adafruit_GFX进行了一些修改后，对80x160彩屏适配的GFX的18位的图形库，经过测试基本上fps可以达到50到60fps，人眼观察完全无闪烁。思路是把所有绘图操作通过canvas进行，canvas是在esp32内存中开辟的一块GRAM，然后SPI把GRAM数据传输到ST7735驱动芯片。
 
-Done:
-# Binary firmware - See https://github.com/eggfly/StickWatch2Binary
 
 TODO:
-# Dump ways to die
-# 见缝插针
+* Dump ways to die
+* 见缝插针
+* 喷水套圈
+* 摩天大楼
 
 link: https://item.taobao.com/item.htm?id=588710395351
