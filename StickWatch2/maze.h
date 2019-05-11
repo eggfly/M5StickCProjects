@@ -145,7 +145,7 @@ void find_nearest_walls(double x, double y, double *left, double *right, double 
       r = w.x;
     }
   }
-  Serial.printf("(%.2f, %.2f)'s nearest walls: l=%.2f, r=%.2f, t=%.2f, b=%.2f\r\n", x, y, l, r, t, b);
+  // Serial.printf("(%.2f, %.2f)'s nearest walls: l=%.2f, r=%.2f, t=%.2f, b=%.2f\r\n", x, y, l, r, t, b);
   // assign result values
   *left = l;
   *right = r;

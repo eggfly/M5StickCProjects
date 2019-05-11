@@ -11,11 +11,11 @@ PCF8563 rtc;
 // adjust 1980 -> 2088
 // adjust 1990 -> 2098
 // adjust 1991 -> 2099
-// adjust 1992 -> 2000 年整
+// adjust 1992 -> 2000
 // adjust 1993 -> 2001
 // adjust 1999 -> 2007
 // adjust 2078 -> 2078
-// adjust 2100 -> 2000 年整
+// adjust 2100 -> 2000
 
 DateTime now;
 
