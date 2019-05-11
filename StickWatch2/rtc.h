@@ -2,6 +2,8 @@
 #define _RTC_H
 
 #include "src/RTCLib/RTClib.h"
+#include "config.h"
+#include <time.h>
 
 PCF8563 rtc;
 
@@ -17,13 +19,23 @@ PCF8563 rtc;
 
 DateTime now;
 
-boolean is_greater_than(DateTime& thiz, DateTime &that) {
-  return thiz.year() > that.year() ||
-         thiz.month() > that.month() ||
-         thiz.day() > that.day() ||
-         thiz.hour() > that.hour() ||
-         thiz.minute() > that.minute() ||
-         thiz.second() > that.second();
+time_t unix_time(DateTime& t) {
+  char buf[100];
+  strncpy(buf, "YYYY-MM-DD hh:mm:ss\0", sizeof(buf));
+  t.format(buf);
+  struct tm tm;
+  time_t epoch;
+  if (strptime(buf, "%Y-%m-%d %H:%M:%S", &tm) != NULL ) {
+    epoch = mktime(&tm);
+#ifdef APP_DEBUG
+    Serial.print("unix timestamp value: ");
+    Serial.println(epoch);
+#endif
+    return epoch;
+  } else {
+    Serial.println("time convert error");
+    return 0;
+  }
 }
 
 void init_rtc() {
@@ -35,9 +47,7 @@ void init_rtc() {
   Serial.print(__DATE__);
   Serial.print(" ");
   Serial.println(__TIME__);
-  Serial.print("compileTime.unixtime() = ");
-  Serial.println(compileTime.unixtime());
-  if (is_greater_than(compileTime, now)) {
+  if (unix_time(now) < unix_time(compileTime)) {
     Serial.println("now < compileTime, RTC need factory reset!");
     rtc.adjust(compileTime);
   } else {

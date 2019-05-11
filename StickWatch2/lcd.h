@@ -23,6 +23,7 @@
 #define ST77XX_MAGENTA    0xFF00FF
 #define ST77XX_YELLOW     0xFFFF00
 #define ST77XX_ORANGE     0xFFA500
+#define ST77XX_GRAY       0x808080
 
 GFXcanvas24 canvas = GFXcanvas24(LCD_WIDTH, LCD_HEIGHT);
 
@@ -38,6 +39,13 @@ void lcd_init() {
   SPI.beginTransaction(SPISettings(70000000, MSBFIRST, SPI_MODE0));
   Lcd_Init();
   canvas.setRotation(1);
+}
+
+void lcd_set_brightness(uint8_t brightness) {
+  Wire.beginTransmission(0x34);
+  Wire.write(0x28);
+  Wire.write(((brightness & 0x0f) << 4));
+  Wire.endTransmission();
 }
 
 void sendGRAM() {

@@ -11,7 +11,9 @@
 #include "math.h"
 #include "3d.h"
 #include "microphone_fft.h"
+#include "maze.h"
 #include "flappy_bird.h"
+#include "warning.h"
 
 #include <string.h>
 #include <assert.h>
@@ -223,9 +225,10 @@ long loopTime, startTime, endTime, fps;
 #define PAGE_AXP_INFO           4
 #define PAGE_3D                 5
 #define PAGE_MICROPHONE         6
-#define PAGE_FLAPPY_BIRD        7
+#define PAGE_MAZE               7
+#define PAGE_FLAPPY_BIRD        8
 
-#define PAGE_COUNT              8
+#define PAGE_COUNT              9
 
 int current_page = PAGE_CLOCK;
 
@@ -235,8 +238,9 @@ int clicked_cursor_x = -1, clicked_cursor_y = -1;
 void draw_cursor() {
   int times = 1;
   int average_accX = 0, average_accY = 0;
+  int16_t accX = 0, accY = 0;
   for (int i = 0; i < times; i++) {
-    read_imu();
+    read_imu(&accX, &accY);
     average_accX += accX;
     average_accY += accY;
   }
@@ -262,8 +266,9 @@ void draw_cursor() {
 void draw_level() {
   int times = 1;
   int average_accX = 0, average_accY = 0;
+  int16_t accX = 0, accY = 0;
   for (int i = 0; i < times; i++) {
-    read_imu();
+    read_imu(&accX, &accY);
     average_accX += accX;
     average_accY += accY;
   }
@@ -541,9 +546,20 @@ void game_no_button_pressed() {
 
 boolean _3d_inited = false;
 
-void loop(void) {
+uint8_t lcd_brightness = LCD_DEFAULT_BRIGHTNESS;
+boolean lcd_brightness_changed = false;
+
+void check_lcd_brightness_change() {
+  if (lcd_brightness_changed) {
+    lcd_set_brightness(lcd_brightness);
+    lcd_brightness_changed = false;
+  }
+}
+
+void loop() {
   canvas.fillScreen(0x00000000); // fill screen bg
   check_update_battery();
+  check_lcd_brightness_change();
   if (current_page == PAGE_CLOCK || current_page == PAGE_TIMER) {
     draw_menu();
     page_1_2();
@@ -554,6 +570,7 @@ void loop(void) {
     //delay(25); // fps wrong fix
     esp_sleep_enable_timer_wakeup(1000000);
     esp_light_sleep_start(); // light sleep for 1 second lowers current from 45ma to 10ma
+    // esp_deep_sleep_start();
   } else if (current_page == PAGE_KEYBOARD) {
     draw_menu();
     page_keyboard();
@@ -582,6 +599,8 @@ void loop(void) {
   } else if (current_page == PAGE_MICROPHONE) {
     fft_check_init();
     page_fft();
+  } else if (current_page == PAGE_MAZE) {
+    page_maze();
   } else if (current_page == PAGE_FLAPPY_BIRD) {
     page_flappy_bird();
   }
@@ -591,6 +610,7 @@ void loop(void) {
   unsigned long delta = endTime - startTime;
   fps = 1000 / delta;
   // Serial.printf("fill+draw+send GRAM cost: %ldms, calc fps:%ld, real fps:%ld\r\n", delta, fps, fps > 60 ? 60 : fps);
+  check_battery_warning_and_escape();
 }
 
 unsigned long last_isr_time;
@@ -601,6 +621,7 @@ void home_isr() {
   if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
     return;
   }
+  feed_battery_warning();
   last_isr_time = millis();
   //if (current_page != PAGE_FLAPPY_BIRD) {
     current_page++;
@@ -615,12 +636,18 @@ void button_isr() {
   if (millis() - last_isr_time < ISR_DITHERING_TIME_MS) {
     return;
   }
+  feed_battery_warning();
   last_isr_time = millis();
-  if (current_page != PAGE_FLAPPY_BIRD) {
+  if (current_page == PAGE_KEYBOARD) {
     Serial.printf("cursorX=%d, cursorY=%d\r\n", cursorX, cursorY);
-    if (current_page == PAGE_KEYBOARD) {
-      clicked_cursor_x = cursorX;
-      clicked_cursor_y = cursorY;
+    clicked_cursor_x = cursorX;
+    clicked_cursor_y = cursorY;
+  } else {
+    lcd_brightness++;
+    if (lcd_brightness > LCD_MAX_BRIGHTNESS) {
+      lcd_brightness = LCD_MIN_BRIGHTNESS;
     }
+    Serial.printf("lcd_set_brightness=%d\r\n", lcd_brightness);
+    lcd_brightness_changed = true;
   }
 }
