@@ -569,8 +569,8 @@ void loop() {
     sendGRAM();
     //delay(25); // fps wrong fix
     esp_sleep_enable_timer_wakeup(1000000);
-    esp_deep_sleep_start();
-    //esp_light_sleep_start(); // light sleep for 1 second lowers current from 45ma to 10ma
+    esp_light_sleep_start(); // light sleep for 1 second lowers current from 45ma to 10ma
+    // esp_deep_sleep_start();
   } else if (current_page == PAGE_KEYBOARD) {
     draw_menu();
     page_keyboard();
