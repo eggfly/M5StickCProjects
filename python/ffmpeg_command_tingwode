@@ -1,0 +1,2 @@
+ffmpeg -i tingwode.flv -vf fps=10 tingwode/out%d.png
+
