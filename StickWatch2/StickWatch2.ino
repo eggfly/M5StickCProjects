@@ -180,6 +180,9 @@ void dump_partitions() {
   ESP_LOGI(TAG, "Example end");
 }
 
+void home_isr();
+void button_isr();
+
 void setup(void) {
   Serial.begin(115200);
   while (!Serial);             // Leonardo: wait for serial monitor
@@ -474,6 +477,10 @@ double ball_x = 80.0;
 double ball_y = STICK_START_Y - BALL_R * 2;
 double ball_speed_x = 2.0;
 double ball_speed_y = -2.0;
+
+void game_no_button_pressed();
+void game_button1_pressed();
+void game_button2_pressed();
 
 void page_game_old() {
   if (game_state == GAME_STATE_INIT) {
